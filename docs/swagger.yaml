@@ -1,0 +1,490 @@
+definitions:
+  handler.signInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.Case:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.CaseItem'
+        type: array
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  model.CaseItem:
+    properties:
+      case_id:
+        type: integer
+      item:
+        $ref: '#/definitions/model.Item'
+      item_id:
+        type: integer
+      weight:
+        type: integer
+    type: object
+  model.Item:
+    properties:
+      name:
+        type: string
+      price:
+        type: integer
+      rarity:
+        type: integer
+    type: object
+  model.ItemWithID:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      rarity:
+        type: integer
+    type: object
+  model.User:
+    properties:
+      balance:
+        type: number
+      email:
+        type: string
+      is_active:
+        type: boolean
+      is_admin:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/model.UserItem'
+        type: array
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.UserItem:
+    properties:
+      item:
+        $ref: '#/definitions/model.Item'
+      item_id:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  schema.CaseInput:
+    properties:
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  schema.CaseItemInput:
+    properties:
+      item_id:
+        type: integer
+      weight:
+        type: integer
+    type: object
+  schema.InputUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  schema.ShowUser:
+    properties:
+      balance:
+        type: number
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Залогиниться
+      operationId: signIn
+      parameters:
+      - description: Credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создать нового пользвателя
+      operationId: signUp
+      parameters:
+      - description: User data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/schema.InputUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: SignUp
+      tags:
+      - auth
+  /auth/update:
+    patch:
+      consumes:
+      - application/json
+      description: Обновить инфу о юзере
+      operationId: updateUser
+      parameters:
+      - description: ID юзера
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updates
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: UserInfo
+          schema:
+            $ref: '#/definitions/schema.ShowUser'
+        "400":
+          description: error
+          schema: {}
+        "500":
+          description: error
+          schema: {}
+      summary: UpdateUser
+      tags:
+      - auth
+  /case/add-items:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет элементы в указанный кейс
+      operationId: addItemsToCase
+      parameters:
+      - description: ID кейса
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Элементы для добавления
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/schema.CaseItemInput'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленный кейс
+          schema:
+            $ref: '#/definitions/model.Case'
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Добавляет элементы в кейс
+      tags:
+      - cases
+  /case/create:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый кейс на основе переданных данных
+      operationId: createCase
+      parameters:
+      - description: Данные для создания кейса
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/schema.CaseInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно созданный кейс
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Создает новый кейс
+      tags:
+      - cases
+  /case/get-case:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию о кейсе по его ID
+      operationId: getCase
+      parameters:
+      - description: ID кейса
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о кейсе
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получает информацию о кейсе
+      tags:
+      - cases
+  /item/create:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый элемент на основе переданных данных
+      operationId: createItem
+      parameters:
+      - description: Данные для создания элемента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно созданный элемент
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Создает новый элемент
+      tags:
+      - items
+  /item/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет элемент по его ID
+      operationId: deleteItem
+      parameters:
+      - description: ID элемента
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Идентификатор удаленного элемента
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Удаляет элемент
+      tags:
+      - items
+  /item/get-all-items:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию обо всех элементах
+      operationId: getAllItems
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация обо всех элементах
+          schema:
+            items:
+              $ref: '#/definitions/model.ItemWithID'
+            type: array
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получает информацию обо всех элементах
+      tags:
+      - items
+  /item/get-item:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию об элементе по его ID
+      operationId: getItem
+      parameters:
+      - description: ID элемента
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация об элементе
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получает информацию об элементе
+      tags:
+      - items
+  /item/update:
+    patch:
+      consumes:
+      - application/json
+      description: Обновляет информацию об элементе
+      operationId: updateItem
+      parameters:
+      - description: Данные для обновления элемента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.ItemWithID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленный элемент
+          schema:
+            $ref: '#/definitions/model.ItemWithID'
+        "400":
+          description: Ошибка в запросе
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Обновляет информацию об элементе
+      tags:
+      - items
+swagger: "2.0"
