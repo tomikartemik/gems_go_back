@@ -35,7 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://api.youngrusssia.ru"}, // Укажите домены, которым разрешен доступ
+		AllowOrigins:     []string{"https://brawl-alpha.vercel.app"}, // Укажите домены, которым разрешен доступ
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
