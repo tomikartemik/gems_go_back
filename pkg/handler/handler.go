@@ -46,7 +46,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	auth := router.Group("/auth")
+	auth := router.Group("/user")
 	{
 		auth.POST("/sign-in", h.signIn)
 		auth.POST("/sign-up", h.signUp)
@@ -69,7 +69,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.GET("/get-all-cases", h.getAllCases)
 		cases.PUT("/update", h.updateCase)
 		cases.DELETE("/delete", h.deleteCase)
-		cases.GET("/open", h.openCase)
+	}
+
+	games := router.Group("/games", h.userIdentity)
+	{
+		games.GET("/open", h.openCase)
 	}
 	return router
 }

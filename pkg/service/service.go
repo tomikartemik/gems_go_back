@@ -13,6 +13,7 @@ type User interface {
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
 	AddItemToInventory(userId string, itemId int) (schema.ShowUser, error)
+	SignIn(email string, password string) (schema.UserWithItems, error)
 }
 
 type Item interface {

@@ -115,6 +115,22 @@ func (s *AuthService) AddItemToInventory(userId string, itemId int) (schema.Show
 	return userWithInventory, nil
 }
 
+func (s *AuthService) SignIn(email string, password string) (schema.UserWithItems, error) {
+	var userWithItems schema.UserWithItems
+	var user schema.ShowUser
+
+	user, err := s.repo.SignIn(email, generatePasswordHash(password))
+	if err != nil {
+		return userWithItems, err
+	}
+
+	userWithItems, err = s.GetUserById(user.ID)
+	if err != nil {
+		return userWithItems, err
+	}
+	return userWithItems, nil
+}
+
 func generatePasswordHash(password string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))

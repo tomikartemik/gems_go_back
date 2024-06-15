@@ -28,5 +28,5 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 	}
-	c.Set(userCtx, userId)
+	c.Set("user_id", userId)
 }
