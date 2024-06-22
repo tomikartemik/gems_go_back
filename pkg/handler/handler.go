@@ -34,7 +34,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://brawl-alpha.vercel.app"}, // Укажите домены, которым разрешен доступ
+		AllowOrigins:     []string{"http://localhost:3000", "https://brawl-alpha.vercel.app", "ws://api.youngrusssia.ru", "ws://api.youngrusssia.ru"}, // Укажите домены, которым разрешен доступ
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With", "Content-Type", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -51,7 +51,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-in", h.signIn)
 		auth.POST("/sign-up", h.signUp)
 		auth.PATCH("/update", h.updateUser)
-		auth.GET("user", h.getUserById)
+		auth.GET("/user", h.getUserById)
 	}
 
 	item := router.Group("/item")
