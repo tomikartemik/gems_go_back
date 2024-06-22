@@ -10,6 +10,7 @@ type Repository struct {
 	User
 	Item
 	Case
+	Crash
 }
 
 type User interface {
@@ -41,10 +42,15 @@ type Case interface {
 	GetChosenItem(id int) (model.ItemWithID, error)
 }
 
+type Crash interface {
+	EchoMSG(msg string) string
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		NewUserPostgres(db),
 		NewItemPostgres(db),
 		NewCasePostgres(db),
+		NewCrashPostgres(db),
 	}
 }

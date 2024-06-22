@@ -4,6 +4,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"gems_go_back/pkg/schema"
+	"github.com/gorilla/websocket"
 )
 
 type User interface {
@@ -34,16 +35,23 @@ type Case interface {
 	OpenCase(caseId int) (model.ItemWithID, error)
 }
 
+type Crash interface {
+	EditConns(ws *websocket.Conn)
+	BroadcastTime()
+}
+
 type Service struct {
 	User
 	Item
 	Case
+	Crash
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User: NewAuthService(repos.User),
-		Item: NewItemService(repos.Item),
-		Case: NewCaseService(repos.Case),
+		User:  NewAuthService(repos.User),
+		Item:  NewItemService(repos.Item),
+		Case:  NewCaseService(repos.Case),
+		Crash: NewCrashService(repos.Crash),
 	}
 }
