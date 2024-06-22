@@ -3,9 +3,11 @@ package handler
 import (
 	"gems_go_back/docs"
 	"gems_go_back/pkg/service"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"time"
 )
 
 type Handler struct {
@@ -32,14 +34,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router := gin.New()
 
-	//router.Use(cors.New(cors.Config{
-	//	AllowOrigins:     []string{"http://localhost:8080"}, // Укажите домены, которым разрешен доступ
-	//	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-	//	AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-	//	ExposeHeaders:    []string{"Content-Length"},
-	//	AllowCredentials: true,
-	//	MaxAge:           12 * time.Hour,
-	//}))
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://brawl-alpha.vercel.app"}, // Укажите домены, которым разрешен доступ
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
