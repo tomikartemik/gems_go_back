@@ -26,13 +26,16 @@ type Responce struct {
 	Status          string  `json:"status"`
 	Multiplier      float64 `json:"multiplier"`
 	TimeBeforeStart float64 `json:"time_before_start"`
+	Length          float64 `json:"length"`
+	Rotate          float64 `json:"rotate"`
 }
 
-var respone = Responce{"Crashed", 1.0, 10.0}
+var respone = Responce{"Crashed", 1.0, 10.0, 0.0, 0.0}
 var clients = make(map[*Client]bool)
 var clientsMutex = &sync.Mutex{}
 var winMultiplier = 0.0
 var u = 0.0
+var delta = 0.0
 
 var stepen = math.Pow(2.0, 52.0)
 
@@ -63,7 +66,8 @@ func (s *CrashService) BroadcastTime() {
 }
 
 func startPreparing() {
-	respone.TimeBeforeStart = 1.0
+	respone.Length = 0.0
+	respone.Rotate = 0.0
 	respone.Status = "Pending"
 	u = rand.Float64() * (stepen)
 	winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
@@ -98,7 +102,12 @@ func game() {
 		time.Sleep(10 * time.Millisecond)
 		//respone.Multiplier = respone.Multiplier * 1.0004
 		respone.Multiplier = math.Round(respone.Multiplier*10003) / 10000
-
+		if respone.Length < 100.0 {
+			respone.Length += 0.4
+		} else if respone.Rotate < 19.5 {
+			respone.Length += 0.0026
+			respone.Rotate += 0.0065
+		}
 		clientsMutex.Lock()
 		for client := range clients {
 			err := client.conn.WriteJSON(respone)
@@ -115,7 +124,9 @@ func game() {
 
 func end() {
 	respone.Status = "Crashed"
+	delta = respone.Rotate / 300.0
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
+		respone.Rotate -= delta
 		time.Sleep(10 * time.Millisecond)
 		clientsMutex.Lock()
 		for client := range clients {
