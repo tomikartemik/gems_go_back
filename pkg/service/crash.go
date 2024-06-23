@@ -29,9 +29,12 @@ type Responce struct {
 }
 
 var respone = Responce{"Crashed", 1.0, 10.0}
-
 var clients = make(map[*Client]bool)
 var clientsMutex = &sync.Mutex{}
+var winMultiplier = 0.0
+var u = 0.0
+
+var stepen = math.Pow(2.0, 52.0)
 
 func (s *CrashService) EditConns(conn *websocket.Conn) {
 
@@ -62,6 +65,8 @@ func (s *CrashService) BroadcastTime() {
 func startPreparing() {
 	respone.TimeBeforeStart = 1.0
 	respone.Status = "Pending"
+	u = rand.Float64() * (stepen)
+	winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
 	preparing()
 }
 func preparing() {
@@ -89,14 +94,10 @@ func startGame() {
 }
 
 func game() {
-	crashDuration := time.Duration(rand.Intn(15)+5) * time.Second
-	startTime := time.Now()
-	growthRate := 0.1
-
-	for time.Since(startTime) < crashDuration {
+	for respone.Multiplier < winMultiplier {
 		time.Sleep(10 * time.Millisecond)
-		elapsed := time.Since(startTime).Seconds()
-		respone.Multiplier = math.Exp(growthRate * elapsed)
+		//respone.Multiplier = respone.Multiplier * 1.0004
+		respone.Multiplier = math.Round(respone.Multiplier*10003) / 10000
 
 		clientsMutex.Lock()
 		for client := range clients {
