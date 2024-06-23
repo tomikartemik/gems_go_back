@@ -36,6 +36,7 @@ var clientsMutex = &sync.Mutex{}
 var winMultiplier = 0.0
 var u = 0.0
 var delta = 0.0
+var deltaCrash = 0.0
 
 var stepen = math.Pow(2.0, 52.0)
 
@@ -125,8 +126,13 @@ func game() {
 func end() {
 	respone.Status = "Crashed"
 	delta = respone.Rotate / 300.0
+	deltaCrash = 0
+	if respone.Length > 100 {
+		deltaCrash = (respone.Length - 100) / 300
+	}
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		respone.Rotate -= delta
+		respone.Length -= deltaCrash
 		time.Sleep(10 * time.Millisecond)
 		clientsMutex.Lock()
 		for client := range clients {
