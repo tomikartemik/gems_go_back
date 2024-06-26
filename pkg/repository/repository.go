@@ -11,6 +11,7 @@ type Repository struct {
 	Item
 	Case
 	Crash
+	Roulette
 }
 
 type User interface {
@@ -46,11 +47,16 @@ type Crash interface {
 	EchoMSG(msg string) string
 }
 
+type Roulette interface {
+	EchoMSGRoulette(msg string) string
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		NewUserPostgres(db),
 		NewItemPostgres(db),
 		NewCasePostgres(db),
 		NewCrashPostgres(db),
+		NewRoulettePostgres(db),
 	}
 }

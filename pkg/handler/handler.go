@@ -43,8 +43,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.GET("/crash", h.handleConnections)
-	go h.services.Crash.BroadcastTime()
+	router.GET("/crash", h.handleConnectionsCrash)
+	go h.services.Crash.BroadcastTimeCrash()
+	router.GET("/roulette", h.handleConnectionsRoulette)
+	go h.services.Roulette.BroadcastTimeRoulette()
 
 	auth := router.Group("/user")
 	{

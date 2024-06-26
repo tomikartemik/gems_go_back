@@ -36,8 +36,13 @@ type Case interface {
 }
 
 type Crash interface {
-	EditConns(ws *websocket.Conn)
-	BroadcastTime()
+	EditConnsCrash(ws *websocket.Conn)
+	BroadcastTimeCrash()
+}
+
+type Roulette interface {
+	EidtConnsRoulette(conn *websocket.Conn)
+	BroadcastTimeRoulette()
 }
 
 type Service struct {
@@ -45,13 +50,15 @@ type Service struct {
 	Item
 	Case
 	Crash
+	Roulette
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:  NewAuthService(repos.User),
-		Item:  NewItemService(repos.Item),
-		Case:  NewCaseService(repos.Case),
-		Crash: NewCrashService(repos.Crash),
+		User:     NewAuthService(repos.User),
+		Item:     NewItemService(repos.Item),
+		Case:     NewCaseService(repos.Case),
+		Crash:    NewCrashService(repos.Crash),
+		Roulette: NewRouletteService(repos.Roulette),
 	}
 }
