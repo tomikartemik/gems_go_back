@@ -71,7 +71,7 @@ func (r *CrashPostgres) NewCashoutCrash(gameID int, userID string, userMultiplie
 }
 
 func (r *CrashPostgres) UpdateWinMultipliers(gameID int, winMultiplier float64) string {
-	err := r.db.Model(&model.BetCrash{}).Where("game_id = ?", gameID).Update("win_multiplier = ?", winMultiplier).Error
+	err := r.db.Model(&model.BetCrash{}).Where("game_id = ?", gameID).Update("win_multiplier", winMultiplier).Error
 	if err != nil {
 		return "Pizda!"
 	}
