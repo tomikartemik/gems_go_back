@@ -44,7 +44,8 @@ type Case interface {
 }
 
 type Crash interface {
-	EchoMSG(msg string) string
+	NewRecord(winMultiplier float64) error
+	GetAllRecords() ([]model.CrashRecord, error)
 }
 
 type Roulette interface {
@@ -53,10 +54,10 @@ type Roulette interface {
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		NewUserPostgres(db),
-		NewItemPostgres(db),
-		NewCasePostgres(db),
-		NewCrashPostgres(db),
-		NewRoulettePostgres(db),
+		User:     NewUserPostgres(db),
+		Item:     NewItemPostgres(db),
+		Case:     NewCasePostgres(db),
+		Crash:    NewCrashPostgres(db),
+		Roulette: NewRoulettePostgres(db),
 	}
 }

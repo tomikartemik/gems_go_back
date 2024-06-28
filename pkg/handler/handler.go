@@ -48,6 +48,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/roulette", h.handleConnectionsRoulette)
 	go h.services.Roulette.BroadcastTimeRoulette()
 
+	router.GET("/all-crash-records", h.getAllRecords)
 	auth := router.Group("/user")
 	{
 		auth.POST("/sign-in", h.signIn)

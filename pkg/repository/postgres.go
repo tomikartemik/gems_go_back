@@ -30,6 +30,8 @@ func NewPostgresDB(cfg Config) (*gorm.DB, error) {
 		&model.Case{},
 		&model.CaseItem{},
 		&model.UserItem{},
+		&model.BetCrash{},
+		&model.CrashRecord{},
 	)
 	if err != nil {
 		return nil, err

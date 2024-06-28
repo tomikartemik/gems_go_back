@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gems_go_back/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"log"
@@ -23,4 +24,13 @@ func (h *Handler) handleConnectionsCrash(c *gin.Context) {
 		return
 	}
 	h.services.EditConnsCrash(conn)
+}
+
+func (h *Handler) getAllRecords(c *gin.Context) {
+	var allRecords []model.CrashRecord
+	allRecords, err := h.services.GetAllRecords()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, allRecords)
 }

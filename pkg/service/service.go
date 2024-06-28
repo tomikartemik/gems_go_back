@@ -38,6 +38,12 @@ type Case interface {
 type Crash interface {
 	EditConnsCrash(ws *websocket.Conn)
 	BroadcastTimeCrash()
+	StartPreparingCrash()
+	PreparingCrash()
+	StartGameCrash()
+	GameCrash()
+	EndCrash()
+	GetAllRecords() ([]model.CrashRecord, error)
 }
 
 type Roulette interface {

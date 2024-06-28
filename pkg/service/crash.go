@@ -1,6 +1,9 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
+	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"github.com/gorilla/websocket"
 	"log"
@@ -22,6 +25,16 @@ type ClientCrash struct {
 	conn *websocket.Conn
 }
 
+type BetMessageCrash struct {
+	PlayerID string  `json:"player_id"`
+	Amount   float64 `json:"amount"`
+}
+
+type CashoutMessageCrash struct {
+	PlayerID   string  `json:"player_id"`
+	Multiplier float64 `json:"multiplier"`
+}
+
 type ResponseCrash struct {
 	Status          string  `json:"status"`
 	Multiplier      float64 `json:"multiplier"`
@@ -39,6 +52,9 @@ var delta = 0.0
 var deltaCrash = 0.0
 
 var stepen = math.Pow(2.0, 52.0)
+var acceptingBetsCrash = true
+
+//var acceptingCashoutsCrash = false
 
 func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 
@@ -50,10 +66,19 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 	clientsMutexCrash.Unlock()
 
 	for {
-		_, _, err := conn.ReadMessage()
+		_, message, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("Read error:", err)
 			break
+		}
+
+		if acceptingBetsCrash {
+			var bet BetMessageCrash
+			if err := json.Unmarshal(message, &bet); err != nil {
+				log.Println("Invalid bet format:", err)
+				continue
+			}
+			fmt.Printf("Received bet from player %s", message)
 		}
 	}
 
@@ -63,18 +88,20 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 }
 
 func (s *CrashService) BroadcastTimeCrash() {
-	startPreparingCrash()
+	s.StartPreparingCrash()
 }
 
-func startPreparingCrash() {
+func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Length = 0.0
 	responseCrash.Rotate = 0.0
 	responseCrash.Status = "Pending"
 	u = rand.Float64() * (stepen)
 	winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
-	preparingCrash()
+	s.repo.NewRecord(winMultiplier)
+	s.PreparingCrash()
 }
-func preparingCrash() {
+
+func (s *CrashService) PreparingCrash() {
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
@@ -89,16 +116,16 @@ func preparingCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
-	startGameCrash()
+	s.StartGameCrash()
 }
 
-func startGameCrash() {
+func (s *CrashService) StartGameCrash() {
 	responseCrash.Status = "Running"
 	responseCrash.Multiplier = 1.0
-	gameCrash()
+	s.GameCrash()
 }
 
-func gameCrash() {
+func (s *CrashService) GameCrash() {
 	for responseCrash.Multiplier < winMultiplier {
 		time.Sleep(10 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
@@ -120,10 +147,10 @@ func gameCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
-	endCrash()
+	s.EndCrash()
 }
 
-func endCrash() {
+func (s *CrashService) EndCrash() {
 	responseCrash.Status = "Crashed"
 	delta = responseCrash.Rotate / 300.0
 	deltaCrash = 0
@@ -145,5 +172,18 @@ func endCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
-	startPreparingCrash()
+	s.StartPreparingCrash()
+}
+
+//
+// FOR HANDLER
+//
+
+func (s *CrashService) GetAllRecords() ([]model.CrashRecord, error) {
+	var allRecords []model.CrashRecord
+	allRecords, err := s.repo.GetAllRecords()
+	if err != nil {
+		return allRecords, err
+	}
+	return allRecords, nil
 }
