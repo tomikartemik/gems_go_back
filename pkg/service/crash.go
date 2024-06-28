@@ -26,16 +26,19 @@ type ClientCrash struct {
 }
 
 type BetMessageCrash struct {
+	GameId   int     `json:"game_id"`
 	PlayerID string  `json:"player_id"`
 	Amount   float64 `json:"amount"`
 }
 
 type CashoutMessageCrash struct {
+	GameId     int     `json:"game_id"`
 	PlayerID   string  `json:"player_id"`
 	Multiplier float64 `json:"multiplier"`
 }
 
 type ResponseCrash struct {
+	GameID          int     `json:"game_id"`
 	Status          string  `json:"status"`
 	Multiplier      float64 `json:"multiplier"`
 	TimeBeforeStart float64 `json:"time_before_start"`
@@ -43,18 +46,19 @@ type ResponseCrash struct {
 	Rotate          float64 `json:"rotate"`
 }
 
-var responseCrash = ResponseCrash{"Crashed", 1.0, 10.0, 0.0, 0.0}
+var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0, 0.0}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
 var u = 0.0
 var delta = 0.0
 var deltaCrash = 0.0
+var lastGameID int
 
 var stepen = math.Pow(2.0, 52.0)
 var acceptingBetsCrash = true
 
-//var acceptingCashoutsCrash = false
+var acceptingCashoutsCrash = false
 
 func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 
@@ -71,14 +75,27 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 			log.Println("Read error:", err)
 			break
 		}
-
 		if acceptingBetsCrash {
 			var bet BetMessageCrash
-			if err := json.Unmarshal(message, &bet); err != nil {
+			if err = json.Unmarshal(message, &bet); err != nil {
 				log.Println("Invalid bet format:", err)
 				continue
 			}
-			fmt.Printf("Received bet from player %s", message)
+			newBet := model.BetCrash{
+				GameId: bet.GameId,
+				UserID: bet.PlayerID,
+				Amount: bet.Amount,
+			}
+			errorStr := s.repo.NewBetCrash(newBet)
+			fmt.Println(errorStr)
+		} else if acceptingCashoutsCrash {
+			var cashout CashoutMessageCrash
+			if err = json.Unmarshal(message, &cashout); err != nil {
+				log.Println("Invalid bet format:", err)
+				continue
+			}
+			errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
+			fmt.Println(errorStr)
 		}
 	}
 
@@ -92,12 +109,18 @@ func (s *CrashService) BroadcastTimeCrash() {
 }
 
 func (s *CrashService) StartPreparingCrash() {
+	acceptingBetsCrash = true
 	responseCrash.Length = 0.0
 	responseCrash.Rotate = 0.0
 	responseCrash.Status = "Pending"
 	u = rand.Float64() * (stepen)
 	winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
-	s.repo.NewRecord(winMultiplier)
+	lastGame, err := s.repo.GetLastRecord()
+	if err != nil {
+		log.Fatal(err)
+	}
+	lastGameID = lastGame.ID + 1
+	responseCrash.GameID = lastGameID
 	s.PreparingCrash()
 }
 
@@ -120,6 +143,8 @@ func (s *CrashService) PreparingCrash() {
 }
 
 func (s *CrashService) StartGameCrash() {
+	acceptingBetsCrash = false
+	acceptingCashoutsCrash = true
 	responseCrash.Status = "Running"
 	responseCrash.Multiplier = 1.0
 	s.GameCrash()
@@ -147,10 +172,12 @@ func (s *CrashService) GameCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
+	go s.repo.NewRecord(winMultiplier)
 	s.EndCrash()
 }
 
 func (s *CrashService) EndCrash() {
+	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
 	delta = responseCrash.Rotate / 300.0
 	deltaCrash = 0
@@ -172,6 +199,8 @@ func (s *CrashService) EndCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
+	s.repo.UpdateWinMultipliers(lastGameID, winMultiplier)
+	s.repo.CreditingWinnings(lastGameID)
 	s.StartPreparingCrash()
 }
 

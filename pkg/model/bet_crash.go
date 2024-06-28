@@ -1,7 +1,7 @@
 package model
 
 type BetCrash struct {
-	BetID          int     `json:"-" db:"bet_id" gorm:"primaryKey"`
+	BetID          int     `json:"-" db:"bet_id" gorm:"autoIncrement" gorm:"autoIncrement"`
 	GameId         int     `json:"game_id"`
 	UserID         string  `json:"user_id"`
 	Amount         float64 `json:"amount"`

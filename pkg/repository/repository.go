@@ -46,6 +46,11 @@ type Case interface {
 type Crash interface {
 	NewRecord(winMultiplier float64) error
 	GetAllRecords() ([]model.CrashRecord, error)
+	GetLastRecord() (model.CrashRecord, error)
+	NewBetCrash(newBet model.BetCrash) string
+	NewCashoutCrash(gameID int, userID string, userMultiplier float64) string
+	UpdateWinMultipliers(gameID int, winMultiplier float64) string
+	CreditingWinnings(gameID int) string
 }
 
 type Roulette interface {
