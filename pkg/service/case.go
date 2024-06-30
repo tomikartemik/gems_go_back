@@ -151,5 +151,15 @@ func (s *CaseService) OpenCase(caseId int) (model.ItemWithID, error) {
 		}
 		randomNumber -= caseItem.Weight
 	}
+	_ = s.repo.NewCaseRecord(caseId)
 	return chosenItem, nil
+}
+
+func (s *CaseService) GetAllCaseRecords() ([]schema.CaseInfo, error) {
+	var records []schema.CaseInfo
+	records, err := s.repo.GetAllCaseRecords()
+	if err != nil {
+		return records, err
+	}
+	return records, nil
 }

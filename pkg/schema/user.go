@@ -17,10 +17,10 @@ type InputUser struct {
 }
 
 type UserWithItems struct {
-	ID       string             `json:"id"`
-	Username string             `json:"username"`
-	Email    string             `json:"email"`
-	IsActive bool               `json:"is_active"`
-	Balance  float64            `json:"balance"`
-	Items    []model.ItemWithID `json:"items"`
+	ID       string                  `json:"id"`
+	Username string                  `json:"username"`
+	Email    string                  `json:"email"`
+	IsActive bool                    `json:"is_active"`
+	Balance  float64                 `json:"balance"`
+	Items    []model.ItemOfInventory `json:"items"`
 }

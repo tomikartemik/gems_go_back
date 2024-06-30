@@ -55,6 +55,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.signUp)
 		auth.PATCH("/update", h.updateUser)
 		auth.GET("/user", h.getUserById)
+		auth.GET("/sell_item", h.sellAnItem)
 	}
 
 	item := router.Group("/item")
@@ -72,6 +73,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.GET("/get-all-cases", h.getAllCases)
 		cases.PUT("/update", h.updateCase)
 		cases.DELETE("/delete", h.deleteCase)
+		cases.GET("/case_story", h.getAllCaseRecords)
 	}
 
 	games := router.Group("/games", h.userIdentity)

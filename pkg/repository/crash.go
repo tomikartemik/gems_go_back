@@ -24,7 +24,7 @@ func (r *CrashPostgres) NewRecord(winMuliplier float64) error {
 	return nil
 }
 
-func (r *CrashPostgres) GetAllRecords() ([]model.CrashRecord, error) {
+func (r *CrashPostgres) GetAllCrashRecords() ([]model.CrashRecord, error) {
 	var all_records []model.CrashRecord
 	err := r.db.Model(&model.CrashRecord{}).Order("id desc").Limit(10).Find(&all_records).Error
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *CrashPostgres) GetAllRecords() ([]model.CrashRecord, error) {
 	return all_records, nil
 }
 
-func (r *CrashPostgres) GetLastRecord() (model.CrashRecord, error) {
+func (r *CrashPostgres) GetLastCrashRecord() (model.CrashRecord, error) {
 	var last_record model.CrashRecord
 	err := r.db.Model(&model.CrashRecord{}).Order("id desc").Last(&last_record).Error
 	if err != nil {

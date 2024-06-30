@@ -115,7 +115,7 @@ func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Status = "Pending"
 	u = rand.Float64() * (stepen)
 	winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
-	lastGame, err := s.repo.GetLastRecord()
+	lastGame, err := s.repo.GetLastCrashRecord()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -210,7 +210,7 @@ func (s *CrashService) EndCrash() {
 
 func (s *CrashService) GetAllRecords() ([]model.CrashRecord, error) {
 	var allRecords []model.CrashRecord
-	allRecords, err := s.repo.GetAllRecords()
+	allRecords, err := s.repo.GetAllCrashRecords()
 	if err != nil {
 		return allRecords, err
 	}

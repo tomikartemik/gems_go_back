@@ -112,3 +112,29 @@ func (r *CasePostgres) GetChosenItem(id int) (model.ItemWithID, error) {
 	}
 	return chosenItem, nil
 }
+
+func (r *CasePostgres) NewCaseRecord(case_id int) error {
+	record := model.CaseRecord{CaseID: case_id}
+	if err := r.db.Model(&model.CaseRecord{}).Create(record).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *CasePostgres) GetAllCaseRecords() ([]schema.CaseInfo, error) {
+	var lastCases []schema.CaseInfo
+	var caseRecords []model.CaseRecord
+	var caseInfo schema.CaseInfo
+	err := r.db.Model(&model.CaseRecord{}).Order("id desc").Limit(10).Find(&caseRecords).Error
+	if err != nil {
+		return lastCases, err
+	}
+	for _, currCase := range caseRecords {
+		err = r.db.Model(&model.Case{}).Where("id = ?", currCase.CaseID).Find(caseInfo).Error
+		if err != nil {
+			return lastCases, err
+		}
+		lastCases = append(lastCases, caseInfo)
+	}
+	return lastCases, nil
+}

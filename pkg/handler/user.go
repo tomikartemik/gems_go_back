@@ -5,6 +5,7 @@ import (
 	"gems_go_back/pkg/schema"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // @Summary SignUp
@@ -106,6 +107,20 @@ func (h *Handler) updateUser(c *gin.Context) {
 func (h *Handler) getUserById(c *gin.Context) {
 	id := c.Query("id")
 	user, err := h.services.GetUserById(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) sellAnItem(c *gin.Context) {
+	userId := c.Query("user_id")
+	userItemIdStr := c.Query("user_item_id")
+	var userItemId, err = strconv.Atoi(userItemIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	user, err := h.services.SellAnItem(userId, userItemId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}

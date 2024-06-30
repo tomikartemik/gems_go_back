@@ -18,9 +18,10 @@ type User interface {
 	CreateUser(user model.User) (schema.ShowUser, error)
 	SignIn(mail, password string) (schema.ShowUser, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
-	GetUserInventory(userId string) ([]model.ItemWithID, error)
+	GetUserInventory(userId string) ([]model.ItemOfInventory, error)
 	GetUserById(id string) (schema.ShowUser, error)
 	AddItemToInventory(userId string, itemId int) (model.UserItem, error)
+	SellAnItem(userId string, user_item_id int) error
 }
 
 type Item interface {
@@ -41,12 +42,14 @@ type Case interface {
 	DeleteCase(id int) error
 	GetItemsWithWeights(id int) ([]model.CaseItem, error)
 	GetChosenItem(id int) (model.ItemWithID, error)
+	NewCaseRecord(case_id int) error
+	GetAllCaseRecords() ([]schema.CaseInfo, error)
 }
 
 type Crash interface {
 	NewRecord(winMultiplier float64) error
-	GetAllRecords() ([]model.CrashRecord, error)
-	GetLastRecord() (model.CrashRecord, error)
+	GetAllCrashRecords() ([]model.CrashRecord, error)
+	GetLastCrashRecord() (model.CrashRecord, error)
 	NewBetCrash(newBet model.BetCrash) string
 	NewCashoutCrash(gameID int, userID string, userMultiplier float64) string
 	UpdateWinMultipliers(gameID int, winMultiplier float64) string

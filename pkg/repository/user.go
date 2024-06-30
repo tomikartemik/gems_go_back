@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"gorm.io/gorm"
@@ -75,14 +74,13 @@ func (r *UserPostgres) UpdateUser(id string, user schema.InputUser) (schema.Show
 	return showUser, nil
 }
 
-func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemWithID, error) {
-	var itemsWithID []model.ItemWithID
+func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemOfInventory, error) {
+	var response []model.ItemOfInventory
 
 	var userItems []model.UserItem
 	err := r.db.Model(model.UserItem{}).Where("user_id = ?", userId).Find(&userItems).Error
-	fmt.Println(userItems)
 	if err != nil {
-		return itemsWithID, err
+		return response, err
 	}
 
 	var item model.ItemWithID
@@ -91,9 +89,16 @@ func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemWithID, erro
 		if err := r.db.Model(model.Item{}).Where("id = ?", itemId).First(&item).Error; err != nil {
 			return nil, err
 		}
-		itemsWithID = append(itemsWithID, item)
+		response = append(response, model.ItemOfInventory{
+			item.ID,
+			item.Name,
+			item.Rarity,
+			item.Price,
+			userItems[i].ID,
+		})
 	}
-	return itemsWithID, nil
+
+	return response, nil
 }
 
 func (r *UserPostgres) AddItemToInventory(userId string, itemId int) (model.UserItem, error) {
@@ -105,4 +110,23 @@ func (r *UserPostgres) AddItemToInventory(userId string, itemId int) (model.User
 		return userItem, result.Error
 	}
 	return userItem, nil
+}
+
+func (r *UserPostgres) SellAnItem(userId string, user_item_id int) error {
+	var user_item model.UserItem
+	var item model.Item
+
+	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Find(&user_item).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&model.Item{}).Where("id = ?", user_item.ItemID).Find(&item).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance + ?", item.Price)).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Delete(user_item).Error; err != nil {
+		return err
+	}
+	return nil
 }

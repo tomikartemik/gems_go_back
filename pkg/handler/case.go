@@ -2,6 +2,7 @@ package handler
 
 import (
 	"gems_go_back/pkg/model"
+	"gems_go_back/pkg/schema"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -120,4 +121,13 @@ func (h *Handler) openCase(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	c.JSON(http.StatusOK, chosenItem)
+}
+
+func (h *Handler) getAllCaseRecords(c *gin.Context) {
+	var allCaseRecords []schema.CaseInfo
+	allCaseRecords, err := h.services.GetAllCaseRecords()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, allCaseRecords)
 }

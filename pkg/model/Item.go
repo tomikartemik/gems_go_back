@@ -13,3 +13,11 @@ type ItemWithID struct {
 	Rarity int    `json:"rarity"`
 	Price  int    `json:"price"`
 }
+
+type ItemOfInventory struct {
+	ItemID     int    `json:"id"`
+	Name       string `json:"name"`
+	Rarity     int    `json:"rarity"`
+	Price      int    `json:"price"`
+	UserItemID int    `json:"user_item_id"`
+}

@@ -115,6 +115,16 @@ func (s *AuthService) AddItemToInventory(userId string, itemId int) (schema.Show
 	return userWithInventory, nil
 }
 
+func (s *AuthService) SellAnItem(userId string, userItemId int) (schema.UserWithItems, error) {
+	var user schema.UserWithItems
+	err := s.repo.SellAnItem(userId, userItemId)
+	if err != nil {
+		return user, err
+	}
+	user, _ = s.GetUserById(userId)
+	return user, nil
+}
+
 func (s *AuthService) SignIn(email string, password string) (schema.UserWithItems, error) {
 	var userWithItems schema.UserWithItems
 	var user schema.ShowUser
