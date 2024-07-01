@@ -46,6 +46,20 @@ type ResponseCrash struct {
 	Rotate          float64 `json:"rotate"`
 }
 
+type InfoAboutCrashBet struct {
+	PlayerID       string `json:"player_id"`
+	PlayerNickname string `json:"player_nickname"`
+	//PlayerPhoto string `json:"player_photo"`
+	Amount         float64 `json:"amount"`
+	UserMultiplier float64 `json:"user_multiplier"`
+	Winning        float64 `json:"winning"`
+}
+
+type BetsAtLastCrashGame struct {
+	Bets []InfoAboutCrashBet `json:"bets"`
+}
+
+var betsAtLastCrashGame BetsAtLastCrashGame
 var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0, 0.0}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
@@ -86,16 +100,22 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 				UserID: bet.PlayerID,
 				Amount: bet.Amount,
 			}
-			errorStr := s.repo.NewBetCrash(newBet)
-			fmt.Println(errorStr)
+			if newBet.BetID == lastCrashGameID {
+				errorStr := s.repo.NewBetCrash(newBet)
+				go s.SaveNewBetCrash(bet.PlayerID, bet.Amount)
+				fmt.Println(errorStr)
+			}
 		} else if acceptingCashoutsCrash {
 			var cashout CashoutMessageCrash
 			if err = json.Unmarshal(message, &cashout); err != nil {
 				log.Println("Invalid bet format:", err)
 				continue
 			}
-			errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
-			fmt.Println(errorStr)
+			if cashout.GameId == lastCrashGameID {
+				errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
+				go s.UpdateSavedBetCrash(cashout.PlayerID, cashout.Multiplier)
+				fmt.Println(errorStr)
+			}
 		}
 	}
 
@@ -105,6 +125,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 }
 
 func (s *CrashService) BroadcastTimeCrash() {
+	betsAtLastCrashGame = BetsAtLastCrashGame{}
 	s.StartPreparingCrash()
 }
 
@@ -202,6 +223,56 @@ func (s *CrashService) EndCrash() {
 	s.repo.UpdateWinMultipliers(lastCrashGameID, winMultiplier)
 	s.repo.CreditingWinningsCrash(lastCrashGameID)
 	s.StartPreparingCrash()
+}
+
+func (s *CrashService) SaveNewBetCrash(userId string, amount float64) {
+	nickname, err := s.repo.GetUsersPhotoAndNick(userId)
+	if err != nil {
+		return
+	}
+	infoAboutCrashBet := InfoAboutCrashBet{
+		PlayerID:       userId,
+		PlayerNickname: nickname,
+		Amount:         amount,
+		UserMultiplier: 0,
+		Winning:        0,
+	}
+	betsAtLastCrashGame.Bets = append(
+		betsAtLastCrashGame.Bets,
+		infoAboutCrashBet,
+	)
+	clientsMutexCrash.Lock()
+	for client := range clientsCrash {
+		err := client.conn.WriteJSON(betsAtLastCrashGame)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsCrash, client)
+		}
+	}
+	clientsMutexCrash.Unlock()
+}
+
+func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
+	for betsInCurrentGame := range betsAtLastCrashGame.Bets {
+		if betsAtLastCrashGame.Bets[betsInCurrentGame].PlayerID == userId {
+			currentWinning := math.Round(betsAtLastCrashGame.Bets[betsInCurrentGame].Amount*multiplier*100.0) / 100.0
+			currentMultiplier := math.Round(multiplier*100.0) / 100.0
+			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
+			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
+			clientsMutexCrash.Lock()
+			for client := range clientsCrash {
+				err := client.conn.WriteJSON(betsAtLastCrashGame)
+				if err != nil {
+					log.Println("Write error:", err)
+					client.conn.Close()
+					delete(clientsCrash, client)
+				}
+			}
+			clientsMutexCrash.Unlock()
+			break
+		}
+	}
 }
 
 //

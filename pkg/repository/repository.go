@@ -54,6 +54,7 @@ type Crash interface {
 	NewCashoutCrash(gameID int, userID string, userMultiplier float64) string
 	UpdateWinMultipliers(gameID int, winMultiplier float64) string
 	CreditingWinningsCrash(gameID int) string
+	GetUsersPhotoAndNick(userId string) (string, error)
 }
 
 type Roulette interface {

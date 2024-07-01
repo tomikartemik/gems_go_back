@@ -94,3 +94,12 @@ func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 	}
 	return "OK"
 }
+
+// Добавить фотку
+func (r *CrashPostgres) GetUsersPhotoAndNick(userId string) (string, error) {
+	var user model.User
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
+		return "", err
+	}
+	return user.Username, nil
+}
