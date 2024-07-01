@@ -3,6 +3,7 @@ package repository
 import (
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
+	"math"
 )
 
 type CrashPostgres struct {
@@ -85,7 +86,7 @@ func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 	}
 	for _, bet := range bets {
 		if bet.UserMultiplier <= bet.WinMultiplier {
-			winAmount := bet.Amount * bet.UserMultiplier
+			winAmount := math.Round(bet.Amount*bet.UserMultiplier*100) / 100
 			if err := r.db.Model(&model.User{}).Where("id = ?", bet.UserID).Update("balance", gorm.Expr("balance + ?", winAmount)); err != nil {
 				return "Pizda!"
 			}
