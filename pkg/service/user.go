@@ -36,6 +36,7 @@ func (s *AuthService) CreateUser(user model.User) (schema.ShowUser, error) {
 	if user.IsAdmin != true {
 		user.IsAdmin = false
 	}
+	user.BestItemId = 0
 	return s.repo.CreateUser(user)
 }
 
@@ -57,6 +58,7 @@ func (s *AuthService) GetUserById(id string) (schema.UserWithItems, error) {
 	userWithInventory.Username = user.Username
 	userWithInventory.Email = user.Email
 	userWithInventory.IsActive = user.IsActive
+	userWithInventory.BestItem = user.BestItem
 	userWithInventory.Items = inventory
 
 	return userWithInventory, nil

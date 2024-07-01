@@ -48,12 +48,24 @@ func (r *UserPostgres) SignIn(mail, password string) (schema.ShowUser, error) {
 }
 
 func (r *UserPostgres) GetUserById(id string) (schema.ShowUser, error) {
-	var user schema.ShowUser
+	var user model.User
+	var userResponse schema.ShowUser
 	err := r.db.Model(model.User{}).Where("id = ?", id).First(&user).Error
 	if err != nil {
-		return user, err
+		return userResponse, err
 	}
-	return user, nil
+	userResponse = schema.ShowUser{
+		ID:       user.Id,
+		Username: user.Username,
+		Email:    user.Email,
+		IsActive: user.IsActive,
+		Balance:  user.Balance,
+		BestItem: model.ItemWithID{},
+	}
+	var bestItem model.ItemWithID
+	err = r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error
+	userResponse.BestItem = bestItem
+	return userResponse, nil
 }
 func (r *UserPostgres) UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error) {
 	if err := r.db.Model(&model.User{}).Where("id = ?", id).Updates(&user).Error; err != nil {
@@ -108,6 +120,28 @@ func (r *UserPostgres) AddItemToInventory(userId string, itemId int) (model.User
 	result := r.db.Create(&userItem)
 	if result.Error != nil {
 		return userItem, result.Error
+	}
+	var newItem, bestItem model.Item
+	var user model.User
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
+		return userItem, nil
+	}
+	if user.BestItemId != 0 {
+		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
+			return userItem, nil
+		}
+		if err := r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
+			return userItem, nil
+		}
+		if newItem.Price > bestItem.Price {
+			if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
+				return userItem, nil
+			}
+		}
+	} else {
+		if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
+			return userItem, nil
+		}
 	}
 	return userItem, nil
 }
