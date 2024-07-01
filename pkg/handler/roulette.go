@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gems_go_back/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"log"
@@ -23,4 +24,13 @@ func (h *Handler) handleConnectionsRoulette(c *gin.Context) {
 		return
 	}
 	h.services.EidtConnsRoulette(conn)
+}
+
+func (h *Handler) getAllRouletteRecords(c *gin.Context) {
+	var allRecords []model.RouletteRecord
+	allRecords, err := h.services.GetAllRouletteRecords()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, allRecords)
 }

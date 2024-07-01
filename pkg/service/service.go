@@ -51,6 +51,12 @@ type Crash interface {
 type Roulette interface {
 	EidtConnsRoulette(conn *websocket.Conn)
 	BroadcastTimeRoulette()
+	StartPreparingRoulette()
+	PreparingRoulette()
+	StartGameRoulette()
+	GameRoulette()
+	EndRoulette()
+	GetAllRouletteRecords() ([]model.RouletteRecord, error)
 }
 
 type Service struct {

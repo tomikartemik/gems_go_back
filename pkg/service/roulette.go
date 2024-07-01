@@ -1,6 +1,9 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
+	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"github.com/gorilla/websocket"
 	"log"
@@ -21,7 +24,15 @@ type ClientRoulette struct {
 	conn *websocket.Conn
 }
 
+type BetMessageRoulette struct {
+	GameId   int     `json:"game_id"`
+	PlayerID string  `json:"player_id"`
+	Amount   float64 `json:"amount"`
+	Cell     int     `json:"cell"`
+}
+
 type ResponseRoulette struct {
+	GameID          int     `json:"game_id"`
 	Status          string  `json:"status"`
 	Cell            int     `json:"cell"`
 	TimeBeforeStart float64 `json:"time_before_start"`
@@ -34,7 +45,7 @@ type Cell struct {
 
 var clientsRoulette = make(map[*ClientRoulette]bool)
 var clientsMutexRoulette = &sync.Mutex{}
-var responeRoulette = ResponseRoulette{"Pending", 0, 0.0}
+var responeRoulette = ResponseRoulette{0, "Pending", 0, 0.0}
 var cells = []Cell{
 	{2, 50},
 	{3, 33},
@@ -44,6 +55,9 @@ var cells = []Cell{
 }
 var totalWeight = 114
 var winCell = 0
+
+var lsatRouletteGameID int
+var acceptingBetsRoulette = true
 
 func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 
@@ -55,10 +69,26 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 	clientsMutexRoulette.Unlock()
 
 	for {
-		_, _, err := conn.ReadMessage()
+		_, message, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("Read error:", err)
 			break
+		}
+
+		if acceptingBetsRoulette {
+			var bet BetMessageRoulette
+			if err = json.Unmarshal(message, &bet); err != nil {
+				log.Println("Invalid bet format:", err)
+				continue
+			}
+			newBet := model.BetRoulette{
+				GameId:   bet.GameId,
+				UserID:   bet.PlayerID,
+				Amount:   bet.Amount,
+				UserCell: bet.Cell,
+			}
+			errorStr := s.repo.NewBetRoulette(newBet)
+			fmt.Println(errorStr)
 		}
 	}
 
@@ -67,17 +97,24 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 	clientsMutexRoulette.Unlock()
 }
 func (s *RouletteService) BroadcastTimeRoulette() {
-	startPreparingRoulette()
+	//s.repo.NewRouletteRecord(100)
+	s.StartPreparingRoulette()
 }
 
-func startPreparingRoulette() {
+func (s *RouletteService) StartPreparingRoulette() {
+	acceptingBetsRoulette = true
 	responeRoulette.Cell = 0
 	responeRoulette.Status = "Pending"
-	responeRoulette.TimeBeforeStart = 10.0
-	preparingRoulette()
+	lastGame, err := s.repo.GetLastRouletteRecord()
+	if err != nil {
+		fmt.Println(err)
+	}
+	lsatRouletteGameID = lastGame.ID + 1
+	responeRoulette.GameID = lsatRouletteGameID
+	s.PreparingRoulette()
 }
 
-func preparingRoulette() {
+func (s *RouletteService) PreparingRoulette() {
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
@@ -92,11 +129,12 @@ func preparingRoulette() {
 		}
 		clientsMutexRoulette.Unlock()
 	}
-	startGameRoulette()
+	s.StartGameRoulette()
 }
 
-func startGameRoulette() {
+func (s *RouletteService) StartGameRoulette() {
 	responeRoulette.Status = "Playing"
+	acceptingBetsRoulette = false
 	randomNumber := rand.Intn(totalWeight)
 
 	for _, choosenCell := range cells {
@@ -107,11 +145,11 @@ func startGameRoulette() {
 		randomNumber -= choosenCell.Weight
 	}
 	responeRoulette.Cell = winCell
-	gameRoulette()
+	s.GameRoulette()
 }
 
-func gameRoulette() {
-	for time_before_end := 1000.0; time_before_end >= 0; time_before_end-- {
+func (s *RouletteService) GameRoulette() {
+	for time_before_end := 700.0; time_before_end >= 0; time_before_end-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
 		for client := range clientsRoulette {
@@ -124,10 +162,11 @@ func gameRoulette() {
 		}
 		clientsMutexRoulette.Unlock()
 	}
-	endRoulette()
+	go s.repo.NewRouletteRecord(winCell)
+	s.EndRoulette()
 }
 
-func endRoulette() {
+func (s *RouletteService) EndRoulette() {
 	responeRoulette.Status = "End"
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
@@ -142,5 +181,16 @@ func endRoulette() {
 		}
 		clientsMutexRoulette.Unlock()
 	}
-	startPreparingRoulette()
+	s.repo.UpdateWinCells(lsatRouletteGameID, winCell)
+	s.repo.CreditingWinningsRoulette(lsatRouletteGameID)
+	s.StartPreparingRoulette()
+}
+
+func (s *RouletteService) GetAllRouletteRecords() ([]model.RouletteRecord, error) {
+	var lastRecords []model.RouletteRecord
+	lastRecords, err := s.repo.GetAllRouletteRecords()
+	if err != nil {
+		return lastRecords, err
+	}
+	return lastRecords, nil
 }

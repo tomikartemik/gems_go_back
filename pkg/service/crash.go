@@ -53,11 +53,11 @@ var winMultiplier = 0.0
 var u = 0.0
 var delta = 0.0
 var deltaCrash = 0.0
-var lastGameID int
+var lastCrashGameID int
 
 var stepen = math.Pow(2.0, 52.0)
-var acceptingBetsCrash = true
 
+var acceptingBetsCrash = true
 var acceptingCashoutsCrash = false
 
 func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
@@ -119,8 +119,8 @@ func (s *CrashService) StartPreparingCrash() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lastGameID = lastGame.ID + 1
-	responseCrash.GameID = lastGameID
+	lastCrashGameID = lastGame.ID + 1
+	responseCrash.GameID = lastCrashGameID
 	s.PreparingCrash()
 }
 
@@ -172,7 +172,7 @@ func (s *CrashService) GameCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
-	go s.repo.NewRecord(winMultiplier)
+	go s.repo.NewCrashRecord(winMultiplier)
 	s.EndCrash()
 }
 
@@ -199,8 +199,8 @@ func (s *CrashService) EndCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
-	s.repo.UpdateWinMultipliers(lastGameID, winMultiplier)
-	s.repo.CreditingWinnings(lastGameID)
+	s.repo.UpdateWinMultipliers(lastCrashGameID, winMultiplier)
+	s.repo.CreditingWinningsCrash(lastCrashGameID)
 	s.StartPreparingCrash()
 }
 

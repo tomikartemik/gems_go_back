@@ -13,7 +13,7 @@ func NewCrashPostgres(db *gorm.DB) *CrashPostgres {
 	return &CrashPostgres{db: db}
 }
 
-func (r *CrashPostgres) NewRecord(winMuliplier float64) error {
+func (r *CrashPostgres) NewCrashRecord(winMuliplier float64) error {
 	record := model.CrashRecord{
 		WinMultiplier: winMuliplier,
 	}
@@ -78,7 +78,7 @@ func (r *CrashPostgres) UpdateWinMultipliers(gameID int, winMultiplier float64) 
 	return "OK"
 }
 
-func (r *CrashPostgres) CreditingWinnings(gameID int) string {
+func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 	var bets []model.BetCrash
 	if err := r.db.Model(&model.BetCrash{}).Where("game_id = ?", gameID).Find(&bets).Error; err != nil {
 		return "Pizda!"

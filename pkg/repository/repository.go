@@ -47,17 +47,22 @@ type Case interface {
 }
 
 type Crash interface {
-	NewRecord(winMultiplier float64) error
+	NewCrashRecord(winMultiplier float64) error
 	GetAllCrashRecords() ([]model.CrashRecord, error)
 	GetLastCrashRecord() (model.CrashRecord, error)
 	NewBetCrash(newBet model.BetCrash) string
 	NewCashoutCrash(gameID int, userID string, userMultiplier float64) string
 	UpdateWinMultipliers(gameID int, winMultiplier float64) string
-	CreditingWinnings(gameID int) string
+	CreditingWinningsCrash(gameID int) string
 }
 
 type Roulette interface {
-	EchoMSGRoulette(msg string) string
+	NewRouletteRecord(winCell int) error
+	GetAllRouletteRecords() ([]model.RouletteRecord, error)
+	GetLastRouletteRecord() (model.RouletteRecord, error)
+	NewBetRoulette(newBet model.BetRoulette) string
+	UpdateWinCells(gameID int, winCell int) string
+	CreditingWinningsRoulette(gameID int) string
 }
 
 func NewRepository(db *gorm.DB) *Repository {

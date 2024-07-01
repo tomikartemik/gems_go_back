@@ -48,7 +48,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/roulette", h.handleConnectionsRoulette)
 	go h.services.Roulette.BroadcastTimeRoulette()
 
-	router.GET("/all-crash-records", h.getAllRecords)
+	router.GET("/all-crash-records", h.getAllCrashRecords)
+	router.GET("/all-roulette-records", h.getAllRouletteRecords)
 	auth := router.Group("/user")
 	{
 		auth.POST("/sign-in", h.signIn)
@@ -73,7 +74,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.GET("/get-all-cases", h.getAllCases)
 		cases.PUT("/update", h.updateCase)
 		cases.DELETE("/delete", h.deleteCase)
-		cases.GET("/case_story", h.getAllCaseRecords)
+		cases.GET("/case-story", h.getAllCaseRecords)
 	}
 
 	games := router.Group("/games", h.userIdentity)

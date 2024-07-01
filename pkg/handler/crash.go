@@ -26,7 +26,7 @@ func (h *Handler) handleConnectionsCrash(c *gin.Context) {
 	h.services.EditConnsCrash(conn)
 }
 
-func (h *Handler) getAllRecords(c *gin.Context) {
+func (h *Handler) getAllCrashRecords(c *gin.Context) {
 	var allRecords []model.CrashRecord
 	allRecords, err := h.services.GetAllRecords()
 	if err != nil {
