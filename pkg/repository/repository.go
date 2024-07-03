@@ -12,6 +12,7 @@ type Repository struct {
 	Case
 	Crash
 	Roulette
+	Replenishment
 }
 
 type User interface {
@@ -66,12 +67,17 @@ type Roulette interface {
 	CreditingWinningsRoulette(gameID int) string
 }
 
+type Replenishment interface {
+	NewReplenishment(userID string, amount float64) (string, string, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		User:     NewUserPostgres(db),
-		Item:     NewItemPostgres(db),
-		Case:     NewCasePostgres(db),
-		Crash:    NewCrashPostgres(db),
-		Roulette: NewRoulettePostgres(db),
+		User:          NewUserPostgres(db),
+		Item:          NewItemPostgres(db),
+		Case:          NewCasePostgres(db),
+		Crash:         NewCrashPostgres(db),
+		Roulette:      NewRoulettePostgres(db),
+		Replenishment: NewReplenishmentPostgres(db),
 	}
 }

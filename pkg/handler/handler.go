@@ -43,13 +43,18 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	router.GET("/crash", h.handleConnectionsCrash)
 	go h.services.Crash.BroadcastTimeCrash()
+
 	router.GET("/roulette", h.handleConnectionsRoulette)
 	go h.services.Roulette.BroadcastTimeRoulette()
 
 	router.GET("/all-crash-records", h.getAllCrashRecords)
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
+	router.POST("/replenishment", h.NewReplenishment)
+	router.POST("/msg-from-fk", h.MSGFromFrekassa)
+
 	auth := router.Group("/user")
 	{
 		auth.POST("/sign-in", h.signIn)

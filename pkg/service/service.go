@@ -61,20 +61,26 @@ type Roulette interface {
 	GetAllRouletteRecords() ([]model.RouletteRecord, error)
 }
 
+type Replenishment interface {
+	NewReplenishment(userId string, amount float64) (string, error)
+}
+
 type Service struct {
 	User
 	Item
 	Case
 	Crash
 	Roulette
+	Replenishment
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:     NewAuthService(repos.User),
-		Item:     NewItemService(repos.Item),
-		Case:     NewCaseService(repos.Case),
-		Crash:    NewCrashService(repos.Crash),
-		Roulette: NewRouletteService(repos.Roulette),
+		User:          NewAuthService(repos.User),
+		Item:          NewItemService(repos.Item),
+		Case:          NewCaseService(repos.Case),
+		Crash:         NewCrashService(repos.Crash),
+		Roulette:      NewRouletteService(repos.Roulette),
+		Replenishment: NewReplenishmentService(repos.Replenishment),
 	}
 }
