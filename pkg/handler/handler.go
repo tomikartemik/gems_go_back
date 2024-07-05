@@ -53,7 +53,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/all-crash-records", h.getAllCrashRecords)
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
 	router.POST("/replenishment", h.NewReplenishment)
-	router.POST("/msg-from-fk", h.MSGFromFrekassa)
+
+	fk := router.Group("/fk")
+	{
+		fk.POST("/msg", h.MSGFromFrekassa)
+		fk.POST("/accepted", h.MSGFromFrekassa)
+		fk.POST("/denied", h.MSGFromFrekassa)
+	}
 
 	auth := router.Group("/user")
 	{

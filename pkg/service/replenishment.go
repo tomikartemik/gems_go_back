@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"gems_go_back/pkg/repository"
 	"net/http"
@@ -12,10 +13,23 @@ import (
 	"time"
 )
 
+// Структуры для парсинга JSON
+type Endpoint struct {
+	URL string `json:"url"`
+}
+
+type ReportTo struct {
+	Endpoints []Endpoint `json:"endpoints"`
+	Group     string     `json:"group"`
+	MaxAge    int        `json:"max_age"`
+}
+
 var merchantID = "46264"
 var secret1 = "@R-m/.IntF(1eh&"
 var secret2 = "1YHPU6{azd?M*LE"
-var currency = "МИР"
+var currency = "RUB"
+var location string
+var reportTo ReportTo
 
 type ReplenishmentService struct {
 	repo repository.Replenishment
@@ -79,7 +93,17 @@ func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderI
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("received non-200 response code: %d", resp.StatusCode)
 	}
+	reportToStr := resp.Header.Get("Report-To")
 
-	location := resp.Header.Get("Location")
+	err = json.Unmarshal([]byte(reportToStr), &reportTo)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+	}
+
+	for _, endpoint := range reportTo.Endpoints {
+		location = endpoint.URL
+		fmt.Println("URL:", endpoint.URL)
+	}
+
 	return location, nil
 }
