@@ -107,5 +107,6 @@ func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderI
 		fmt.Println("URL:", endpoint.URL)
 	}
 
+	fmt.Println(resp)
 	return location, nil
 }
