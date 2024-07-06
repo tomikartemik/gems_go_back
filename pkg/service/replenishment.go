@@ -76,7 +76,9 @@ func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderI
 	form.Add("i", description)
 	form.Add("email", email)
 
+	fmt.Println(form)
 	req, err := http.NewRequest("GET", "https://pay.freekassa.com/", strings.NewReader(form.Encode()))
+	fmt.Println(form.Encode())
 	if err != nil {
 		return "", err
 	}
