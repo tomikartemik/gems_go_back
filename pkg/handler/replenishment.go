@@ -22,6 +22,10 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 	c.JSON(http.StatusOK, location)
 }
 
+func (h *Handler) RedirectAccepted(c *gin.Context) {
+	c.Redirect(http.StatusFound, "https://www.google.com")
+}
+
 func (h *Handler) MSGFromFrekassa(c *gin.Context) {
 	var data map[string]interface{}
 

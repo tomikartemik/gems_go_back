@@ -3,14 +3,9 @@ package service
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"gems_go_back/pkg/repository"
-	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
-	"time"
 )
 
 // Структуры для парсинга JSON
@@ -65,48 +60,9 @@ func createSignature(merchantID, secret1, amount, currency, orderID string) stri
 
 // Функция для отправки запроса на пополнение
 func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderID, description, email string) (string, error) {
+
 	signature := createSignature(merchantID, secret1, amount, currency, orderID)
-
-	form := url.Values{}
-	form.Add("m", merchantID)
-	form.Add("oa", amount)
-	form.Add("o", orderID)
-	form.Add("s", signature)
-	form.Add("currency", currency)
-	form.Add("i", description)
-	form.Add("email", email)
-
-	fmt.Println(form)
-	req, err := http.NewRequest("GET", "https://pay.freekassa.com/", strings.NewReader(form.Encode()))
-	fmt.Println(form.Encode())
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("received non-200 response code: %d", resp.StatusCode)
-	}
-	reportToStr := resp.Header.Get("Report-To")
-
-	err = json.Unmarshal([]byte(reportToStr), &reportTo)
-	if err != nil {
-		fmt.Println("Error parsing JSON:", err)
-	}
-
-	for _, endpoint := range reportTo.Endpoints {
-		location = endpoint.URL
-		fmt.Println("URL:", endpoint.URL)
-	}
-
-	fmt.Println(resp)
-	return location, nil
+	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&m=%s&o=%s&oa=%s&s=%s", currency, email, description, merchantID, orderID, amount, signature)
+	fmt.Println(url)
+	return url, nil
 }
