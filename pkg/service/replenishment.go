@@ -23,8 +23,6 @@ var merchantID = "46264"
 var secret1 = "@R-m/.IntF(1eh&"
 var secret2 = "1YHPU6{azd?M*LE"
 var currency = "RUB"
-var location string
-var reportTo ReportTo
 
 type ReplenishmentService struct {
 	repo repository.Replenishment
