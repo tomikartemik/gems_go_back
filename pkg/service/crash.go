@@ -86,13 +86,14 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Read error:", err)
+			fmt.Println("Read error:", err)
 			break
 		}
+		fmt.Println(string(message))
 		if acceptingBetsCrash {
 			var bet BetMessageCrash
 			if err = json.Unmarshal(message, &bet); err != nil {
-				log.Println("Invalid bet format:", err)
+				fmt.Println("Invalid bet format:", err)
 				continue
 			}
 			newBet := model.BetCrash{
@@ -108,7 +109,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 		} else if acceptingCashoutsCrash {
 			var cashout CashoutMessageCrash
 			if err = json.Unmarshal(message, &cashout); err != nil {
-				log.Println("Invalid bet format:", err)
+				fmt.Println("Invalid bet format:", err)
 				continue
 			}
 			if cashout.GameId == lastCrashGameID {
