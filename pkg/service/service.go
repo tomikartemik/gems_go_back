@@ -63,6 +63,7 @@ type Roulette interface {
 
 type Replenishment interface {
 	NewReplenishment(userId string, amount float64) (string, error)
+	AcceptReplenishment(replenishmentID int)
 }
 
 type Service struct {

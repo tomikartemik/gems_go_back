@@ -65,4 +65,9 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (
 	return location, nil
 }
 
-func (s *ReplenishmentService) AcceptReplenishment(replenishmentID int) {}
+func (s *ReplenishmentService) AcceptReplenishment(replenishmentID int) {
+	err := s.repo.AcceptReplenishment(replenishmentID)
+	if err != nil {
+		fmt.Println(err)
+	}
+}

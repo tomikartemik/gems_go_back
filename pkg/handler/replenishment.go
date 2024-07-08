@@ -5,6 +5,7 @@ import (
 	"gems_go_back/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) NewReplenishment(c *gin.Context) {
@@ -23,15 +24,19 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 }
 
 func (h *Handler) RedirectAccepted(c *gin.Context) {
-	//c.Redirect(http.StatusFound, "https://www.google.com")
-	queryParams := c.Request.URL.Query()
-
-	// Выводим query параметры
-	for key, values := range queryParams {
-		for _, value := range values {
-			c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
-		}
-	}
+	////c.Redirect(http.StatusFound, "https://www.google.com")
+	//queryParams := c.Request.URL.Query()
+	//
+	//// Выводим query параметры
+	//for key, values := range queryParams {
+	//	for _, value := range values {
+	//		c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
+	//	}
+	//}
+	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
+	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
+	go h.services.AcceptReplenishment(replenishmentId)
+	c.Redirect(http.StatusFound, "https://www.google.com")
 }
 
 func (h *Handler) RedirectDenied(c *gin.Context) {
