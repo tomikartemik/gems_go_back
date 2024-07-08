@@ -101,11 +101,9 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 				UserID: bet.PlayerID,
 				Amount: bet.Amount,
 			}
-			if newBet.BetID == lastCrashGameID {
-				errorStr := s.repo.NewBetCrash(newBet)
-				go s.SaveNewBetCrash(bet.PlayerID, bet.Amount)
-				fmt.Println(errorStr)
-			}
+			errorStr := s.repo.NewBetCrash(newBet)
+			go s.SaveNewBetCrash(bet.PlayerID, bet.Amount)
+			fmt.Println(errorStr)
 		} else if acceptingCashoutsCrash {
 			var cashout CashoutMessageCrash
 			if err = json.Unmarshal(message, &cashout); err != nil {
