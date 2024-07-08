@@ -32,18 +32,6 @@ func NewReplenishmentService(repo repository.Replenishment) *ReplenishmentServic
 	return &ReplenishmentService{repo: repo}
 }
 
-func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (string, error) {
-	replenishmentID, email, err := s.repo.NewReplenishment(userId, amount)
-	if err != nil {
-		return "", err
-	}
-	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "test", email)
-	if err != nil {
-		return "", err
-	}
-	return location, nil
-}
-
 // Функция для генерации MD5 хеша
 func generateMD5Hash(data string) string {
 	hash := md5.Sum([]byte(data))
@@ -64,3 +52,17 @@ func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderI
 	fmt.Println(url)
 	return url, nil
 }
+
+func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (string, error) {
+	replenishmentID, email, err := s.repo.NewReplenishment(userId, amount)
+	if err != nil {
+		return "", err
+	}
+	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "test", email)
+	if err != nil {
+		return "", err
+	}
+	return location, nil
+}
+
+func (s *ReplenishmentService) AcceptReplenishment(replenishmentID int) {}

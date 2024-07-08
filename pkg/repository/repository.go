@@ -69,6 +69,7 @@ type Roulette interface {
 
 type Replenishment interface {
 	NewReplenishment(userID string, amount float64) (string, string, error)
+	AcceptReplenishment(replenishmentID int) error
 }
 
 func NewRepository(db *gorm.DB) *Repository {

@@ -58,7 +58,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		fk.POST("/msg", h.MSGFromFrekassa)
 		fk.GET("/accepted", h.RedirectAccepted)
-		fk.POST("/denied", h.MSGFromFrekassa)
+		fk.POST("/denied", h.RedirectDenied)
 	}
 
 	auth := router.Group("/user")

@@ -23,7 +23,27 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 }
 
 func (h *Handler) RedirectAccepted(c *gin.Context) {
-	c.Redirect(http.StatusFound, "https://www.google.com")
+	//c.Redirect(http.StatusFound, "https://www.google.com")
+	queryParams := c.Request.URL.Query()
+
+	// Выводим query параметры
+	for key, values := range queryParams {
+		for _, value := range values {
+			c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
+		}
+	}
+}
+
+func (h *Handler) RedirectDenied(c *gin.Context) {
+	//c.Redirect(http.StatusFound, "https://www.google.com/url?sa=i&url=https%3A%2F%2Fru.dreamstime.com%2Fillustration%2Fdenied.html&psig=AOvVaw0AVCa5fJqyiZjf9Ic5wiBZ&ust=1720542463329000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCIiV7qbul4cDFQAAAAAdAAAAABAE")
+	queryParams := c.Request.URL.Query()
+
+	// Выводим query параметры
+	for key, values := range queryParams {
+		for _, value := range values {
+			c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
+		}
+	}
 }
 
 func (h *Handler) MSGFromFrekassa(c *gin.Context) {

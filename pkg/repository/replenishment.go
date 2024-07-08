@@ -33,3 +33,20 @@ func (r *ReplenishmentPostgres) NewReplenishment(userID string, amount float64) 
 	fmt.Println("repo: ", strconv.Itoa(newReplenishment.ID), user.Email)
 	return strconv.Itoa(newReplenishment.ID), user.Email, nil
 }
+
+func (r *ReplenishmentPostgres) AcceptReplenishment(replenishmentID int) error {
+	var replenishment model.Replenishment
+	err := r.db.Model(&model.Replenishment{}).Where("id = ?", replenishmentID).First(&replenishment).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Model(&model.Replenishment{}).Where("id = ?", replenishmentID).Update("success", true).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Model(&model.User{}).Where("id = ?", replenishment.UserID).Update("balance", gorm.Expr("balance + ?", replenishment.Amount)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
