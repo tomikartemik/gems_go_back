@@ -36,11 +36,10 @@ func (h *Handler) RedirectAccepted(c *gin.Context) {
 	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
 	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
 	go h.services.AcceptReplenishment(replenishmentId)
-	c.Redirect(http.StatusFound, "https://www.google.com")
+	c.Redirect(http.StatusFound, "https://brawl-alpha.vercel.app/")
 }
 
 func (h *Handler) RedirectDenied(c *gin.Context) {
-	//c.Redirect(http.StatusFound, "https://www.google.com/url?sa=i&url=https%3A%2F%2Fru.dreamstime.com%2Fillustration%2Fdenied.html&psig=AOvVaw0AVCa5fJqyiZjf9Ic5wiBZ&ust=1720542463329000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCIiV7qbul4cDFQAAAAAdAAAAABAE")
 	queryParams := c.Request.URL.Query()
 
 	// Выводим query параметры
@@ -49,6 +48,7 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 			c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
 		}
 	}
+	c.Redirect(http.StatusFound, "https://brawl-alpha.vercel.app/")
 }
 
 func (h *Handler) MSGFromFrekassa(c *gin.Context) {
@@ -60,6 +60,7 @@ func (h *Handler) MSGFromFrekassa(c *gin.Context) {
 		return
 	}
 	fmt.Println(data)
+	c.Redirect(http.StatusFound, "https://brawl-alpha.vercel.app/")
 	// Для демонстрации выводим полученные данные в консоль
 	//c.JSON(http.StatusOK, data)
 }

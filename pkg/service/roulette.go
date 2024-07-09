@@ -32,7 +32,6 @@ type BetMessageRoulette struct {
 }
 
 type BetMessageRouletteResponse struct {
-	PlayerID       string `json:"player_id"`
 	PlayerNickname string `json:"player_nickname"`
 	//Image    string `json:"image"`
 	Amount float64 `json:"amount"`
@@ -216,7 +215,6 @@ func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64
 	}
 	betMessageRouletteResponse.PlayerNickname = playerNickname
 	betMessageRouletteResponse.Amount = amount
-	betMessageRouletteResponse.PlayerID = userID
 	if cell == 2 {
 		betsAtLastRouletteGame.Bet2 = append(betsAtLastRouletteGame.Bet2, betMessageRouletteResponse)
 	} else if cell == 3 {
