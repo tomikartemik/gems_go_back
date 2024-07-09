@@ -102,20 +102,20 @@ func (s *AuthService) ParseToken(accesToken string) (string, error) {
 	return claims.UserId, nil
 }
 
-func (s *AuthService) AddItemToInventory(userId string, itemId int) (schema.ShowUser, error) {
-	var userWithInventory schema.ShowUser
-
-	_, err := s.repo.AddItemToInventory(userId, itemId)
-	if err != nil {
-		return userWithInventory, err
-	}
-
-	userWithInventory, err = s.repo.GetUserById(userId)
-	if err != nil {
-		return userWithInventory, err
-	}
-	return userWithInventory, nil
-}
+//func (s *AuthService) AddItemToInventory(userId string, itemId int) (schema.ShowUser, error) {
+//	var userWithInventory schema.ShowUser
+//
+//	_, err := s.repo.AddItemToInventory(userId, itemId)
+//	if err != nil {
+//		return userWithInventory, err
+//	}
+//
+//	userWithInventory, err = s.repo.GetUserById(userId)
+//	if err != nil {
+//		return userWithInventory, err
+//	}
+//	return userWithInventory, nil
+//}
 
 func (s *AuthService) SellAnItem(userId string, userItemId int) (schema.UserWithItems, error) {
 	var user schema.UserWithItems

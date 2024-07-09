@@ -13,7 +13,7 @@ type User interface {
 	ParseToken(token string) (string, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
-	AddItemToInventory(userId string, itemId int) (schema.ShowUser, error)
+	//AddItemToInventory(userId string, itemId int) (schema.ShowUser, error)
 	SellAnItem(userId string, userItemId int) (schema.UserWithItems, error)
 	SignIn(email string, password string) (schema.UserWithItems, error)
 }
@@ -33,7 +33,7 @@ type Case interface {
 	GetAllCases() ([]schema.CaseInfo, error)
 	UpdateCase(id int, updates model.Case) (schema.ShowCase, error)
 	DeleteCase(caseId int) error
-	OpenCase(caseId int) (model.ItemWithID, error)
+	OpenCase(caseId int, userId string) (model.ItemWithID, error)
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
 }
 

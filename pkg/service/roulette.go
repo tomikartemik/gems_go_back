@@ -69,7 +69,7 @@ var cells = []Cell{
 	{10, 10},
 	{100, 1},
 }
-var totalWeight = 114
+var totalWeightInRoulette = 114
 var winCell = 0
 
 var lsatRouletteGameID int
@@ -155,7 +155,7 @@ func (s *RouletteService) PreparingRoulette() {
 func (s *RouletteService) StartGameRoulette() {
 	responeRoulette.Status = "Playing"
 	acceptingBetsRoulette = false
-	randomNumber := rand.Intn(totalWeight)
+	randomNumber := rand.Intn(totalWeightInRoulette)
 
 	for _, choosenCell := range cells {
 		if randomNumber < choosenCell.Weight {

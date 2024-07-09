@@ -121,6 +121,42 @@ func (r *CasePostgres) NewCaseRecord(case_id int) error {
 	return nil
 }
 
+func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId int) error {
+	var userItem model.UserItem
+	userItem.ItemID = itemId
+	userItem.UserID = userId
+	result := r.db.Create(&userItem)
+	if result.Error != nil {
+		return result.Error
+	}
+	var newItem, bestItem model.Item
+	var user model.User
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
+		return err
+	}
+	if user.BestItemId != 0 {
+		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
+			return err
+		}
+		if err := r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
+			return err
+		}
+		if newItem.Price > bestItem.Price {
+			if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
+				return err
+			}
+		}
+	} else {
+		if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
+			return err
+		}
+	}
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", user.Balance-float64(newItem.Price)).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *CasePostgres) GetAllCaseRecords() ([]schema.CaseInfo, error) {
 	var lastCases []schema.CaseInfo
 	var caseRecords []model.CaseRecord

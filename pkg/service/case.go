@@ -120,7 +120,7 @@ func (s *CaseService) DeleteCase(caseId int) error {
 	return nil
 }
 
-func (s *CaseService) OpenCase(caseId int) (model.ItemWithID, error) {
+func (s *CaseService) OpenCase(caseId int, userId string) (model.ItemWithID, error) {
 	var chosenItem model.ItemWithID
 
 	var caseItems []model.CaseItem
@@ -130,14 +130,14 @@ func (s *CaseService) OpenCase(caseId int) (model.ItemWithID, error) {
 	}
 
 	//Суммируем все веса
-	totalWeight := 0
+	totalWeightInCase := 0
 	for _, caseItem := range caseItems {
-		totalWeight += caseItem.Weight
+		totalWeightInCase += caseItem.Weight
 	}
 
 	//Генерируем случайное число
 	rand.Seed(time.Now().UnixNano())
-	randomNumber := rand.Intn(totalWeight)
+	randomNumber := rand.Intn(totalWeightInCase)
 
 	//Выбираем случайно предмет, учитывая веса
 	for _, caseItem := range caseItems {
@@ -151,7 +151,14 @@ func (s *CaseService) OpenCase(caseId int) (model.ItemWithID, error) {
 		}
 		randomNumber -= caseItem.Weight
 	}
-	_ = s.repo.NewCaseRecord(caseId)
+	err = s.repo.NewCaseRecord(caseId)
+	if err != nil {
+		return model.ItemWithID{}, err
+	}
+	err = s.repo.AddItemToInventoryAndChangeBalance(userId, caseId)
+	if err != nil {
+		return model.ItemWithID{}, err
+	}
 	return chosenItem, nil
 }
 

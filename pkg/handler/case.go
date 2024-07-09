@@ -105,18 +105,14 @@ func (h *Handler) deleteCase(c *gin.Context) {
 }
 
 func (h *Handler) openCase(c *gin.Context) {
+	userId := c.GetString("user_id")
 	caseIdStr := c.Query("case_id")
 	caseId, err := strconv.Atoi(caseIdStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	userId := c.GetString("user_id")
-	chosenItem, err := h.services.OpenCase(caseId)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-	_, err = h.services.AddItemToInventory(userId, chosenItem.ID)
+	chosenItem, err := h.services.OpenCase(caseId, userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}

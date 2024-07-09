@@ -21,7 +21,7 @@ type User interface {
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserInventory(userId string) ([]model.ItemOfInventory, error)
 	GetUserById(id string) (schema.ShowUser, error)
-	AddItemToInventory(userId string, itemId int) (model.UserItem, error)
+	//AddItemToInventory(userId string, itemId int) (model.UserItem, error)
 	SellAnItem(userId string, user_item_id int) error
 }
 
@@ -45,6 +45,7 @@ type Case interface {
 	GetChosenItem(id int) (model.ItemWithID, error)
 	NewCaseRecord(case_id int) error
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
+	AddItemToInventoryAndChangeBalance(userId string, itemId int) error
 }
 
 type Crash interface {
