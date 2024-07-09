@@ -229,12 +229,12 @@ func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64
 		betsAtLastRouletteGame.Bet100 = append(betsAtLastRouletteGame.Bet100, betMessageRouletteResponse)
 	}
 	clientsMutexRoulette.Lock()
-	for client := range clientsCrash {
+	for client := range clientsRoulette {
 		err = client.conn.WriteJSON(betsAtLastRouletteGame)
 		if err != nil {
 			log.Println("Write error:", err)
 			client.conn.Close()
-			delete(clientsCrash, client)
+			delete(clientsRoulette, client)
 		}
 	}
 	clientsMutexRoulette.Unlock()
