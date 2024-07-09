@@ -158,7 +158,7 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 			return err
 		}
 	}
-	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", user.Balance-float64(newItem.Price)).Error; err != nil {
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", newItem.Price)).Error; err != nil {
 		fmt.Println(err)
 		return err
 	}
