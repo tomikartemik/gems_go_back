@@ -110,6 +110,7 @@ func (h *Handler) openCase(c *gin.Context) {
 	caseIdStr := c.Query("case_id")
 	caseId, err := strconv.Atoi(caseIdStr)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 

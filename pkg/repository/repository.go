@@ -43,7 +43,7 @@ type Case interface {
 	DeleteCase(id int) error
 	GetItemsWithWeights(id int) ([]model.CaseItem, error)
 	GetChosenItem(id int) (model.ItemWithID, error)
-	NewCaseRecord(case_id int) error
+	NewCaseRecord(caseId int) error
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
 	AddItemToInventoryAndChangeBalance(userId string, itemId int) error
 }

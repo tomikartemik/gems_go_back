@@ -114,9 +114,9 @@ func (r *CasePostgres) GetChosenItem(id int) (model.ItemWithID, error) {
 	return chosenItem, nil
 }
 
-func (r *CasePostgres) NewCaseRecord(case_id int) error {
-	record := model.CaseRecord{CaseID: case_id}
-	if err := r.db.Model(&model.CaseRecord{}).Create(record).Error; err != nil {
+func (r *CasePostgres) NewCaseRecord(caseId int) error {
+	record := model.CaseRecord{CaseID: caseId}
+	if err := r.db.Model(&model.CaseRecord{}).Create(&record).Error; err != nil {
 		return err
 	}
 	return nil
