@@ -31,7 +31,23 @@ type BetMessageRoulette struct {
 	Cell     int     `json:"cell"`
 }
 
-type ResponseRoulette struct {
+type BetMessageRouletteResponse struct {
+	PlayerID       string `json:"player_id"`
+	PlayerNickname string `json:"player_nickname"`
+	//Image    string `json:"image"`
+	Amount float64 `json:"amount"`
+}
+
+type BetsAtLastRouletteGame struct {
+	MainAmount float64                      `json:"main_amount"`
+	Bet2       []BetMessageRouletteResponse `json:"bet2"`
+	Bet3       []BetMessageRouletteResponse `json:"bet3"`
+	Bet5       []BetMessageRouletteResponse `json:"bet5"`
+	Bet10      []BetMessageRouletteResponse `json:"bet10"`
+	Bet100     []BetMessageRouletteResponse `json:"bet100"`
+}
+
+type ResponseRouletteStatus struct {
 	GameID          int     `json:"game_id"`
 	Status          string  `json:"status"`
 	Cell            int     `json:"cell"`
@@ -43,9 +59,10 @@ type Cell struct {
 	Weight int
 }
 
+var betsAtLastRouletteGame BetsAtLastRouletteGame
 var clientsRoulette = make(map[*ClientRoulette]bool)
 var clientsMutexRoulette = &sync.Mutex{}
-var responeRoulette = ResponseRoulette{0, "Pending", 0, 0.0}
+var responeRoulette = ResponseRouletteStatus{0, "Pending", 0, 0.0}
 var cells = []Cell{
 	{2, 50},
 	{3, 33},
@@ -88,6 +105,7 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 				UserCell: bet.Cell,
 			}
 			errorStr := s.repo.NewBetRoulette(newBet)
+			go s.AddRouletteBetToResponse(bet.PlayerID, bet.Amount, bet.Cell)
 			fmt.Println(errorStr)
 		}
 	}
@@ -96,12 +114,15 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 	delete(clientsRoulette, client)
 	clientsMutexRoulette.Unlock()
 }
+
 func (s *RouletteService) BroadcastTimeRoulette() {
 	//s.repo.NewRouletteRecord(100)
 	s.StartPreparingRoulette()
 }
 
 func (s *RouletteService) StartPreparingRoulette() {
+	betsAtLastRouletteGame = BetsAtLastRouletteGame{}
+	betsAtLastRouletteGame.MainAmount = 0.0
 	acceptingBetsRoulette = true
 	responeRoulette.Cell = 0
 	responeRoulette.Status = "Pending"
@@ -184,6 +205,39 @@ func (s *RouletteService) EndRoulette() {
 	s.repo.UpdateWinCells(lsatRouletteGameID, winCell)
 	s.repo.CreditingWinningsRoulette(lsatRouletteGameID)
 	s.StartPreparingRoulette()
+}
+
+func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64, cell int) {
+	var betMessageRouletteResponse BetMessageRouletteResponse
+	betsAtLastRouletteGame.MainAmount += amount
+	playerNickname, err := s.repo.GetUsersPhotoAndNickForRoulette(userID)
+	if err != nil {
+		log.Println(err)
+	}
+	betMessageRouletteResponse.PlayerNickname = playerNickname
+	betMessageRouletteResponse.Amount = amount
+	betMessageRouletteResponse.PlayerID = userID
+	if cell == 2 {
+		betsAtLastRouletteGame.Bet2 = append(betsAtLastRouletteGame.Bet2, betMessageRouletteResponse)
+	} else if cell == 3 {
+		betsAtLastRouletteGame.Bet3 = append(betsAtLastRouletteGame.Bet3, betMessageRouletteResponse)
+	} else if cell == 5 {
+		betsAtLastRouletteGame.Bet5 = append(betsAtLastRouletteGame.Bet5, betMessageRouletteResponse)
+	} else if cell == 10 {
+		betsAtLastRouletteGame.Bet10 = append(betsAtLastRouletteGame.Bet10, betMessageRouletteResponse)
+	} else if cell == 100 {
+		betsAtLastRouletteGame.Bet100 = append(betsAtLastRouletteGame.Bet100, betMessageRouletteResponse)
+	}
+	clientsMutexCrash.Lock()
+	for client := range clientsCrash {
+		err = client.conn.WriteJSON(betsAtLastRouletteGame)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsCrash, client)
+		}
+	}
+	clientsMutexCrash.Unlock()
 }
 
 func (s *RouletteService) GetAllRouletteRecords() ([]model.RouletteRecord, error) {

@@ -96,7 +96,7 @@ func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 }
 
 // Добавить фотку
-func (r *CrashPostgres) GetUsersPhotoAndNick(userId string) (string, error) {
+func (r *CrashPostgres) GetUsersPhotoAndNickForCrash(userId string) (string, error) {
 	var user model.User
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
 		return "", err

@@ -102,7 +102,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 				Amount: bet.Amount,
 			}
 			errorStr := s.repo.NewBetCrash(newBet)
-			go s.SaveNewBetCrash(bet.PlayerID, bet.Amount)
+			go s.AddBetCrashToResponse(bet.PlayerID, bet.Amount)
 			fmt.Println(errorStr)
 		} else if acceptingCashoutsCrash {
 			var cashout CashoutMessageCrash
@@ -224,8 +224,8 @@ func (s *CrashService) EndCrash() {
 	s.StartPreparingCrash()
 }
 
-func (s *CrashService) SaveNewBetCrash(userId string, amount float64) {
-	nickname, err := s.repo.GetUsersPhotoAndNick(userId)
+func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
+	nickname, err := s.repo.GetUsersPhotoAndNickForCrash(userId)
 	if err != nil {
 		return
 	}

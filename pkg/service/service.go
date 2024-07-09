@@ -47,7 +47,7 @@ type Crash interface {
 	EndCrash()
 	GetAllRecords() ([]model.CrashRecord, error)
 	UpdateSavedBetCrash(userId string, multiplier float64)
-	SaveNewBetCrash(userId string, amount float64)
+	AddBetCrashToResponse(userId string, amount float64)
 }
 
 type Roulette interface {
