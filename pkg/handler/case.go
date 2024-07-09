@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"github.com/gin-gonic/gin"
@@ -114,6 +115,7 @@ func (h *Handler) openCase(c *gin.Context) {
 
 	chosenItem, err := h.services.OpenCase(userId, caseId)
 	if err != nil {
+		fmt.Println(err)
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	c.JSON(http.StatusOK, chosenItem)

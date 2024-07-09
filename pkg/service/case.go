@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"gems_go_back/pkg/schema"
@@ -153,10 +154,12 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, err
 	}
 	err = s.repo.NewCaseRecord(caseId)
 	if err != nil {
+		fmt.Println(err)
 		return model.ItemWithID{}, err
 	}
 	err = s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID)
 	if err != nil {
+		fmt.Println(err)
 		return model.ItemWithID{}, err
 	}
 	return chosenItem, nil

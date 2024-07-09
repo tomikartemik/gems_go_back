@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"gorm.io/gorm"
@@ -127,31 +128,38 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 	userItem.UserID = userId
 	result := r.db.Create(&userItem)
 	if result.Error != nil {
+		fmt.Println(result.Error)
 		return result.Error
 	}
 	var newItem, bestItem model.Item
 	var user model.User
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
+		fmt.Println(err)
 		return err
 	}
 	if user.BestItemId != 0 {
 		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
+			fmt.Println(err)
 			return err
 		}
 		if err := r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
+			fmt.Println(err)
 			return err
 		}
 		if newItem.Price > bestItem.Price {
 			if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
+				fmt.Println(err)
 				return err
 			}
 		}
 	} else {
 		if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
+			fmt.Println(err)
 			return err
 		}
 	}
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", user.Balance-float64(newItem.Price)).Error; err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
