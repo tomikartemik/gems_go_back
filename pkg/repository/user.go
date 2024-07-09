@@ -63,7 +63,9 @@ func (r *UserPostgres) GetUserById(id string) (schema.ShowUser, error) {
 		BestItem: model.ItemWithID{},
 	}
 	var bestItem model.ItemWithID
-	err = r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error
+	if user.BestItemId != 0 {
+		err = r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error
+	}
 	userResponse.BestItem = bestItem
 	return userResponse, nil
 }
