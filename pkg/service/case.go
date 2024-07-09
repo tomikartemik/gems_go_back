@@ -129,7 +129,6 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, err
 	if err != nil {
 		return chosenItem, err
 	}
-
 	//Суммируем все веса
 	totalWeightInCase := 0
 	for _, caseItem := range caseItems {
@@ -139,16 +138,15 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, err
 	//Генерируем случайное число
 	rand.Seed(time.Now().UnixNano())
 	randomNumber := rand.Intn(totalWeightInCase)
-
 	//Выбираем случайно предмет, учитывая веса
 	for _, caseItem := range caseItems {
 		if randomNumber < caseItem.Weight {
 			id := caseItem.ItemID
 			chosenItem, err = s.repo.GetChosenItem(id)
 			if err != nil {
-				return chosenItem, err
+				break
 			}
-			return chosenItem, nil
+			break
 		}
 		randomNumber -= caseItem.Weight
 	}
