@@ -33,7 +33,7 @@ type Case interface {
 	GetAllCases() ([]schema.CaseInfo, error)
 	UpdateCase(id int, updates model.Case) (schema.ShowCase, error)
 	DeleteCase(caseId int) error
-	OpenCase(caseId int, userId string) (model.ItemWithID, error)
+	OpenCase(userId string, caseId int) (model.ItemWithID, error)
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
 }
 

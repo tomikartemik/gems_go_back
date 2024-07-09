@@ -112,7 +112,7 @@ func (h *Handler) openCase(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	chosenItem, err := h.services.OpenCase(caseId, userId)
+	chosenItem, err := h.services.OpenCase(userId, caseId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}

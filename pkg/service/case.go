@@ -120,7 +120,7 @@ func (s *CaseService) DeleteCase(caseId int) error {
 	return nil
 }
 
-func (s *CaseService) OpenCase(caseId int, userId string) (model.ItemWithID, error) {
+func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, error) {
 	var chosenItem model.ItemWithID
 
 	var caseItems []model.CaseItem
@@ -155,7 +155,7 @@ func (s *CaseService) OpenCase(caseId int, userId string) (model.ItemWithID, err
 	if err != nil {
 		return model.ItemWithID{}, err
 	}
-	err = s.repo.AddItemToInventoryAndChangeBalance(userId, caseId)
+	err = s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID)
 	if err != nil {
 		return model.ItemWithID{}, err
 	}
