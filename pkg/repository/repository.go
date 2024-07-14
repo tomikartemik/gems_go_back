@@ -45,7 +45,7 @@ type Case interface {
 	GetChosenItem(id int) (model.ItemWithID, error)
 	NewCaseRecord(caseId int) error
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
-	AddItemToInventoryAndChangeBalance(userId string, itemId int) error
+	AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) error
 }
 
 type Crash interface {

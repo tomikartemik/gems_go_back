@@ -122,8 +122,11 @@ func (r *CasePostgres) NewCaseRecord(caseId int) error {
 	return nil
 }
 
-func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId int) error {
+func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) error {
 	var userItem model.UserItem
+	var purchasedСase model.Case
+	var newItem, bestItem model.Item
+	var user model.User
 	userItem.ItemID = itemId
 	userItem.UserID = userId
 	result := r.db.Create(&userItem)
@@ -131,12 +134,17 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 		fmt.Println(result.Error)
 		return result.Error
 	}
-	var newItem, bestItem model.Item
-	var user model.User
+
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	if err := r.db.Model(&model.Case{}).Where("id = ?", caseId).First(&purchasedСase).Error; err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	if user.BestItemId != 0 {
 		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
 			fmt.Println(err)
@@ -158,7 +166,7 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 			return err
 		}
 	}
-	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", newItem.Price)).Error; err != nil {
+	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", purchasedСase.Price)).Error; err != nil {
 		fmt.Println(err)
 		return err
 	}

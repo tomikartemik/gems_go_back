@@ -155,7 +155,7 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, err
 		fmt.Println(err)
 		return model.ItemWithID{}, err
 	}
-	err = s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID)
+	err = s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID, caseId)
 	if err != nil {
 		fmt.Println(err)
 		return model.ItemWithID{}, err
