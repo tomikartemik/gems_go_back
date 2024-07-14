@@ -124,11 +124,11 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 }
 
 func (s *CrashService) BroadcastTimeCrash() {
-	betsAtLastCrashGame.Bets = []InfoAboutCrashBet{}
 	s.StartPreparingCrash()
 }
 
 func (s *CrashService) StartPreparingCrash() {
+	betsAtLastCrashGame = BetsAtLastCrashGame{}
 	acceptingBetsCrash = true
 	responseCrash.Length = 0.0
 	responseCrash.Rotate = 0.0
