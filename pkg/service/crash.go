@@ -124,7 +124,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 }
 
 func (s *CrashService) BroadcastTimeCrash() {
-	betsAtLastCrashGame = BetsAtLastCrashGame{}
+	betsAtLastCrashGame.Bets = []InfoAboutCrashBet{}
 	s.StartPreparingCrash()
 }
 
