@@ -121,13 +121,15 @@ func (s *CaseService) DeleteCase(caseId int) error {
 	return nil
 }
 
-func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, error) {
+func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int, error) {
+	if s.repo.CheckThePossibilityOfPurchasing(userId, caseId) == false {
+		return model.ItemWithID{}, -1, nil
+	}
 	var chosenItem model.ItemWithID
-
 	var caseItems []model.CaseItem
 	caseItems, err := s.repo.GetItemsWithWeights(caseId)
 	if err != nil {
-		return chosenItem, err
+		return chosenItem, 0, err
 	}
 	//Суммируем все веса
 	totalWeightInCase := 0
@@ -153,14 +155,14 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, err
 	err = s.repo.NewCaseRecord(caseId)
 	if err != nil {
 		fmt.Println(err)
-		return model.ItemWithID{}, err
+		return model.ItemWithID{}, 0, err
 	}
-	err = s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID, caseId)
+	userItemId, err := s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID, caseId)
 	if err != nil {
 		fmt.Println(err)
-		return model.ItemWithID{}, err
+		return model.ItemWithID{}, 0, err
 	}
-	return chosenItem, nil
+	return chosenItem, userItemId, nil
 }
 
 func (s *CaseService) GetAllCaseRecords() ([]schema.CaseInfo, error) {

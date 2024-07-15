@@ -9,18 +9,11 @@ import (
 	"strconv"
 )
 
-// createCase создает новый кейс.
-// @Summary Создает новый кейс
-// @Tags cases
-// @Description Создает новый кейс на основе переданных данных
-// @ID createCase
-// @Accept json
-// @Produce json
-// @Param input body schema.CaseInput true "Данные для создания кейса"
-// @Success 200 {object} map[string]interface{} "Успешно созданный кейс"
-// @Failure 400 {object} map[string]interface{} "Ошибка в запросе"
-// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
-// @Router /case/create [post]
+type OpenedCaseResponse struct {
+	WinedItem  model.ItemWithID `json:"wined_item"`
+	UserItemId int              `json:"user_item_id"`
+}
+
 func (h *Handler) createCase(c *gin.Context) {
 	var input model.Case
 	if err := c.BindJSON(&input); err != nil {
@@ -37,18 +30,6 @@ func (h *Handler) createCase(c *gin.Context) {
 	c.JSON(http.StatusOK, createdCase)
 }
 
-// getCase получает информацию о кейсе.
-// @Summary Получает информацию о кейсе
-// @Tags cases
-// @Description Получает информацию о кейсе по его ID
-// @ID getCase
-// @Accept json
-// @Produce json
-// @Param id query int true "ID кейса"
-// @Success 200 {object} map[string]interface{} "Информация о кейсе"
-// @Failure 400 {object} map[string]interface{} "Ошибка в запросе"
-// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
-// @Router /case/get-case [get]
 func (h *Handler) getCase(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
@@ -114,12 +95,19 @@ func (h *Handler) openCase(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	chosenItem, err := h.services.OpenCase(userId, caseId)
+	chosenItem, userItemId, err := h.services.OpenCase(userId, caseId)
 	if err != nil {
 		fmt.Println(err)
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	} else if userItemId == -1 {
+		c.JSON(http.StatusBadRequest, "иди у мамы денег проси")
+	} else {
+		openedCaseResponse := OpenedCaseResponse{
+			WinedItem:  chosenItem,
+			UserItemId: userItemId,
+		}
+		c.JSON(http.StatusOK, openedCaseResponse)
 	}
-	c.JSON(http.StatusOK, chosenItem)
 }
 
 func (h *Handler) getAllCaseRecords(c *gin.Context) {

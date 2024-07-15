@@ -41,11 +41,12 @@ type Case interface {
 	GetAllCases() ([]schema.CaseInfo, error)
 	UpdateCase(id int, newCase schema.CaseInput) (schema.ShowCase, error)
 	DeleteCase(id int) error
+	CheckThePossibilityOfPurchasing(userId string, caseId int) bool
 	GetItemsWithWeights(id int) ([]model.CaseItem, error)
 	GetChosenItem(id int) (model.ItemWithID, error)
 	NewCaseRecord(caseId int) error
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
-	AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) error
+	AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) (int, error)
 }
 
 type Crash interface {
