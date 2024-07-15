@@ -40,6 +40,8 @@ type Case interface {
 type Crash interface {
 	EditConnsCrash(ws *websocket.Conn)
 	BroadcastTimeCrash()
+	CheckStatusOfStartCrash()
+	ChangeStatusOfStartCrash(start bool)
 	StartPreparingCrash()
 	PreparingCrash()
 	StartGameCrash()
@@ -53,6 +55,8 @@ type Crash interface {
 type Roulette interface {
 	EidtConnsRoulette(conn *websocket.Conn)
 	BroadcastTimeRoulette()
+	CheckStatusOfStartRoulette()
+	ChangeStatusOfStartRoulette(statusFromFront bool)
 	StartPreparingRoulette()
 	PreparingRoulette()
 	StartGameRoulette()

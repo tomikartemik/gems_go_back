@@ -54,6 +54,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
 	router.POST("/replenishment", h.NewReplenishment)
 
+	admin := router.Group("/admin")
+	{
+		admin.POST("/change-status", h.adminChangeStatus)
+	}
+
 	fk := router.Group("/fk")
 	{
 		fk.POST("/msg", h.MSGFromFrekassa)

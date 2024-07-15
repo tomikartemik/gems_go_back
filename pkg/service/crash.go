@@ -59,6 +59,7 @@ type BetsAtLastCrashGame struct {
 	Bets []InfoAboutCrashBet `json:"bets"`
 }
 
+var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
 var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0, 0.0}
 var clientsCrash = make(map[*ClientCrash]bool)
@@ -123,8 +124,32 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 	clientsMutexCrash.Unlock()
 }
 
+func (s *CrashService) CheckStatusOfStartCrash() {
+	if startCrash == false {
+		responseCrash.Status = "Stopped"
+		clientsMutexCrash.Lock()
+		for client := range clientsCrash {
+			err := client.conn.WriteJSON(responseCrash.Status)
+			if err != nil {
+				log.Println("Write error:", err)
+				client.conn.Close()
+				delete(clientsCrash, client)
+			}
+		}
+		clientsMutexCrash.Unlock()
+		time.Sleep(1 * time.Second)
+		s.CheckStatusOfStartCrash()
+	} else {
+		s.StartPreparingCrash()
+	}
+}
+
+func (s *CrashService) ChangeStatusOfStartCrash(statusFromFront bool) {
+	startCrash = statusFromFront
+}
+
 func (s *CrashService) BroadcastTimeCrash() {
-	s.StartPreparingCrash()
+	s.CheckStatusOfStartCrash()
 }
 
 func (s *CrashService) StartPreparingCrash() {
@@ -223,7 +248,11 @@ func (s *CrashService) EndCrash() {
 	}
 	s.repo.UpdateWinMultipliers(lastCrashGameID, winMultiplier)
 	s.repo.CreditingWinningsCrash(lastCrashGameID)
-	s.StartPreparingCrash()
+	if startCrash {
+		s.StartPreparingCrash()
+	} else {
+		s.CheckStatusOfStartCrash()
+	}
 }
 
 func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {

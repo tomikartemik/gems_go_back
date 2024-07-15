@@ -58,10 +58,11 @@ type Cell struct {
 	Weight int
 }
 
+var startRoulette = false
 var betsAtLastRouletteGame BetsAtLastRouletteGame
 var clientsRoulette = make(map[*ClientRoulette]bool)
 var clientsMutexRoulette = &sync.Mutex{}
-var responeRoulette = ResponseRouletteStatus{0, "Pending", 0, 0.0}
+var responseRoulette = ResponseRouletteStatus{0, "Pending", 0, 0.0}
 var cells = []Cell{
 	{2, 50},
 	{3, 33},
@@ -119,18 +120,42 @@ func (s *RouletteService) BroadcastTimeRoulette() {
 	s.StartPreparingRoulette()
 }
 
+func (s *RouletteService) CheckStatusOfStartRoulette() {
+	if startRoulette == false {
+		responseRoulette.Status = "Stopped"
+		clientsMutexRoulette.Lock()
+		for client := range clientsRoulette {
+			err := client.conn.WriteJSON(responseRoulette.Status)
+			if err != nil {
+				log.Println("Write error:", err)
+				client.conn.Close()
+				delete(clientsRoulette, client)
+			}
+		}
+		clientsMutexRoulette.Unlock()
+		time.Sleep(1 * time.Second)
+		s.CheckStatusOfStartRoulette()
+	} else {
+		s.StartPreparingRoulette()
+	}
+}
+
+func (s *RouletteService) ChangeStatusOfStartRoulette(statusFromFront bool) {
+	startRoulette = statusFromFront
+}
+
 func (s *RouletteService) StartPreparingRoulette() {
 	betsAtLastRouletteGame = BetsAtLastRouletteGame{}
 	betsAtLastRouletteGame.MainAmount = 0.0
 	acceptingBetsRoulette = true
-	responeRoulette.Cell = 0
-	responeRoulette.Status = "Pending"
+	responseRoulette.Cell = 0
+	responseRoulette.Status = "Pending"
 	lastGame, err := s.repo.GetLastRouletteRecord()
 	if err != nil {
 		fmt.Println(err)
 	}
 	lsatRouletteGameID = lastGame.ID + 1
-	responeRoulette.GameID = lsatRouletteGameID
+	responseRoulette.GameID = lsatRouletteGameID
 	s.PreparingRoulette()
 }
 
@@ -138,9 +163,9 @@ func (s *RouletteService) PreparingRoulette() {
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
-		responeRoulette.TimeBeforeStart = time_before_start / 100.0
+		responseRoulette.TimeBeforeStart = time_before_start / 100.0
 		for client := range clientsRoulette {
-			err := client.conn.WriteJSON(responeRoulette)
+			err := client.conn.WriteJSON(responseRoulette)
 			if err != nil {
 				log.Println("Write error:", err)
 				client.conn.Close()
@@ -153,7 +178,7 @@ func (s *RouletteService) PreparingRoulette() {
 }
 
 func (s *RouletteService) StartGameRoulette() {
-	responeRoulette.Status = "Playing"
+	responseRoulette.Status = "Playing"
 	acceptingBetsRoulette = false
 	randomNumber := rand.Intn(totalWeightInRoulette)
 
@@ -164,7 +189,7 @@ func (s *RouletteService) StartGameRoulette() {
 		}
 		randomNumber -= choosenCell.Weight
 	}
-	responeRoulette.Cell = winCell
+	responseRoulette.Cell = winCell
 	s.GameRoulette()
 }
 
@@ -173,7 +198,7 @@ func (s *RouletteService) GameRoulette() {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
 		for client := range clientsRoulette {
-			err := client.conn.WriteJSON(responeRoulette)
+			err := client.conn.WriteJSON(responseRoulette)
 			if err != nil {
 				log.Println("Write error:", err)
 				client.conn.Close()
@@ -187,12 +212,12 @@ func (s *RouletteService) GameRoulette() {
 }
 
 func (s *RouletteService) EndRoulette() {
-	responeRoulette.Status = "End"
+	responseRoulette.Status = "End"
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
 		for client := range clientsRoulette {
-			err := client.conn.WriteJSON(responeRoulette)
+			err := client.conn.WriteJSON(responseRoulette)
 			if err != nil {
 				log.Println("Write error:", err)
 				client.conn.Close()
@@ -203,7 +228,11 @@ func (s *RouletteService) EndRoulette() {
 	}
 	s.repo.UpdateWinCells(lsatRouletteGameID, winCell)
 	s.repo.CreditingWinningsRoulette(lsatRouletteGameID)
-	s.StartPreparingRoulette()
+	if startRoulette {
+		s.StartPreparingRoulette()
+	} else {
+		s.CheckStatusOfStartRoulette()
+	}
 }
 
 func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64, cell int) {
