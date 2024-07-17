@@ -44,11 +44,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	router.GET("/crash", h.handleConnectionsCrash)
-	go h.services.Crash.BroadcastTimeCrash()
+	go h.services.Crash.CrashGame()
+	go h.services.Roulette.RouletteGame()
+	h.services.TelegramBot()
 
+	router.GET("/crash", h.handleConnectionsCrash)
 	router.GET("/roulette", h.handleConnectionsRoulette)
-	go h.services.Roulette.BroadcastTimeRoulette()
 
 	router.GET("/all-crash-records", h.getAllCrashRecords)
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
@@ -96,6 +97,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	games := router.Group("/games", h.userIdentity)
 	{
 		games.GET("/open", h.openCase)
+	}
+
+	withdraw := router.Group("/withdraw")
+	{
+		withdraw.POST("/create", h.createWithdraw)
 	}
 	return router
 }

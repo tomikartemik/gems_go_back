@@ -115,7 +115,7 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 	clientsMutexRoulette.Unlock()
 }
 
-func (s *RouletteService) BroadcastTimeRoulette() {
+func (s *RouletteService) RouletteGame() {
 	//s.repo.NewRouletteRecord(100)
 	s.StartPreparingRoulette()
 }

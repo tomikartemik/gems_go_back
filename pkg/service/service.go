@@ -4,6 +4,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"gems_go_back/pkg/schema"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/gorilla/websocket"
 )
 
@@ -39,7 +40,7 @@ type Case interface {
 
 type Crash interface {
 	EditConnsCrash(ws *websocket.Conn)
-	BroadcastTimeCrash()
+	CrashGame()
 	CheckStatusOfStartCrash()
 	ChangeStatusOfStartCrash(start bool)
 	StartPreparingCrash()
@@ -54,7 +55,7 @@ type Crash interface {
 
 type Roulette interface {
 	EidtConnsRoulette(conn *websocket.Conn)
-	BroadcastTimeRoulette()
+	RouletteGame()
 	CheckStatusOfStartRoulette()
 	ChangeStatusOfStartRoulette(statusFromFront bool)
 	StartPreparingRoulette()
@@ -70,6 +71,12 @@ type Replenishment interface {
 	AcceptReplenishment(replenishmentID int)
 }
 
+type Withdraw interface {
+	TelegramBot()
+	CreateWithdraw(newWithdraw model.Withdraw) error
+	HandleUpdatesTelegram(bot *tgbotapi.BotAPI)
+}
+
 type Service struct {
 	User
 	Item
@@ -77,6 +84,7 @@ type Service struct {
 	Crash
 	Roulette
 	Replenishment
+	Withdraw
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -87,5 +95,6 @@ func NewService(repos *repository.Repository) *Service {
 		Crash:         NewCrashService(repos.Crash),
 		Roulette:      NewRouletteService(repos.Roulette),
 		Replenishment: NewReplenishmentService(repos.Replenishment),
+		Withdraw:      NewWithdrawService(repos.Withdraw),
 	}
 }

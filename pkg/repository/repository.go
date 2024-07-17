@@ -13,6 +13,7 @@ type Repository struct {
 	Crash
 	Roulette
 	Replenishment
+	Withdraw
 }
 
 type User interface {
@@ -75,6 +76,12 @@ type Replenishment interface {
 	AcceptReplenishment(replenishmentID int) error
 }
 
+type Withdraw interface {
+	CreateWithdraw(withdraw model.Withdraw) (model.Withdraw, error)
+	CompleteWithdraw(withdrawId int) error
+	GetWithdraw(withdrawId int) (model.Withdraw, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:          NewUserPostgres(db),
@@ -83,5 +90,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Crash:         NewCrashPostgres(db),
 		Roulette:      NewRoulettePostgres(db),
 		Replenishment: NewReplenishmentPostgres(db),
+		Withdraw:      NewWithdrawPostgres(db),
 	}
 }

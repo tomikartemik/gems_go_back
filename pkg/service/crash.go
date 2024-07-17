@@ -148,7 +148,7 @@ func (s *CrashService) ChangeStatusOfStartCrash(statusFromFront bool) {
 	startCrash = statusFromFront
 }
 
-func (s *CrashService) BroadcastTimeCrash() {
+func (s *CrashService) CrashGame() {
 	s.CheckStatusOfStartCrash()
 }
 
