@@ -275,3 +275,7 @@ func (s *RouletteService) GetAllRouletteRecords() ([]model.RouletteRecord, error
 	}
 	return lastRecords, nil
 }
+
+func (s *RouletteService) InitRouletteBetsForNewClient() BetsAtLastRouletteGame {
+	return betsAtLastRouletteGame
+}

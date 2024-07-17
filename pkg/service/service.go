@@ -51,6 +51,7 @@ type Crash interface {
 	GetAllRecords() ([]model.CrashRecord, error)
 	UpdateSavedBetCrash(userId string, multiplier float64)
 	AddBetCrashToResponse(userId string, amount float64)
+	InitCrashBetsForNewClient() BetsAtLastCrashGame
 }
 
 type Roulette interface {
@@ -64,6 +65,7 @@ type Roulette interface {
 	GameRoulette()
 	EndRoulette()
 	GetAllRouletteRecords() ([]model.RouletteRecord, error)
+	InitRouletteBetsForNewClient() BetsAtLastRouletteGame
 }
 
 type Replenishment interface {

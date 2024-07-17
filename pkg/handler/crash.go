@@ -34,3 +34,8 @@ func (h *Handler) getAllCrashRecords(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, allRecords)
 }
+
+func (h *Handler) initCrashBetsForNewClient(c *gin.Context) {
+	betsAtCurrentGame := h.services.InitCrashBetsForNewClient()
+	c.JSON(http.StatusOK, betsAtCurrentGame)
+}

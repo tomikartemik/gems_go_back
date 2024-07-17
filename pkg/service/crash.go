@@ -317,3 +317,7 @@ func (s *CrashService) GetAllRecords() ([]model.CrashRecord, error) {
 	}
 	return allRecords, nil
 }
+
+func (s *CrashService) InitCrashBetsForNewClient() BetsAtLastCrashGame {
+	return betsAtLastCrashGame
+}

@@ -34,3 +34,8 @@ func (h *Handler) getAllRouletteRecords(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, allRecords)
 }
+
+func (h *Handler) initRouletteBetsForNewClient(c *gin.Context) {
+	betsAtCurrentGame := h.services.InitRouletteBetsForNewClient()
+	c.JSON(http.StatusOK, betsAtCurrentGame)
+}
