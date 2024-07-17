@@ -146,6 +146,16 @@ func (s *RouletteService) ChangeStatusOfStartRoulette(statusFromFront bool) {
 
 func (s *RouletteService) StartPreparingRoulette() {
 	betsAtLastRouletteGame = BetsAtLastRouletteGame{}
+	clientsMutexRoulette.Lock()
+	for client := range clientsRoulette {
+		err := client.conn.WriteJSON(betsAtLastRouletteGame)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsRoulette, client)
+		}
+	}
+	clientsMutexRoulette.Unlock()
 	betsAtLastRouletteGame.MainAmount = 0.0
 	acceptingBetsRoulette = true
 	responseRoulette.Cell = 0

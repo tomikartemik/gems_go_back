@@ -154,6 +154,16 @@ func (s *CrashService) CrashGame() {
 
 func (s *CrashService) StartPreparingCrash() {
 	betsAtLastCrashGame = BetsAtLastCrashGame{}
+	clientsMutexCrash.Lock()
+	for client := range clientsCrash {
+		err := client.conn.WriteJSON(betsAtLastCrashGame)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsCrash, client)
+		}
+	}
+	clientsMutexCrash.Unlock()
 	acceptingBetsCrash = true
 	responseCrash.Length = 0.0
 	responseCrash.Rotate = 0.0
