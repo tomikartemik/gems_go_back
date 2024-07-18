@@ -126,15 +126,15 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int
 		return model.ItemWithID{}, -1, nil
 	}
 	var chosenItem model.ItemWithID
-	var caseItems []model.CaseItem
-	caseItems, err := s.repo.GetItemsWithWeights(caseId)
+	var caseItems []model.ItemWithID
+	caseItems, err := s.repo.GetCaseItems(caseId)
 	if err != nil {
 		return chosenItem, 0, err
 	}
 	//Суммируем все веса
 	totalWeightInCase := 0
 	for _, caseItem := range caseItems {
-		totalWeightInCase += caseItem.Weight
+		totalWeightInCase += caseItem.Rarity
 	}
 
 	//Генерируем случайное число
@@ -142,15 +142,15 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int
 	randomNumber := rand.Intn(totalWeightInCase)
 	//Выбираем случайно предмет, учитывая веса
 	for _, caseItem := range caseItems {
-		if randomNumber < caseItem.Weight {
-			id := caseItem.ItemID
+		if randomNumber < caseItem.Rarity {
+			id := caseItem.ID
 			chosenItem, err = s.repo.GetChosenItem(id)
 			if err != nil {
 				break
 			}
 			break
 		}
-		randomNumber -= caseItem.Weight
+		randomNumber -= caseItem.Rarity
 	}
 	err = s.repo.NewCaseRecord(caseId)
 	if err != nil {

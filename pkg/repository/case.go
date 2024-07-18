@@ -112,14 +112,6 @@ func (r *CasePostgres) CheckThePossibilityOfPurchasing(userId string, caseId int
 	return false
 }
 
-func (r *CasePostgres) GetItemsWithWeights(id int) ([]model.CaseItem, error) {
-	var caseItems []model.CaseItem
-	if err := r.db.Where("case_id = ?", id).Find(&caseItems).Error; err != nil {
-		return nil, err
-	}
-	return caseItems, nil
-}
-
 func (r *CasePostgres) GetChosenItem(id int) (model.ItemWithID, error) {
 	var chosenItem model.ItemWithID
 	result := r.db.Model(&model.Item{}).Where("id = ?", id).First(&chosenItem)
