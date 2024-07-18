@@ -19,6 +19,7 @@ func (r *CasePostgres) CreateCase(newCase schema.CaseInput) (int, error) {
 	var caseInfo model.Case
 	caseInfo.Name = newCase.Name
 	caseInfo.Price = newCase.Price
+	caseInfo.PhotoLink = newCase.PhotoLink
 	result := r.db.Model(&model.Case{}).Create(&caseInfo)
 	if result.Error != nil {
 		return 0, result.Error

@@ -22,6 +22,7 @@ func (s *CaseService) CreateCase(newCase model.Case) (schema.ShowCase, error) {
 	var caseInput schema.CaseInput
 	caseInput.Name = newCase.Name
 	caseInput.Price = newCase.Price
+	caseInput.PhotoLink = newCase.PhotoLink
 	createdCaseId, err := s.repo.CreateCase(caseInput)
 	if err != nil {
 		return createdCase, err
@@ -52,6 +53,7 @@ func (s *CaseService) GetCase(id int) (schema.ShowCase, error) {
 	caseOutput.Id = caseInfo.ID
 	caseOutput.Name = caseInfo.Name
 	caseOutput.Price = caseInfo.Price
+	caseOutput.PhotoLink = caseInfo.PhotoLink
 	caseOutput.Items = caseItems
 	return caseOutput, nil
 }
