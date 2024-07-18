@@ -24,6 +24,7 @@ type User interface {
 	GetUserById(id string) (schema.ShowUser, error)
 	SellItem(userId string, user_item_id int) error
 	SellAllItem(userId string) error
+	ChangeAvatar(userId string, newPhoto int) error
 }
 
 type Item interface {

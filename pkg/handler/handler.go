@@ -77,6 +77,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.GET("/user", h.getUserById)
 		auth.GET("/sell-item", h.sellItem)
 		auth.GET("/sell-all-items", h.sellAllItems)
+		auth.GET("/change-photo", h.changeAvatar)
 	}
 
 	item := router.Group("/item")

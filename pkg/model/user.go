@@ -9,5 +9,6 @@ type User struct {
 	IsActive   bool       `json:"is_active"`
 	IsAdmin    bool       `json:"is_admin"`
 	BestItemId int        `json:"best_item_id"`
+	Photo      int        `json:"photo"`
 	Items      []UserItem `json:"items" gorm:"foreignKey:UserID"`
 }

@@ -17,6 +17,7 @@ type User interface {
 	SignIn(email string, password string) (schema.UserWithItems, error)
 	SellItem(userId string, userItemId int) (schema.UserWithItems, error)
 	SellAllItems(userId string) error
+	ChangeAvatar(userId string) (int, error)
 }
 
 type Item interface {

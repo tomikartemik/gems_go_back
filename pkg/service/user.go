@@ -9,6 +9,7 @@ import (
 	"gems_go_back/pkg/schema"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -37,6 +38,9 @@ func (s *AuthService) CreateUser(user model.User) (schema.ShowUser, error) {
 		user.IsAdmin = false
 	}
 	user.BestItemId = 0
+	rand.Seed(time.Now().UnixNano())
+	photoInt := rand.Intn(82) + 1
+	user.Photo = photoInt
 	return s.repo.CreateUser(user)
 }
 
@@ -59,6 +63,7 @@ func (s *AuthService) GetUserById(id string) (schema.UserWithItems, error) {
 	userWithInventory.Email = user.Email
 	userWithInventory.IsActive = user.IsActive
 	userWithInventory.BestItem = user.BestItem
+	userWithInventory.Photo = user.Photo
 	userWithInventory.Items = inventory
 
 	return userWithInventory, nil
@@ -141,4 +146,14 @@ func (s *AuthService) SellAllItems(userId string) error {
 		return err
 	}
 	return nil
+}
+
+func (s *AuthService) ChangeAvatar(userId string) (int, error) {
+	rand.Seed(time.Now().UnixNano())
+	newPhoto := rand.Intn(82) + 1
+	err := s.repo.ChangeAvatar(userId, newPhoto)
+	if err != nil {
+		return 0, err
+	}
+	return newPhoto, nil
 }

@@ -61,6 +61,7 @@ func (r *UserPostgres) GetUserById(id string) (schema.ShowUser, error) {
 		IsActive: user.IsActive,
 		Balance:  user.Balance,
 		BestItem: model.ItemWithID{},
+		Photo:    user.Photo,
 	}
 	var bestItem model.ItemWithID
 	if user.BestItemId != 0 {
@@ -158,5 +159,14 @@ func (r *UserPostgres) SellAllItem(userId string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *UserPostgres) ChangeAvatar(userId string, newPhoto int) error {
+	err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", 10)).Error
+	if err != nil {
+		return err
+	}
+	r.db.Model(&model.User{}).Where("id = ?", userId).Update("photo", newPhoto)
 	return nil
 }

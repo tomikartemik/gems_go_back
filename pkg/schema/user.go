@@ -8,6 +8,7 @@ type ShowUser struct {
 	Email    string           `json:"email"`
 	IsActive bool             `json:"is_active"`
 	Balance  float64          `json:"balance"`
+	Photo    int              `json:"photo"`
 	BestItem model.ItemWithID `json:"best_item"`
 }
 
@@ -24,5 +25,6 @@ type UserWithItems struct {
 	IsActive bool                    `json:"is_active"`
 	Balance  float64                 `json:"balance"`
 	BestItem model.ItemWithID        `json:"best_item"`
+	Photo    int                     `json:"photo"`
 	Items    []model.ItemOfInventory `json:"items"`
 }

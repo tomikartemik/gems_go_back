@@ -135,3 +135,12 @@ func (h *Handler) sellAllItems(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, "OK!")
 }
+
+func (h *Handler) changeAvatar(c *gin.Context) {
+	userId := c.Query("user_id")
+	newPhoto, err := h.services.ChangeAvatar(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "не хватает денежек")
+	}
+	c.JSON(http.StatusOK, newPhoto)
+}
