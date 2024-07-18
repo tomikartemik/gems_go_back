@@ -25,10 +25,6 @@ func NewWithdrawService(repo repository.Withdraw) *WithdrawService {
 	TOKEN = os.Getenv("TELEGRAM_TOKEN")
 	channelID = os.Getenv("TELEGRAM_CHANNEL")
 	bot, errTG = tgbotapi.NewBotAPI(TOKEN)
-	fmt.Println(TOKEN)
-	if errTG != nil {
-		fmt.Println(errTG)
-	}
 	return &WithdrawService{repo: repo}
 }
 
