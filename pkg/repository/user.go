@@ -50,7 +50,7 @@ func (r *UserPostgres) SignIn(mail, password string) (schema.ShowUser, error) {
 func (r *UserPostgres) GetUserById(id string) (schema.ShowUser, error) {
 	var user model.User
 	var userResponse schema.ShowUser
-	err := r.db.Model(model.User{}).Where("id = ?", id).First(&user).Error
+	err := r.db.Model(&model.User{}).Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return userResponse, err
 	}
