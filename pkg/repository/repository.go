@@ -22,8 +22,8 @@ type User interface {
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserInventory(userId string) ([]model.ItemOfInventory, error)
 	GetUserById(id string) (schema.ShowUser, error)
-	//AddItemToInventory(userId string, itemId int) (model.UserItem, error)
-	SellAnItem(userId string, user_item_id int) error
+	SellItem(userId string, user_item_id int) error
+	SellAllItem(userId string) error
 }
 
 type Item interface {

@@ -115,40 +115,7 @@ func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemOfInventory,
 	return response, nil
 }
 
-//func (r *UserPostgres) AddItemToInventory(userId string, itemId int) (model.UserItem, error) {
-//	var userItem model.UserItem
-//	userItem.ItemID = itemId
-//	userItem.UserID = userId
-//	result := r.db.Create(&userItem)
-//	if result.Error != nil {
-//		return userItem, result.Error
-//	}
-//	var newItem, bestItem model.Item
-//	var user model.User
-//	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
-//		return userItem, nil
-//	}
-//	if user.BestItemId != 0 {
-//		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
-//			return userItem, nil
-//		}
-//		if err := r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
-//			return userItem, nil
-//		}
-//		if newItem.Price > bestItem.Price {
-//			if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
-//				return userItem, nil
-//			}
-//		}
-//	} else {
-//		if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
-//			return userItem, nil
-//		}
-//	}
-//	return userItem, nil
-//}
-
-func (r *UserPostgres) SellAnItem(userId string, user_item_id int) error {
+func (r *UserPostgres) SellItem(userId string, user_item_id int) error {
 	var user_item model.UserItem
 	var item model.Item
 
@@ -162,6 +129,33 @@ func (r *UserPostgres) SellAnItem(userId string, user_item_id int) error {
 		return err
 	}
 	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Delete(user_item).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UserPostgres) SellAllItem(userId string) error {
+	var userItems []model.UserItem
+	var item model.Item
+	totalPrice := 0
+	err := r.db.Model(&model.UserItem{}).Where("user_id = ?", userId).Find(&userItems).Error
+	if err != nil {
+		return err
+	}
+	for _, userItem := range userItems {
+		err = r.db.Model(&model.Item{}).Where("id = ?", userItem.ItemID).First(&item).Error
+		if err != nil {
+			return err
+		}
+		totalPrice += item.Price
+		item = model.Item{}
+	}
+	err = r.db.Model(&model.UserItem{}).Delete(userItems).Error
+	if err != nil {
+		return err
+	}
+	err = r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance + ?", totalPrice)).Error
+	if err != nil {
 		return err
 	}
 	return nil

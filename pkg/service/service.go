@@ -14,9 +14,9 @@ type User interface {
 	ParseToken(token string) (string, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
-	//AddItemToInventory(userId string, itemId int) (schema.ShowUser, error)
-	SellAnItem(userId string, userItemId int) (schema.UserWithItems, error)
 	SignIn(email string, password string) (schema.UserWithItems, error)
+	SellItem(userId string, userItemId int) (schema.UserWithItems, error)
+	SellAllItems(userId string) error
 }
 
 type Item interface {

@@ -113,16 +113,25 @@ func (h *Handler) getUserById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *Handler) sellAnItem(c *gin.Context) {
+func (h *Handler) sellItem(c *gin.Context) {
 	userId := c.Query("user_id")
 	userItemIdStr := c.Query("user_item_id")
 	var userItemId, err = strconv.Atoi(userItemIdStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	user, err := h.services.SellAnItem(userId, userItemId)
+	user, err := h.services.SellItem(userId, userItemId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) sellAllItems(c *gin.Context) {
+	userId := c.Query("user_id")
+	err := h.services.SellAllItems(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, "OK!")
 }

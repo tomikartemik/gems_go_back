@@ -38,7 +38,7 @@ func (s *WithdrawService) TelegramBot() {
 
 func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 	createdWithdraw, err := s.repo.CreateWithdraw(currentWithdraw)
-	if err != nil {
+	if err != nil || createdWithdraw.Username == "денег не хватает, броук" {
 		return err
 	}
 

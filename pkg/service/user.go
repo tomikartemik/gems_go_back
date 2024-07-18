@@ -102,31 +102,6 @@ func (s *AuthService) ParseToken(accesToken string) (string, error) {
 	return claims.UserId, nil
 }
 
-//func (s *AuthService) AddItemToInventory(userId string, itemId int) (schema.ShowUser, error) {
-//	var userWithInventory schema.ShowUser
-//
-//	_, err := s.repo.AddItemToInventory(userId, itemId)
-//	if err != nil {
-//		return userWithInventory, err
-//	}
-//
-//	userWithInventory, err = s.repo.GetUserById(userId)
-//	if err != nil {
-//		return userWithInventory, err
-//	}
-//	return userWithInventory, nil
-//}
-
-func (s *AuthService) SellAnItem(userId string, userItemId int) (schema.UserWithItems, error) {
-	var user schema.UserWithItems
-	err := s.repo.SellAnItem(userId, userItemId)
-	if err != nil {
-		return user, err
-	}
-	user, _ = s.GetUserById(userId)
-	return user, nil
-}
-
 func (s *AuthService) SignIn(email string, password string) (schema.UserWithItems, error) {
 	var userWithItems schema.UserWithItems
 	var user schema.ShowUser
@@ -148,4 +123,22 @@ func generatePasswordHash(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func (s *AuthService) SellItem(userId string, userItemId int) (schema.UserWithItems, error) {
+	var user schema.UserWithItems
+	err := s.repo.SellItem(userId, userItemId)
+	if err != nil {
+		return user, err
+	}
+	user, _ = s.GetUserById(userId)
+	return user, nil
+}
+
+func (s *AuthService) SellAllItems(userId string) error {
+	err := s.repo.SellAllItem(userId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

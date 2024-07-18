@@ -75,7 +75,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.signUp)
 		auth.PATCH("/update", h.updateUser)
 		auth.GET("/user", h.getUserById)
-		auth.GET("/sell_item", h.sellAnItem)
+		auth.GET("/sell-item", h.sellItem)
+		auth.GET("/sell-all-items", h.sellAllItems)
 	}
 
 	item := router.Group("/item")
