@@ -76,7 +76,7 @@ func (r *RoulettePostgres) CreditingWinningsRoulette(gameID int) string {
 		return "Pizda!"
 	}
 	for _, bet := range bets {
-		if bet.WinCell == bet.WinCell {
+		if bet.UserCell == bet.WinCell {
 			winAmount := bet.Amount * float64(bet.WinCell)
 			if err := r.db.Model(&model.User{}).Where("id = ?", bet.UserID).Update("balance", gorm.Expr("balance + ?", winAmount)); err != nil {
 				return "Pizda!"
