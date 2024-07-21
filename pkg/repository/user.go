@@ -34,11 +34,11 @@ func (r *UserPostgres) SignIn(mail, password string) (schema.ShowUser, error) {
 	var showUser schema.ShowUser
 	err := r.db.Where("email = ?", mail).First(&user).Error
 	if err != nil {
-		return showUser, errors.New("user not found")
+		return showUser, errors.New("Пользователя с такой почтой не существует!")
 	}
 	err = r.db.Where("email = ? AND password = ?", mail, password).First(&user).Error
 	if err != nil {
-		return showUser, errors.New("incorrect password")
+		return showUser, errors.New("Неверный пароль!")
 	}
 	showUser, err = r.GetUserById(user.Id)
 	if err != nil {
