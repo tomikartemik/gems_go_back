@@ -20,4 +20,4 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no user@server 'bash -s' < deploy_gems.sh
+          ssh -o StrictHostKeyChecking=no user@77.221.159.102 'bash -s' < deploy_gems.sh
