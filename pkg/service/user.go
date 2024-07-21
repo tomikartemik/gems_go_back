@@ -26,6 +26,11 @@ type tokenClaims struct {
 	UserId string `json:"user_id"`
 }
 
+type SignInResponse struct {
+	Token string               `json:"token"`
+	User  schema.UserWithItems `json:"user"`
+}
+
 func NewAuthService(repo repository.User) *AuthService {
 	return &AuthService{repo: repo}
 }
@@ -72,22 +77,22 @@ func (s *AuthService) UpdateUser(id string, user schema.InputUser) (schema.ShowU
 	return s.repo.UpdateUser(id, user)
 }
 
-func (s *AuthService) GenerateToken(mail, password string) (string, error) {
-	user, err := s.repo.SignIn(mail, generatePasswordHash(password))
-	if err != nil {
-		return "", err
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		user.ID,
-	})
-
-	return token.SignedString([]byte(signingKey))
-}
+//func (s *AuthService) GenerateToken(mail, password string) (string, error) {
+//	user, err := s.repo.SignIn(mail, generatePasswordHash(password))
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+//		jwt.StandardClaims{
+//			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
+//			IssuedAt:  time.Now().Unix(),
+//		},
+//		user.ID,
+//	})
+//
+//	return token.SignedString([]byte(signingKey))
+//}
 
 func (s *AuthService) ParseToken(accesToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accesToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -107,20 +112,32 @@ func (s *AuthService) ParseToken(accesToken string) (string, error) {
 	return claims.UserId, nil
 }
 
-func (s *AuthService) SignIn(email string, password string) (schema.UserWithItems, error) {
+func (s *AuthService) SignIn(email string, password string) (SignInResponse, error) {
+	var signInResponse SignInResponse
 	var userWithItems schema.UserWithItems
 	var user schema.ShowUser
 
 	user, err := s.repo.SignIn(email, generatePasswordHash(password))
 	if err != nil {
-		return userWithItems, err
+		return signInResponse, err
 	}
 
 	userWithItems, err = s.GetUserById(user.ID)
 	if err != nil {
-		return userWithItems, err
+		return signInResponse, err
 	}
-	return userWithItems, nil
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		user.ID,
+	})
+
+	signInResponse.Token, _ = token.SignedString([]byte(signingKey))
+	signInResponse.User = userWithItems
+	return signInResponse, nil
 }
 
 func generatePasswordHash(password string) string {

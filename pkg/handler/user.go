@@ -41,17 +41,6 @@ type signInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// @Summary SignIn
-// @Tags auth
-// @Description Залогиниться
-// @ID signIn
-// @Accept json
-// @Produce json
-// @Param input body handler.signInInput true "Credentials"
-// @Success 200 {object} map[string]interface{} "token"
-// @Failure 400 {object} map[string]interface{} "error"
-// @Failure 500 {object} map[string]interface{} "error"
-// @Router /auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
@@ -60,37 +49,16 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.GenerateToken(input.Email, input.Password)
+	signInResponse, err := h.services.SignIn(input.Email, input.Password)
 
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	user, err := h.services.SignIn(input.Email, input.Password)
-
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
-		"user":  user,
-	})
+	c.JSON(http.StatusOK, signInResponse)
 }
 
-// @Summary UpdateUser
-// @Tags auth
-// @Description Обновить инфу о юзере
-// @ID updateUser
-// @Accept json
-// @Produce json
-// @Param id query int true "ID юзера"
-// @Param input body model.User true "Updates"
-// @Success 200 {object} schema.InputUser "UserInfo"
-// @Failure 400 {object} error "error"
-// @Failure 500 {object} error "error"
-// @Router /auth/update [patch]
 func (h *Handler) updateUser(c *gin.Context) {
 	id := c.Query("id")
 	var input schema.InputUser

@@ -10,11 +10,11 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (schema.ShowUser, error)
-	GenerateToken(mail, password string) (string, error)
+	//GenerateToken(mail, password string) (string, error)
 	ParseToken(token string) (string, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
-	SignIn(email string, password string) (schema.UserWithItems, error)
+	SignIn(email string, password string) (SignInResponse, error)
 	SellItem(userId string, userItemId int) (schema.UserWithItems, error)
 	SellAllItems(userId string) error
 	ChangeAvatar(userId string) (int, error)

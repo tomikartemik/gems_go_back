@@ -32,15 +32,15 @@ func (r *UserPostgres) CreateUser(user model.User) (schema.ShowUser, error) {
 func (r *UserPostgres) SignIn(mail, password string) (schema.ShowUser, error) {
 	var user model.User
 	var showUser schema.ShowUser
-	result := r.db.Where("email = ? AND password = ?", mail, password).First(&user)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	err := r.db.Where("email = ?", mail).First(&user).Error
+	if err != nil {
 		return showUser, errors.New("user not found")
 	}
-	if result.Error != nil {
-		return showUser, result.Error
+	err = r.db.Where("email = ? AND password = ?", mail, password).First(&user).Error
+	if err != nil {
+		return showUser, errors.New("incorrect password")
 	}
-
-	showUser, err := r.GetUserById(user.Id)
+	showUser, err = r.GetUserById(user.Id)
 	if err != nil {
 		return showUser, err
 	}
