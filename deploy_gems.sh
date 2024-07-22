@@ -41,6 +41,9 @@ tmux new-session -d -s $SESSION_NAME
 tmux_send "cd $REPO_DIR/cmd"
 tmux_send "go run main.go"
 
+echo "Waiting for 10 seconds..."
+sleep 10
+
 echo "Changing game status to true..."
 change_status true
 
