@@ -6,6 +6,7 @@ type Item struct {
 	Rarity    int    `json:"rarity"`
 	Price     int    `json:"price"`
 	PhotoLink string `json:"photo_link"`
+	Color     string `json:"color"`
 }
 
 type ItemWithID struct {
@@ -14,6 +15,7 @@ type ItemWithID struct {
 	Rarity    int    `json:"rarity"`
 	Price     int    `json:"price"`
 	PhotoLink string `json:"photo_link"`
+	Color     string `json:"color"`
 }
 
 type ItemOfInventory struct {
@@ -22,5 +24,6 @@ type ItemOfInventory struct {
 	Rarity     int    `json:"rarity"`
 	Price      int    `json:"price"`
 	PhotoLink  string `json:"photo_link"`
+	Color      string `json:"color"`
 	UserItemID int    `json:"user_item_id"`
 }

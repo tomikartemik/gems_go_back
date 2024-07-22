@@ -14,7 +14,17 @@ func NewItemService(repo repository.Item) *ItemService {
 }
 
 func (s *ItemService) CreateItem(item model.Item) (model.ItemWithID, error) {
-
+	if item.Rarity < 10 {
+		item.Color = "#fd9d2d"
+	} else if item.Rarity < 20 {
+		item.Color = "#6cbf01"
+	} else if item.Rarity < 40 {
+		item.Color = "#7d42c9"
+	} else if item.Rarity < 50 {
+		item.Color = "#db2f4c"
+	} else {
+		item.Color = "#3b4364"
+	}
 	return s.repo.CreateItem(item)
 }
 

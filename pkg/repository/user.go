@@ -110,6 +110,7 @@ func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemOfInventory,
 			item.Rarity,
 			item.Price,
 			item.PhotoLink,
+			item.Color,
 			userItems[i].ID,
 		})
 	}
