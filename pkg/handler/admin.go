@@ -19,5 +19,6 @@ func (h *Handler) adminChangeStatus(c *gin.Context) {
 
 	h.services.ChangeStatusOfStartCrash(input.Status)
 	h.services.ChangeStatusOfStartRoulette(input.Status)
+	h.services.Online.SetOnline()
 	c.JSON(http.StatusOK, "Changed status to "+strconv.FormatBool(input.Status))
 }

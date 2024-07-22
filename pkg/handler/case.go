@@ -109,6 +109,7 @@ func (h *Handler) openCase(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, openedCaseResponse)
 	}
+	h.services.Online.SetOnline()
 }
 
 func (h *Handler) getAllCaseRecords(c *gin.Context) {

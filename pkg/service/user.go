@@ -77,23 +77,6 @@ func (s *AuthService) UpdateUser(id string, user schema.InputUser) (schema.ShowU
 	return s.repo.UpdateUser(id, user)
 }
 
-//func (s *AuthService) GenerateToken(mail, password string) (string, error) {
-//	user, err := s.repo.SignIn(mail, generatePasswordHash(password))
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-//		jwt.StandardClaims{
-//			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
-//			IssuedAt:  time.Now().Unix(),
-//		},
-//		user.ID,
-//	})
-//
-//	return token.SignedString([]byte(signingKey))
-//}
-
 func (s *AuthService) ParseToken(accesToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accesToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

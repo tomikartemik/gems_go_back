@@ -55,8 +55,8 @@ func (h *Handler) signIn(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, signInResponse)
+	h.services.Online.SetOnline()
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
@@ -111,4 +111,5 @@ func (h *Handler) changeAvatar(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "не хватает денежек")
 	}
 	c.JSON(http.StatusOK, newPhoto)
+	h.services.Online.SetOnline()
 }
