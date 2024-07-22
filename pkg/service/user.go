@@ -62,6 +62,9 @@ func (s *AuthService) GetUserById(id string) (schema.UserWithItems, error) {
 		return userWithInventory, err
 	}
 
+	for i, j := 0, len(inventory)-1; i < j; i, j = i+1, j-1 {
+		inventory[i], inventory[j] = inventory[j], inventory[i]
+	}
 	userWithInventory.ID = user.ID
 	userWithInventory.Balance = user.Balance
 	userWithInventory.Username = user.Username
