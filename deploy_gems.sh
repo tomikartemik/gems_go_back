@@ -23,8 +23,8 @@ change_status() {
 echo "Changing game status to false..."
 change_status false
 
-echo "Waiting for 30 seconds..."
-sleep 30
+#echo "Waiting for 180 seconds..."
+#sleep 180
 
 echo "Killing existing tmux session (if any)"
 tmux kill-session -t $SESSION_NAME

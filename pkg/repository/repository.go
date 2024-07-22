@@ -14,6 +14,7 @@ type Repository struct {
 	Roulette
 	Replenishment
 	Withdraw
+	Online
 }
 
 type User interface {
@@ -82,6 +83,11 @@ type Withdraw interface {
 	GetWithdraw(withdrawId int) (model.Withdraw, error)
 }
 
+type Online interface {
+	GetOnline() int
+	SetOnline(usersOnline int)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:          NewUserPostgres(db),
@@ -91,5 +97,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Roulette:      NewRoulettePostgres(db),
 		Replenishment: NewReplenishmentPostgres(db),
 		Withdraw:      NewWithdrawPostgres(db),
+		Online:        NewOnlinePostgres(db),
 	}
 }

@@ -48,6 +48,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	go h.services.Roulette.RouletteGame()
 	h.services.TelegramBot()
 
+	router.GET("/online", h.getOnline)
 	router.GET("/crash", h.handleConnectionsCrash)
 	router.GET("/roulette", h.handleConnectionsRoulette)
 	router.GET("/crash/init-bets-for-new-client", h.initCrashBetsForNewClient)

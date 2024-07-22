@@ -51,6 +51,7 @@ func (h *Handler) getAllCases(c *gin.Context) {
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
+	h.services.Online.SetOnline()
 	c.JSON(http.StatusOK, cases)
 }
 

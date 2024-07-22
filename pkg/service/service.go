@@ -80,6 +80,11 @@ type Withdraw interface {
 	HandleUpdatesTelegram(bot *tgbotapi.BotAPI)
 }
 
+type Online interface {
+	GetOnline() int
+	SetOnline()
+}
+
 type Service struct {
 	User
 	Item
@@ -88,6 +93,7 @@ type Service struct {
 	Roulette
 	Replenishment
 	Withdraw
+	Online
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -99,5 +105,6 @@ func NewService(repos *repository.Repository) *Service {
 		Roulette:      NewRouletteService(repos.Roulette),
 		Replenishment: NewReplenishmentService(repos.Replenishment),
 		Withdraw:      NewWithdrawService(repos.Withdraw),
+		Online:        NewOnlineService(repos.Online),
 	}
 }
