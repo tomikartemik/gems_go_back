@@ -91,9 +91,9 @@ func (r *UserPostgres) UpdateUser(id string, user schema.InputUser) (schema.Show
 
 func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemOfInventory, error) {
 	var response []model.ItemOfInventory
-
 	var userItems []model.UserItem
-	err := r.db.Model(model.UserItem{}).Where("user_id = ?", userId).Find(&userItems).Error
+
+	err := r.db.Model(model.UserItem{}).Where("user_id = ?", userId).Order("id").Find(&userItems).Error
 	if err != nil {
 		return response, err
 	}
