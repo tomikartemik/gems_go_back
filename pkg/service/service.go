@@ -78,6 +78,7 @@ type Withdraw interface {
 	TelegramBot()
 	CreateWithdraw(newWithdraw model.Withdraw) error
 	HandleUpdatesTelegram(bot *tgbotapi.BotAPI)
+	GetUsersWithdraws(userId string) ([]model.Withdraw, error)
 }
 
 type Online interface {

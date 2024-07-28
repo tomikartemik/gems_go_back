@@ -61,3 +61,12 @@ func (r *WithdrawPostgres) CompleteWithdraw(withdrawId int) error {
 	}
 	return nil
 }
+
+func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, error) {
+	var withdraws []model.Withdraw
+	err := r.db.Model(&model.Withdraw{}).Where("user_id = ?", userId).Find(&withdraws).Error
+	if err != nil {
+		return withdraws, err
+	}
+	return withdraws, nil
+}

@@ -18,3 +18,8 @@ func (h *Handler) createWithdraw(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, "OK!")
 }
+
+func (h *Handler) getUsersWithdraws(c *gin.Context) {
+	userId := c.Query("user_id")
+	h.services.Withdraw.GetUsersWithdraws(userId)
+}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
@@ -34,8 +35,11 @@ func (s *WithdrawService) TelegramBot() {
 
 func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 	createdWithdraw, err := s.repo.CreateWithdraw(currentWithdraw)
-	if err != nil || createdWithdraw.Username == "денег не хватает, броук" {
+	if err != nil {
 		return err
+	}
+	if createdWithdraw.Username == "денег не хватает, броук" {
+		return errors.New("денег не хватает, броук")
 	}
 
 	callbackData := fmt.Sprintf("perform_task_%d", createdWithdraw.ID)
@@ -177,4 +181,12 @@ func (s *WithdrawService) HandleFinishTask(callback *tgbotapi.CallbackQuery, cur
 
 	response := tgbotapi.NewCallback(callback.ID, "Задание завершено!")
 	bot.AnswerCallbackQuery(response)
+}
+
+func (s *WithdrawService) GetUsersWithdraws(userId string) ([]model.Withdraw, error) {
+	withdraws, err := s.repo.GetUsersWithdraws(userId)
+	if err != nil {
+		return nil, err
+	}
+	return withdraws, nil
 }

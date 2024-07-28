@@ -107,6 +107,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	withdraw := router.Group("/withdraw")
 	{
 		withdraw.POST("/create", h.createWithdraw)
+		withdraw.GET("/info", h.getUsersWithdraws)
 	}
 	return router
 }
