@@ -14,7 +14,7 @@ func (h *Handler) createWithdraw(c *gin.Context) {
 	}
 	err := h.services.CreateWithdraw(input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	c.JSON(http.StatusCreated, "OK!")
 }
