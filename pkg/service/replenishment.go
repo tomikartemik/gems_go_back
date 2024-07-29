@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"gems_go_back/pkg/repository"
+	"os"
 	"strconv"
 )
 
-// Структуры для парсинга JSON
 type Endpoint struct {
 	URL string `json:"url"`
 }
@@ -19,10 +19,10 @@ type ReportTo struct {
 	MaxAge    int        `json:"max_age"`
 }
 
-var merchantID = "46264"
-var secret1 = "@R-m/.IntF(1eh&"
-var secret2 = "1YHPU6{azd?M*LE"
-var currency = "RUB"
+var merchantID = os.Getenv("MERCHANT_ID")
+var secret1 = os.Getenv("SECRET_1")
+var secret2 = os.Getenv("SECRET_2")
+var currency = os.Getenv("CURRENCY")
 
 type ReplenishmentService struct {
 	repo repository.Replenishment
