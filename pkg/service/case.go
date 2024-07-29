@@ -6,6 +6,7 @@ import (
 	"gems_go_back/pkg/repository"
 	"gems_go_back/pkg/schema"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -59,7 +60,16 @@ func (s *CaseService) GetCase(id int) (schema.ShowCase, error) {
 }
 
 func (s *CaseService) GetAllCases() ([]schema.CaseInfo, error) {
-	return s.repo.GetAllCases()
+	allCases, err := s.repo.GetAllCases()
+	if err != nil {
+		return allCases, err
+	}
+
+	sort.Slice(allCases, func(i, j int) bool {
+		return allCases[i].Id < allCases[j].Id
+	})
+
+	return allCases, nil
 }
 
 func (s *CaseService) AddItemsToCase(id int, caseItems []model.CaseItem) (schema.ShowCase, error) {

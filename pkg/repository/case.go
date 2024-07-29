@@ -76,7 +76,7 @@ func (r *CasePostgres) GetCaseItems(caseId int) ([]model.ItemWithID, error) {
 
 func (r *CasePostgres) GetAllCases() ([]schema.CaseInfo, error) {
 	var caseList []schema.CaseInfo
-	if err := r.db.Model(model.Case{}).Find(&caseList).Order("id").Error; err != nil {
+	if err := r.db.Model(model.Case{}).Find(&caseList).Error; err != nil {
 		return nil, err
 	}
 	return caseList, nil
