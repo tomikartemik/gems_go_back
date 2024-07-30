@@ -36,10 +36,6 @@ func (s *DropService) EidtConnsDrop(conn *websocket.Conn) {
 	clientsMutexDrop.Lock()
 	clientsDrop[client] = true
 	clientsMutexDrop.Unlock()
-
-	clientsMutexDrop.Lock()
-	delete(clientsDrop, client)
-	clientsMutexDrop.Unlock()
 }
 
 func (s *DropService) DropsWS() {
