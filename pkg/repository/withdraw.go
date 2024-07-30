@@ -68,7 +68,7 @@ func (r *WithdrawPostgres) CancelWithdraw(withdrawId int) error {
 }
 
 func (r *WithdrawPostgres) ReturnMoneyBecauseCanceled(currentWithdraw model.Withdraw) {
-	r.db.Model(&model.User{}).Where("id = ?", currentWithdraw.UserId).Update("balance", gorm.Expr("balance - ?", float64(currentWithdraw.Amount)))
+	r.db.Model(&model.User{}).Where("id = ?", currentWithdraw.UserId).Update("balance", gorm.Expr("balance + ?", float64(currentWithdraw.Amount)))
 }
 
 func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, error) {
