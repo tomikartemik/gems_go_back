@@ -74,11 +74,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.POST("/sign-in", h.signIn)
 		auth.POST("/sign-up", h.signUp)
-		auth.PATCH("/update", h.updateUser)
-		auth.GET("/user", h.getUserById)
-		auth.GET("/sell-item", h.sellItem)
-		auth.GET("/sell-all-items", h.sellAllItems)
-		auth.GET("/change-photo", h.changeAvatar)
 	}
 
 	item := router.Group("/item")
@@ -100,15 +95,25 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.GET("/last-drops", h.getLastDrops)
 	}
 
-	games := router.Group("/games", h.userIdentity)
+	authenticated := router.Group("/authenticated", h.userIdentity)
 	{
-		games.GET("/open", h.openCase)
-	}
+		authenticated.GET("/open-case", h.openCase)
 
-	withdraw := router.Group("/withdraw")
-	{
-		withdraw.POST("/create", h.createWithdraw)
-		withdraw.GET("/info", h.getUsersWithdraws)
+		withdraw := authenticated.Group("/withdraw")
+		{
+			withdraw.POST("/create", h.createWithdraw)
+			withdraw.GET("/info", h.getUsersWithdraws)
+		}
+
+		user := authenticated.Group("/user")
+		{
+			user.PATCH("/update", h.updateUser)
+			user.GET("/user", h.getUserById)
+			user.GET("/sell-item", h.sellItem)
+			user.GET("/sell-all-items", h.sellAllItems)
+			user.GET("/change-photo", h.changeAvatar)
+		}
+
 	}
 	return router
 }

@@ -8,17 +8,6 @@ import (
 	"strconv"
 )
 
-// @Summary SignUp
-// @Tags auth
-// @Description Создать нового пользвателя
-// @ID signUp
-// @Accept json
-// @Produce json
-// @Param input body schema.InputUser true "User data"
-// @Success 200 {object} map[string]interface{} "id"
-// @Failure 400 {object} map[string]interface{} "error"
-// @Failure 500 {object} map[string]interface{} "error"
-// @Router /auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input model.User
 
@@ -60,10 +49,11 @@ func (h *Handler) signIn(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
-	id := c.Query("id")
+	id := c.GetString("user_id")
 	var input schema.InputUser
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	updatedUser, err := h.services.UpdateUser(id, input)
 	if err != nil {
@@ -73,42 +63,47 @@ func (h *Handler) updateUser(c *gin.Context) {
 }
 
 func (h *Handler) getUserById(c *gin.Context) {
-	id := c.Query("id")
+	id := c.GetString("user_id")
 	user, err := h.services.GetUserById(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
 
 func (h *Handler) sellItem(c *gin.Context) {
-	userId := c.Query("user_id")
+	userId := c.GetString("user_id")
 	userItemIdStr := c.Query("user_item_id")
 	var userItemId, err = strconv.Atoi(userItemIdStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	user, err := h.services.SellItem(userId, userItemId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
 
 func (h *Handler) sellAllItems(c *gin.Context) {
-	userId := c.Query("user_id")
+	userId := c.GetString("user_id")
 	err := h.services.SellAllItems(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, "OK!")
 }
 
 func (h *Handler) changeAvatar(c *gin.Context) {
-	userId := c.Query("user_id")
+	userId := c.GetString("user_id")
 	newPhoto, err := h.services.ChangeAvatar(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "не хватает денежек")
+		return
 	}
 	c.JSON(http.StatusOK, newPhoto)
 	h.services.Online.SetOnline()

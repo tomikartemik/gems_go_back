@@ -17,7 +17,7 @@ type OpenedCaseResponse struct {
 func (h *Handler) createCase(c *gin.Context) {
 	var input model.Case
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -34,7 +34,8 @@ func (h *Handler) getCase(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	caseInfo, err := h.services.GetCase(id)
@@ -50,6 +51,7 @@ func (h *Handler) getAllCases(c *gin.Context) {
 	cases, err := h.services.GetAllCases()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	h.services.Online.SetOnline()
 	c.JSON(http.StatusOK, cases)
@@ -59,17 +61,20 @@ func (h *Handler) updateCase(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	var input model.Case
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	updatedCaseInfo, err := h.services.UpdateCase(id, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, updatedCaseInfo)
 }
@@ -78,11 +83,13 @@ func (h *Handler) deleteCase(c *gin.Context) {
 	idStr := c.Query("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	err = h.services.DeleteCase(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -98,10 +105,11 @@ func (h *Handler) openCase(c *gin.Context) {
 
 	chosenItem, userItemId, err := h.services.OpenCase(userId, caseId)
 	if err != nil {
-		fmt.Println(err)
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	} else if userItemId == -1 {
 		c.JSON(http.StatusBadRequest, "иди у мамы денег проси")
+		return
 	} else {
 		openedCaseResponse := OpenedCaseResponse{
 			WinedItem:  chosenItem,
@@ -117,6 +125,7 @@ func (h *Handler) getAllCaseRecords(c *gin.Context) {
 	allCaseRecords, err := h.services.GetAllCaseRecords()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, allCaseRecords)
 }
@@ -125,6 +134,7 @@ func (h *Handler) getLastDrops(c *gin.Context) {
 	lastDrops, err := h.services.GetLastDrops()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	} else {
 		c.JSON(http.StatusOK, lastDrops)
 	}

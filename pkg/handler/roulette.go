@@ -31,6 +31,7 @@ func (h *Handler) getAllRouletteRecords(c *gin.Context) {
 	allRecords, err := h.services.GetAllRouletteRecords()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, allRecords)
 }

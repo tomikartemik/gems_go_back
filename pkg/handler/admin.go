@@ -13,7 +13,7 @@ type AdminChangeStatus struct {
 func (h *Handler) adminChangeStatus(c *gin.Context) {
 	var input AdminChangeStatus
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 

@@ -31,6 +31,7 @@ func (h *Handler) getAllCrashRecords(c *gin.Context) {
 	allRecords, err := h.services.GetAllRecords()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, allRecords)
 }

@@ -49,7 +49,7 @@ func (r *CrashPostgres) NewBetCrash(newBet model.BetCrash) string {
 	if err != nil {
 		return "User not found!"
 	}
-	if user.Balance < newBet.Amount {
+	if user.Balance < newBet.Amount || user.Balance < 0 {
 		return "Not enough money!"
 	}
 	err = r.db.Model(&model.User{}).Where("id = ?", user.Id).Update("balance", (user.Balance - newBet.Amount)).Error
@@ -95,7 +95,6 @@ func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 	return "OK"
 }
 
-// Добавить фотку
 func (r *CrashPostgres) GetUsersPhotoAndNickForCrash(userId string) (string, error) {
 	var user model.User
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {

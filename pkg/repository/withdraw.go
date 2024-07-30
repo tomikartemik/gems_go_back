@@ -21,7 +21,7 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	if err != nil {
 		return newWithdraw, err
 	}
-	if user.Balance < float64(newWithdraw.Amount) {
+	if user.Balance < float64(newWithdraw.Amount) || user.Balance <= 0 {
 		return model.Withdraw{Username: "денег не хватает, броук"}, err
 	}
 	err = r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", float64(withdraw.Amount))).Error
