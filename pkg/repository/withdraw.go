@@ -33,6 +33,7 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	newWithdraw.AccountEmail = withdraw.AccountEmail
 	newWithdraw.Code = withdraw.Code
 	newWithdraw.Amount = withdraw.Amount
+	newWithdraw.Status = "processing"
 	newWithdraw.CreatedAt = time.Now()
 	err = r.db.Model(&model.Withdraw{}).Create(&newWithdraw).Error
 	if err != nil {
@@ -51,11 +52,15 @@ func (r *WithdrawPostgres) GetWithdraw(withdrawId int) (model.Withdraw, error) {
 }
 
 func (r *WithdrawPostgres) CompleteWithdraw(withdrawId int) error {
-	err := r.db.Model(&model.Withdraw{}).Where("id = ?", withdrawId).Update("completed", true).Error
+	err := r.db.Model(&model.Withdraw{}).Where("id = ?", withdrawId).Update("status", "completed").Error
 	if err != nil {
 		return err
 	}
-	err = r.db.Model(&model.Withdraw{}).Where("id = ?", withdrawId).Update("completed_at", time.Now()).Error
+	return nil
+}
+
+func (r *WithdrawPostgres) CancelWithdraw(withdrawId int) error {
+	err := r.db.Model(&model.Withdraw{}).Where("id = ?", withdrawId).Update("status", "canceled").Error
 	if err != nil {
 		return err
 	}

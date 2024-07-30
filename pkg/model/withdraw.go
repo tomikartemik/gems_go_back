@@ -11,7 +11,6 @@ type Withdraw struct {
 	AccountEmail string    `json:"account_email"`
 	Amount       int       `json:"amount"`
 	CreatedAt    time.Time `json:"created_at"`
-	Completed    bool      `json:"completed"`
-	CompletedAt  time.Time `json:"completed_at"`
+	Status       string    `json:"status"`
 	Code         int       `json:"code"`
 }

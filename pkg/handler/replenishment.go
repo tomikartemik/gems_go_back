@@ -10,11 +10,11 @@ import (
 
 func (h *Handler) NewReplenishment(c *gin.Context) {
 	var input model.Replenishment
+	userID := c.GetString("user_id")
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	userID := input.UserID
 	amount := input.Amount
 	location, err := h.services.Replenishment.NewReplenishment(userID, amount)
 	if err != nil {
