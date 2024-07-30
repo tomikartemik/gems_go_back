@@ -42,7 +42,7 @@ func (s *DropService) EidtConnsDrop(conn *websocket.Conn) {
 	clientsMutexDrop.Unlock()
 }
 
-func (s *DropService) DropsWS() {
+func (s *DropService) DropWS() {
 	for {
 		clientsMutexDrop.Lock()
 		for client := range clientsDrop {
