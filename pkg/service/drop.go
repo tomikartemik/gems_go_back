@@ -22,7 +22,6 @@ func (s *DropService) GetLastDrops() ([]model.Item, error) {
 
 type ClientDrop struct {
 	conn *websocket.Conn
-	send chan []model.Item
 }
 
 var lastDrops = []model.Item{}
@@ -30,44 +29,30 @@ var clientsMutexDrop = &sync.Mutex{}
 var clientsDrop = make(map[*ClientDrop]bool)
 
 func (s *DropService) EidtConnsDrop(conn *websocket.Conn) {
-	client := &ClientDrop{conn: conn, send: make(chan []model.Item)}
 
+	defer conn.Close()
+
+	client := &ClientDrop{conn: conn}
 	clientsMutexDrop.Lock()
 	clientsDrop[client] = true
 	clientsMutexDrop.Unlock()
 
-	go s.handleClient(client)
-}
-
-func (s *DropService) handleClient(client *ClientDrop) {
-	defer func() {
-		clientsMutexDrop.Lock()
-		delete(clientsDrop, client)
-		clientsMutexDrop.Unlock()
-		client.conn.Close()
-	}()
-
-	for msg := range client.send {
-		err := client.conn.WriteJSON(msg)
-		if err != nil {
-			log.Println("Write error:", err)
-			break
-		}
-	}
+	clientsMutexDrop.Lock()
+	delete(clientsDrop, client)
+	clientsMutexDrop.Unlock()
 }
 
 func (s *DropService) DropsWS() {
 	clientsMutexDrop.Lock()
-	defer clientsMutexDrop.Unlock()
-
 	for client := range clientsDrop {
-		select {
-		case client.send <- lastDrops:
-		default:
-			close(client.send)
+		err := client.conn.WriteJSON(lastDrops)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
 			delete(clientsDrop, client)
 		}
 	}
+	clientsMutexDrop.Unlock()
 }
 
 func (s *DropService) NewDrop(itemId int) {
