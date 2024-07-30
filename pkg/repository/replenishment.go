@@ -16,12 +16,6 @@ func NewReplenishmentPostgres(db *gorm.DB) *ReplenishmentPostgres {
 }
 
 func (r *ReplenishmentPostgres) NewReplenishment(userID string, amount float64) (string, string, error) {
-	var user model.User
-	err := r.db.Where("user_id = ?", userID).First(&user).Error
-	if err != nil {
-		return "", "", err
-	}
-
 	newReplenishment := model.Replenishment{
 		UserID:  userID,
 		Amount:  amount,
@@ -30,6 +24,11 @@ func (r *ReplenishmentPostgres) NewReplenishment(userID string, amount float64) 
 	result := r.db.Model(&model.Replenishment{}).Create(&newReplenishment)
 	if result.Error != nil {
 		return "", "", result.Error
+	}
+	var user model.User
+	err := r.db.Model(&model.User{}).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return "", "", err
 	}
 	fmt.Println("repo: ", strconv.Itoa(newReplenishment.ID), user.Email)
 	return strconv.Itoa(newReplenishment.ID), user.Email, nil
