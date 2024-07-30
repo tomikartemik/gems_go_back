@@ -185,16 +185,41 @@ func (r *CasePostgres) GetAllCaseRecords() ([]schema.CaseInfo, error) {
 	var lastCases []schema.CaseInfo
 	var caseRecords []model.CaseRecord
 	var caseInfo schema.CaseInfo
-	err := r.db.Model(&model.CaseRecord{}).Order("id desc").Limit(10).Find(&caseRecords).Error
+	err := r.db.Model(&model.CaseRecord{}).Order("id desc").Limit(100).Find(&caseRecords).Error
 	if err != nil {
 		return lastCases, err
 	}
 	for _, currCase := range caseRecords {
-		err = r.db.Model(&model.Case{}).Where("id = ?", currCase.CaseID).Find(caseInfo).Error
+		err = r.db.Model(&model.Case{}).Where("id = ?", currCase.CaseID).Find(&caseInfo).Error
 		if err != nil {
 			return lastCases, err
 		}
 		lastCases = append(lastCases, caseInfo)
 	}
 	return lastCases, nil
+}
+
+func (r *CasePostgres) AddNewDrop(itemID int) {
+	newDrop := model.DropRecord{
+		ItemID: itemID,
+	}
+	r.db.Model(&model.DropRecord{}).Create(&newDrop)
+}
+
+func (r *CasePostgres) GetLastDrops() ([]model.Item, error) {
+	var itemInfo model.Item
+	var lastDrops []model.Item
+	var dropRecords []model.DropRecord
+	err := r.db.Model(&model.DropRecord{}).Order("id desc").Limit(100).Find(&dropRecords).Error
+	if err != nil {
+		return lastDrops, err
+	}
+	for _, currItem := range dropRecords {
+		err = r.db.Model(&model.Item{}).Where("id = ?", currItem.ItemID).Find(&itemInfo).Error
+		if err != nil {
+			return lastDrops, err
+		}
+		lastDrops = append(lastDrops, itemInfo)
+	}
+	return lastDrops, nil
 }

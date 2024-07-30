@@ -143,16 +143,13 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int
 	if err != nil {
 		return chosenItem, 0, err
 	}
-	//Суммируем все веса
 	totalWeightInCase := 0
 	for _, caseItem := range caseItems {
 		totalWeightInCase += caseItem.Rarity
 	}
 
-	//Генерируем случайное число
 	rand.Seed(time.Now().UnixNano())
 	randomNumber := rand.Intn(totalWeightInCase)
-	//Выбираем случайно предмет, учитывая веса
 	for _, caseItem := range caseItems {
 		if randomNumber < caseItem.Rarity {
 			id := caseItem.ID
@@ -169,6 +166,13 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int
 		fmt.Println(err)
 		return model.ItemWithID{}, 0, err
 	}
+	//
+	//
+	//
+	s.repo.AddNewDrop(chosenItem.ID)
+	//
+	//
+	//
 	userItemId, err := s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID, caseId)
 	if err != nil {
 		fmt.Println(err)
@@ -184,4 +188,8 @@ func (s *CaseService) GetAllCaseRecords() ([]schema.CaseInfo, error) {
 		return records, err
 	}
 	return records, nil
+}
+
+func (s *CaseService) GetLastDrops() ([]model.Item, error) {
+	return s.repo.GetLastDrops()
 }

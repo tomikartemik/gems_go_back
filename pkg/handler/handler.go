@@ -97,6 +97,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.PUT("/update", h.updateCase)
 		cases.DELETE("/delete", h.deleteCase)
 		cases.GET("/case-story", h.getAllCaseRecords)
+		cases.GET("/last-drops", h.getLastDrops)
 	}
 
 	games := router.Group("/games", h.userIdentity)

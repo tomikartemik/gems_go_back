@@ -120,3 +120,12 @@ func (h *Handler) getAllCaseRecords(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, allCaseRecords)
 }
+
+func (h *Handler) getLastDrops(c *gin.Context) {
+	lastDrops, err := h.services.GetLastDrops()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusOK, lastDrops)
+	}
+}

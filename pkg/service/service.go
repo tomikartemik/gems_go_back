@@ -37,6 +37,7 @@ type Case interface {
 	DeleteCase(caseId int) error
 	OpenCase(userId string, caseId int) (model.ItemWithID, int, error)
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
+	GetLastDrops() ([]model.Item, error)
 }
 
 type Crash interface {

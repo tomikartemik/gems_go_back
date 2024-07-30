@@ -49,6 +49,8 @@ type Case interface {
 	NewCaseRecord(caseId int) error
 	GetAllCaseRecords() ([]schema.CaseInfo, error)
 	AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) (int, error)
+	AddNewDrop(itemID int)
+	GetLastDrops() ([]model.Item, error)
 }
 
 type Crash interface {
