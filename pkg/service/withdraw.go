@@ -89,6 +89,11 @@ func (s *WithdrawService) HandleUpdatesTelegram(bot *tgbotapi.BotAPI) {
 				orderIDToInt, _ := strconv.Atoi(orderID)
 				currentWithdraw, _ := s.repo.GetWithdraw(orderIDToInt)
 				s.HandleFinishTask(callback, currentWithdraw)
+			} else if strings.HasPrefix(data, "cancel_task_") {
+				orderID := strings.TrimPrefix(data, "cancel_task_")
+				orderIDToInt, _ := strconv.Atoi(orderID)
+				currentWithdraw, _ := s.repo.GetWithdraw(orderIDToInt)
+				s.HandleCancelTask(callback, currentWithdraw)
 			}
 		}
 	}
@@ -111,11 +116,13 @@ func (s *WithdrawService) HandlePerformTask(callback *tgbotapi.CallbackQuery, or
 		log.Println("Error editing message:", err)
 	}
 
-	// Отправляем личное сообщение пользователю с деталями заказа и кнопкой "Завершить"
 	callbackDataFinish := fmt.Sprintf("finish_task_%s", orderID)
-	finishButton := tgbotapi.NewInlineKeyboardButtonData("Завершить", callbackDataFinish)
+	callbackDataCancel := fmt.Sprintf("cancel_task_%s", orderID)
+	finishButton := tgbotapi.NewInlineKeyboardButtonData("Выполнен", callbackDataFinish)
+	cancelhButton := tgbotapi.NewInlineKeyboardButtonData("Не выполнен", callbackDataCancel)
 	finishKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(finishButton),
+		tgbotapi.NewInlineKeyboardRow(cancelhButton),
 	)
 
 	orderIDToInt, err := strconv.Atoi(orderID)
@@ -161,6 +168,41 @@ func (s *WithdrawService) HandleFinishTask(callback *tgbotapi.CallbackQuery, cur
 			"📋 Заказ:\n"+
 			"└ Гемы: %d\n\n"+
 			"Выполнен ✅✅✅",
+		currentWithdraw.ID,
+		currentWithdraw.UserId,
+		currentWithdraw.Username,
+		currentWithdraw.AccountEmail,
+		currentWithdraw.Code,
+		currentWithdraw.Amount)
+
+	editMsg := tgbotapi.NewEditMessageText(
+		callback.Message.Chat.ID,
+		callback.Message.MessageID,
+		responseText,
+	)
+
+	_, err := bot.Send(editMsg)
+	if err != nil {
+		log.Println("Error editing message:", err)
+	}
+
+	response := tgbotapi.NewCallback(callback.ID, "Задание завершено!")
+	bot.AnswerCallbackQuery(response)
+}
+
+func (s *WithdrawService) HandleCancelTask(callback *tgbotapi.CallbackQuery, currentWithdraw model.Withdraw) {
+	s.repo.CompleteWithdraw(currentWithdraw.ID)
+
+	responseText := fmt.Sprintf(
+		"📋 Заказ №%d\n\n"+
+			"👤 Пользователь:\n"+
+			"├ ID: %s\n"+
+			"├ Username: %s\n"+
+			"├ Email: %s\n"+
+			"└ Code: %d\n\n"+
+			"📋 Заказ:\n"+
+			"└ Гемы: %d\n\n"+
+			"Отменен ❌❌❌",
 		currentWithdraw.ID,
 		currentWithdraw.UserId,
 		currentWithdraw.Username,
