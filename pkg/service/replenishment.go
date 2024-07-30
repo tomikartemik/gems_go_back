@@ -19,11 +19,6 @@ type ReportTo struct {
 	MaxAge    int        `json:"max_age"`
 }
 
-var merchantID = os.Getenv("MERCHANT_ID")
-var secret1 = os.Getenv("SECRET_1")
-var secret2 = os.Getenv("SECRET_2")
-var currency = os.Getenv("CURRENCY")
-
 type ReplenishmentService struct {
 	repo repository.Replenishment
 }
@@ -58,6 +53,12 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (
 	if err != nil {
 		return "", err
 	}
+
+	var merchantID = os.Getenv("MERCHANT_ID")
+	var secret1 = os.Getenv("SECRET_1")
+	var secret2 = os.Getenv("SECRET_2")
+	var currency = os.Getenv("CURRENCY")
+
 	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "test", email)
 	if err != nil {
 		return "", err
