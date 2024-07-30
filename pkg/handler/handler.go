@@ -35,6 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	go h.services.Crash.CrashGame()
 	go h.services.Roulette.RouletteGame()
 	go h.services.Drop.DropWS()
+	go h.services.DirtyMoves()
 	h.services.TelegramBot()
 
 	router.GET("/online", h.getOnline)

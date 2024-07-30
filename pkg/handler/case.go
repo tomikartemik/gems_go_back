@@ -115,7 +115,7 @@ func (h *Handler) openCase(c *gin.Context) {
 			UserItemId: userItemId,
 		}
 		c.JSON(http.StatusOK, openedCaseResponse)
-		h.services.NewDrop(chosenItem.ID)
+		h.services.NewDrop(chosenItem.ID, false)
 	}
 	h.services.Online.SetOnline()
 }

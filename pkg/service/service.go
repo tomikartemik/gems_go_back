@@ -86,9 +86,10 @@ type Online interface {
 
 type Drop interface {
 	GetLastDrops() ([]model.Item, error)
-	NewDrop(itemId int)
+	EditConnsDrop(conn *websocket.Conn)
+	NewDrop(itemId int, dirty bool)
+	DirtyMoves()
 	DropWS()
-	EidtConnsDrop(conn *websocket.Conn)
 }
 
 type Service struct {

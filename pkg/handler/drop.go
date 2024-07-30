@@ -31,5 +31,5 @@ func (h *Handler) handleConnectionsDrop(c *gin.Context) {
 		log.Println("Upgrade error:", err)
 		return
 	}
-	h.services.EidtConnsDrop(conn)
+	h.services.EditConnsDrop(conn)
 }
