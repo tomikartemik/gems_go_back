@@ -85,6 +85,7 @@ type Withdraw interface {
 	GetWithdraw(withdrawId int) (model.Withdraw, error)
 	GetUsersWithdraws(userId string) ([]model.Withdraw, error)
 	CancelWithdraw(withdrawId int) error
+	ReturnMoneyBecauseCanceled(currentWithdraw model.Withdraw)
 }
 
 type Online interface {
