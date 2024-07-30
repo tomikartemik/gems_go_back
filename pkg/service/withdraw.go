@@ -191,7 +191,7 @@ func (s *WithdrawService) HandleFinishTask(callback *tgbotapi.CallbackQuery, cur
 }
 
 func (s *WithdrawService) HandleCancelTask(callback *tgbotapi.CallbackQuery, currentWithdraw model.Withdraw) {
-	s.repo.CompleteWithdraw(currentWithdraw.ID)
+	s.repo.CancelWithdraw(currentWithdraw.ID)
 	s.repo.ReturnMoneyBecauseCanceled(currentWithdraw)
 
 	responseText := fmt.Sprintf(

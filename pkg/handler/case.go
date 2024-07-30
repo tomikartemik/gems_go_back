@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"gems_go_back/pkg/model"
-	"gems_go_back/pkg/schema"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -116,26 +115,7 @@ func (h *Handler) openCase(c *gin.Context) {
 			UserItemId: userItemId,
 		}
 		c.JSON(http.StatusOK, openedCaseResponse)
+		h.services.NewDrop(chosenItem.ID)
 	}
 	h.services.Online.SetOnline()
-}
-
-func (h *Handler) getAllCaseRecords(c *gin.Context) {
-	var allCaseRecords []schema.CaseInfo
-	allCaseRecords, err := h.services.GetAllCaseRecords()
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	c.JSON(http.StatusOK, allCaseRecords)
-}
-
-func (h *Handler) getLastDrops(c *gin.Context) {
-	lastDrops, err := h.services.GetLastDrops()
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	} else {
-		c.JSON(http.StatusOK, lastDrops)
-	}
 }

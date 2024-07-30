@@ -161,35 +161,14 @@ func (s *CaseService) OpenCase(userId string, caseId int) (model.ItemWithID, int
 		}
 		randomNumber -= caseItem.Rarity
 	}
-	err = s.repo.NewCaseRecord(caseId)
 	if err != nil {
 		fmt.Println(err)
 		return model.ItemWithID{}, 0, err
 	}
-	//
-	//
-	//
-	s.repo.AddNewDrop(chosenItem.ID)
-	//
-	//
-	//
 	userItemId, err := s.repo.AddItemToInventoryAndChangeBalance(userId, chosenItem.ID, caseId)
 	if err != nil {
 		fmt.Println(err)
 		return model.ItemWithID{}, 0, err
 	}
 	return chosenItem, userItemId, nil
-}
-
-func (s *CaseService) GetAllCaseRecords() ([]schema.CaseInfo, error) {
-	var records []schema.CaseInfo
-	records, err := s.repo.GetAllCaseRecords()
-	if err != nil {
-		return records, err
-	}
-	return records, nil
-}
-
-func (s *CaseService) GetLastDrops() ([]model.Item, error) {
-	return s.repo.GetLastDrops()
 }

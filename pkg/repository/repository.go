@@ -15,6 +15,7 @@ type Repository struct {
 	Replenishment
 	Withdraw
 	Online
+	Drop
 }
 
 type User interface {
@@ -46,11 +47,7 @@ type Case interface {
 	DeleteCase(id int) error
 	CheckThePossibilityOfPurchasing(userId string, caseId int) bool
 	GetChosenItem(id int) (model.ItemWithID, error)
-	NewCaseRecord(caseId int) error
-	GetAllCaseRecords() ([]schema.CaseInfo, error)
 	AddItemToInventoryAndChangeBalance(userId string, itemId int, caseId int) (int, error)
-	AddNewDrop(itemID int)
-	GetLastDrops() ([]model.Item, error)
 }
 
 type Crash interface {
@@ -93,6 +90,11 @@ type Online interface {
 	SetOnline(usersOnline int)
 }
 
+type Drop interface {
+	NewDrop(itemId int) (model.Item, error)
+	GetLastDrops() ([]model.Item, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:          NewUserPostgres(db),
@@ -103,5 +105,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Replenishment: NewReplenishmentPostgres(db),
 		Withdraw:      NewWithdrawPostgres(db),
 		Online:        NewOnlinePostgres(db),
+		Drop:          NewDropPostgres(db),
 	}
 }

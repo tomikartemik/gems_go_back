@@ -10,7 +10,6 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (schema.ShowUser, error)
-	//GenerateToken(mail, password string) (string, error)
 	ParseToken(token string) (string, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
@@ -36,8 +35,6 @@ type Case interface {
 	UpdateCase(id int, updates model.Case) (schema.ShowCase, error)
 	DeleteCase(caseId int) error
 	OpenCase(userId string, caseId int) (model.ItemWithID, int, error)
-	GetAllCaseRecords() ([]schema.CaseInfo, error)
-	GetLastDrops() ([]model.Item, error)
 }
 
 type Crash interface {
@@ -87,6 +84,12 @@ type Online interface {
 	SetOnline()
 }
 
+type Drop interface {
+	GetLastDrops() ([]model.Item, error)
+	NewDrop(itemId int)
+	EidtConnsDrop(conn *websocket.Conn)
+}
+
 type Service struct {
 	User
 	Item
@@ -96,6 +99,7 @@ type Service struct {
 	Replenishment
 	Withdraw
 	Online
+	Drop
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -108,5 +112,6 @@ func NewService(repos *repository.Repository) *Service {
 		Replenishment: NewReplenishmentService(repos.Replenishment),
 		Withdraw:      NewWithdrawService(repos.Withdraw),
 		Online:        NewOnlineService(repos.Online),
+		Drop:          NewDropService(repos.Drop),
 	}
 }

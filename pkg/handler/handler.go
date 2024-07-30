@@ -45,6 +45,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/all-crash-records", h.getAllCrashRecords)
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
 
+	router.GET("/last-drops", h.getLastDrops)
+	router.GET("/drops", h.handleConnectionsDrop)
+
 	admin := router.Group("/admin")
 	{
 		admin.POST("/change-status", h.adminChangeStatus)
@@ -78,7 +81,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		cases.GET("/get-all-cases", h.getAllCases)
 		cases.PUT("/update", h.updateCase)
 		cases.DELETE("/delete", h.deleteCase)
-		cases.GET("/case-story", h.getAllCaseRecords)
 		cases.GET("/last-drops", h.getLastDrops)
 	}
 
