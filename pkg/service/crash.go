@@ -90,7 +90,6 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 			fmt.Println("Read error:", err)
 			break
 		}
-		fmt.Println(string(message))
 		if acceptingBetsCrash {
 			var bet BetMessageCrash
 			if err = json.Unmarshal(message, &bet); err != nil {

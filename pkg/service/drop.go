@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"github.com/gorilla/websocket"
@@ -14,10 +15,6 @@ type DropService struct {
 
 func NewDropService(repo repository.Drop) *DropService {
 	return &DropService{repo: repo}
-}
-
-func (s *DropService) GetLastDrops() ([]model.Item, error) {
-	return s.repo.GetLastDrops()
 }
 
 type ClientDrop struct {
@@ -37,24 +34,31 @@ func (s *DropService) EidtConnsDrop(conn *websocket.Conn) {
 	clientsDrop[client] = true
 	clientsMutexDrop.Unlock()
 
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("Read error:", err)
+			break
+		}
+	}
+
 	clientsMutexDrop.Lock()
 	delete(clientsDrop, client)
 	clientsMutexDrop.Unlock()
 }
 
 func (s *DropService) DropWS() {
-	for {
-		clientsMutexDrop.Lock()
-		for client := range clientsDrop {
-			err := client.conn.WriteJSON(lastDrops)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsDrop, client)
-			}
+	clientsMutexDrop.Lock()
+	for client := range clientsDrop {
+		err := client.conn.WriteJSON(lastDrops)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsDrop, client)
 		}
-		clientsMutexDrop.Unlock()
 	}
+	clientsMutexDrop.Unlock()
+
 }
 
 func (s *DropService) NewDrop(itemId int) {
@@ -65,4 +69,9 @@ func (s *DropService) NewDrop(itemId int) {
 		}
 		lastDrops = append(lastDrops, item)
 	}
+	s.DropWS()
+}
+
+func (s *DropService) GetLastDrops() ([]model.Item, error) {
+	return s.repo.GetLastDrops()
 }
