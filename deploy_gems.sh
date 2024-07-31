@@ -20,13 +20,11 @@ change_status() {
         -d "{\"status\": $status}"
 }
 
-echo "Changing game status to false..."
 change_status false
 
 #echo "Waiting for 180 seconds..."
 #sleep 180
 
-echo "Killing existing tmux session (if any)"
 tmux kill-session -t $SESSION_NAME
 
 echo "Cloning/updating repository"
@@ -36,15 +34,10 @@ fi
 
 cd $REPO_DIR && git pull origin main
 
-echo "Starting new tmux session"
 tmux new-session -d -s $SESSION_NAME
-tmux_send "cd $REPO_DIR/cmd"
+tmux_send "cmd"
 tmux_send "go run main.go"
 
-echo "Waiting for 10 seconds..."
 sleep 10
 
-echo "Changing game status to true..."
 change_status true
-
-echo "Deployment script finished"
