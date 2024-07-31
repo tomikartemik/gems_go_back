@@ -116,8 +116,8 @@ func (s *RouletteService) EidtConnsRoulette(conn *websocket.Conn) {
 }
 
 func (s *RouletteService) RouletteGame() {
-	s.repo.NewRouletteRecord(100)
-	//s.StartPreparingRoulette()
+	//s.repo.NewRouletteRecord(100)
+	s.StartPreparingRoulette()
 }
 
 func (s *RouletteService) CheckStatusOfStartRoulette() {
