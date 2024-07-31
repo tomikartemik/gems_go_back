@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
 )
@@ -29,10 +30,12 @@ func (r *DropPostgres) GetLastDrops() ([]model.Item, error) {
 	if err := r.db.Model(&model.DropRecord{}).Order("id desc").Limit(7).Find(&drops).Error; err != nil {
 		return items, err
 	}
+	fmt.Println(drops)
 	for _, drop := range drops {
 		r.db.Model(&model.Item{}).Where("id = ?", drop.ItemID).First(&item)
 		items = append(items, item)
 	}
+	fmt.Println(items)
 	return items, nil
 }
 
