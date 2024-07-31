@@ -84,6 +84,7 @@ type Withdraw interface {
 	CancelWithdraw(withdrawId int) error
 	ReturnMoneyBecauseCanceled(currentWithdraw model.Withdraw)
 	GetPositionPrice(amount int) (float64, error)
+	GetPositionPrices() []model.Price
 }
 
 type Online interface {

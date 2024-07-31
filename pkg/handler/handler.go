@@ -43,6 +43,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/crash/init-bets-for-new-client", h.initCrashBetsForNewClient)
 	router.GET("/roulette/init-bets-for-new-client", h.initRouletteBetsForNewClient)
 
+	router.GET("gems-prices", h.getPositionPrices)
+
 	router.GET("/all-crash-records", h.getAllCrashRecords)
 	router.GET("/all-roulette-records", h.getAllRouletteRecords)
 

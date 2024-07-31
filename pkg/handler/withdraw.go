@@ -25,3 +25,7 @@ func (h *Handler) getUsersWithdraws(c *gin.Context) {
 	userId := c.GetString("user_id")
 	h.services.Withdraw.GetUsersWithdraws(userId)
 }
+
+func (h *Handler) getPositionPrices(c *gin.Context) {
+	c.JSON(http.StatusOK, h.services.GetPositionPrices())
+}

@@ -21,7 +21,7 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	if err != nil {
 		return newWithdraw, err
 	}
-	if user.Balance < float64(newWithdraw.Amount) || user.Balance <= 0 {
+	if user.Balance < newWithdraw.Price || user.Balance <= 0 {
 		return model.Withdraw{Username: "денег не хватает, броук"}, err
 	}
 	err = r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", withdraw.Price)).Error
@@ -88,4 +88,12 @@ func (r *WithdrawPostgres) GetPositionPrice(amount int) (float64, error) {
 		return 0, err
 	}
 	return postition.Price, nil
+}
+
+func (r *WithdrawPostgres) GetPositionPrices() []model.Price {
+	var positions []model.Price
+	if err := r.db.Model(&model.Price{}).Find(&positions).Error; err != nil {
+		return []model.Price{}
+	}
+	return positions
 }

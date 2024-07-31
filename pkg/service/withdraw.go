@@ -238,3 +238,7 @@ func (s *WithdrawService) GetUsersWithdraws(userId string) ([]model.Withdraw, er
 	}
 	return withdraws, nil
 }
+
+func (s *WithdrawService) GetPositionPrices() []model.Price {
+	return s.repo.GetPositionPrices()
+}
