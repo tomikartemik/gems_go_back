@@ -23,6 +23,7 @@ type DropResponse struct {
 var itemsIds []int
 
 func NewDropService(repo repository.Drop) *DropService {
+	itemsIds, _ = repo.GetItemsIds()
 	return &DropService{repo: repo}
 }
 
@@ -85,7 +86,8 @@ func (s *DropService) NewDrop(itemId int, dirty bool) {
 func (s *DropService) DirtyMoves() {
 	rand.Seed(time.Now().UnixNano())
 	for {
-		s.NewDrop(itemsIds[rand.Intn(len(itemsIds))], true)
+		randIndex := rand.Intn(len(itemsIds))
+		s.NewDrop(itemsIds[randIndex], true)
 		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 	}
 }
