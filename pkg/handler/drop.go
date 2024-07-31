@@ -8,11 +8,7 @@ import (
 )
 
 func (h *Handler) getLastDrops(c *gin.Context) {
-	drops, err := h.services.GetLastDrops()
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
+	drops := h.services.GetLastDrops()
 	c.JSON(http.StatusOK, drops)
 }
 

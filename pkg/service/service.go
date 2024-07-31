@@ -86,7 +86,7 @@ type Online interface {
 }
 
 type Drop interface {
-	GetLastDrops() ([]model.Item, error)
+	GetLastDrops() []DropResponse
 	EditConnsDrop(conn *websocket.Conn)
 	NewDrop(itemId int, dirty bool)
 	DirtyMoves()

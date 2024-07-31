@@ -94,7 +94,6 @@ type Online interface {
 
 type Drop interface {
 	NewDrop(itemId int, dirty bool) (model.Item, error)
-	GetLastDrops() ([]model.Item, error)
 	GetItemsIds() ([]int, error)
 }
 

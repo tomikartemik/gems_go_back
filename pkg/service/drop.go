@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"github.com/gorilla/websocket"
 	"log"
@@ -95,6 +94,6 @@ func (s *DropService) DirtyMoves() {
 	}
 }
 
-func (s *DropService) GetLastDrops() ([]model.Item, error) {
-	return s.repo.GetLastDrops()
+func (s *DropService) GetLastDrops() []DropResponse {
+	return lastDrops
 }
