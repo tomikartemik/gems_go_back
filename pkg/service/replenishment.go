@@ -59,7 +59,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (
 	var secret2 = os.Getenv("SECRET_2")
 	var currency = os.Getenv("CURRENCY")
 
-	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "test", email)
+	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "buying_gems", email)
 	if err != nil {
 		return "", err
 	}

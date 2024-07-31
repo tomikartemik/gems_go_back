@@ -6,6 +6,7 @@ type CaseInput struct {
 	Name      string `json:"name"`
 	Price     int    `json:"price"`
 	PhotoLink string `json:"photo_link"`
+	Color     string `json:"color"`
 }
 
 type CaseInfo struct {
@@ -13,6 +14,7 @@ type CaseInfo struct {
 	Name      string `json:"name"`
 	Price     int    `json:"price"`
 	PhotoLink string `json:"photo_link"`
+	Color     string `json:"color"`
 }
 
 type ShowCase struct {
