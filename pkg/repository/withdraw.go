@@ -82,10 +82,10 @@ func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, e
 }
 
 func (r *WithdrawPostgres) GetPositionPrice(amount int) (float64, error) {
-	var price float64
-	err := r.db.Model(&model.Price{}).Where("position = ?", amount).Find(&price).Error
+	var postition model.Price
+	err := r.db.Model(&model.Price{}).Where("position = ?", amount).Find(&postition).Error
 	if err != nil {
-		return price, err
+		return 0, err
 	}
-	return price, nil
+	return postition.Price, nil
 }
