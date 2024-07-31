@@ -38,6 +38,7 @@ func NewPostgresDB(cfg Config) (*gorm.DB, error) {
 		&model.Withdraw{},
 		&model.Online{},
 		&model.DropRecord{},
+		&model.Price{},
 	)
 	if err != nil {
 		return nil, err
