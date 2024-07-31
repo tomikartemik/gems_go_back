@@ -6,4 +6,5 @@ type Case struct {
 	Price     int        `json:"price"`
 	Items     []CaseItem `gorm:"foreignKey:CaseID"`
 	PhotoLink string     `json:"photo_link"`
+	Color     string     `json:"color"`
 }

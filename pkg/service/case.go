@@ -24,6 +24,17 @@ func (s *CaseService) CreateCase(newCase model.Case) (schema.ShowCase, error) {
 	caseInput.Name = newCase.Name
 	caseInput.Price = newCase.Price
 	caseInput.PhotoLink = newCase.PhotoLink
+	if newCase.Price < 100 {
+		newCase.Color = "#fd9d2d"
+	} else if newCase.Price < 200 {
+		newCase.Color = "#6cbf01"
+	} else if newCase.Price < 400 {
+		newCase.Color = "#7d42c9"
+	} else if newCase.Price < 500 {
+		newCase.Color = "#db2f4c"
+	} else {
+		newCase.Color = "#3b4364"
+	}
 	createdCaseId, err := s.repo.CreateCase(caseInput)
 	if err != nil {
 		return createdCase, err
