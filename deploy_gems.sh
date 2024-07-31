@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SESSION_NAME="back"
-REPO_DIR="$HOME/gems_github/gems_go_back"
+REPO_DIR="$HOME/gems_go_back"
 GIT_REPO_URL="https://github.com/tomikartemik/gems_go_back"
 STATUS_URL="https://api.dododrop.ru/admin/change-status"
 
