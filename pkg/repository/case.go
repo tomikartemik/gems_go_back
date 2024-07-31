@@ -5,6 +5,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"gorm.io/gorm"
+	"sort"
 )
 
 type CasePostgres struct {
@@ -59,7 +60,7 @@ func (r *CasePostgres) GetCaseInfo(id int) (model.Case, error) {
 
 func (r *CasePostgres) GetCaseItems(caseId int) ([]model.ItemWithID, error) {
 	var caseItems []model.CaseItem
-	if err := r.db.Where("case_id = ?", caseId).Find(&caseItems).Order("rarity").Error; err != nil {
+	if err := r.db.Where("case_id = ?", caseId).Find(&caseItems).Error; err != nil {
 		return nil, err
 	}
 	var itemsWithID []model.ItemWithID
@@ -71,6 +72,9 @@ func (r *CasePostgres) GetCaseItems(caseId int) ([]model.ItemWithID, error) {
 		}
 		itemsWithID = append(itemsWithID, item)
 	}
+	sort.Slice(itemsWithID, func(i, j int) bool {
+		return itemsWithID[i].Rarity < itemsWithID[j].Rarity
+	})
 	return itemsWithID, nil
 }
 
