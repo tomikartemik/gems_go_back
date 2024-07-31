@@ -20,6 +20,6 @@ func (s *OnlineService) GetOnline() int {
 
 func (s *OnlineService) SetOnline() {
 	rand.Seed(time.Now().UnixNano())
-	onlineUsers := rand.Intn(4000) + 2000
+	onlineUsers := rand.Intn(1000) + s.repo.GetOnline()
 	s.repo.SetOnline(onlineUsers)
 }
