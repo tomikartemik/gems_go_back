@@ -16,7 +16,7 @@ type DropService struct {
 }
 
 type DropResponse struct {
-	Photo string `json:"photo"`
+	Photo string `json:"photo_link"`
 	Color string `json:"color"`
 }
 
@@ -29,6 +29,11 @@ func NewDropService(repo repository.Drop) *DropService {
 
 type ClientDrop struct {
 	conn *websocket.Conn
+}
+
+type InitDropsResponse struct {
+	Color string `json:"color"`
+	Photo string `json:"photo"`
 }
 
 var lastDrops = []DropResponse{}
