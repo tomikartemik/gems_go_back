@@ -58,18 +58,16 @@ func (s *DropService) EditConnsDrop(conn *websocket.Conn) {
 }
 
 func (s *DropService) DropWS() {
-	for {
-		clientsMutexDrop.Lock()
-		for client := range clientsDrop {
-			err := client.conn.WriteJSON(lastDrops)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsDrop, client)
-			}
+	clientsMutexDrop.Lock()
+	for client := range clientsDrop {
+		err := client.conn.WriteJSON(lastDrops)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsDrop, client)
 		}
-		clientsMutexDrop.Unlock()
 	}
+	clientsMutexDrop.Unlock()
 }
 
 func (s *DropService) NewDrop(itemId int, dirty bool) {
