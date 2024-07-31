@@ -34,6 +34,11 @@ func (s *WithdrawService) TelegramBot() {
 }
 
 func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
+	price, err := s.repo.GetPositionPrice(currentWithdraw.Amount)
+	if err != nil {
+		return err
+	}
+	currentWithdraw.Price = price
 	createdWithdraw, err := s.repo.CreateWithdraw(currentWithdraw)
 	if err != nil {
 		return err

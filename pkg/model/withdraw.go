@@ -10,6 +10,7 @@ type Withdraw struct {
 	Username     string    `json:"username"`
 	AccountEmail string    `json:"account_email"`
 	Amount       int       `json:"amount"`
+	Price        float64   `json:"price"`
 	CreatedAt    time.Time `json:"created_at"`
 	Status       string    `json:"status"`
 	Code         int       `json:"code"`

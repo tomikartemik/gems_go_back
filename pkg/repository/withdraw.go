@@ -24,7 +24,7 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	if user.Balance < float64(newWithdraw.Amount) || user.Balance <= 0 {
 		return model.Withdraw{Username: "денег не хватает, броук"}, err
 	}
-	err = r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", float64(withdraw.Amount))).Error
+	err = r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", withdraw.Price)).Error
 	if err != nil {
 		return newWithdraw, err
 	}
@@ -33,6 +33,7 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	newWithdraw.AccountEmail = withdraw.AccountEmail
 	newWithdraw.Code = withdraw.Code
 	newWithdraw.Amount = withdraw.Amount
+	newWithdraw.Price = withdraw.Price
 	newWithdraw.Status = "processing"
 	newWithdraw.CreatedAt = time.Now()
 	err = r.db.Model(&model.Withdraw{}).Create(&newWithdraw).Error
@@ -68,7 +69,7 @@ func (r *WithdrawPostgres) CancelWithdraw(withdrawId int) error {
 }
 
 func (r *WithdrawPostgres) ReturnMoneyBecauseCanceled(currentWithdraw model.Withdraw) {
-	r.db.Model(&model.User{}).Where("id = ?", currentWithdraw.UserId).Update("balance", gorm.Expr("balance + ?", float64(currentWithdraw.Amount)))
+	r.db.Model(&model.User{}).Where("id = ?", currentWithdraw.UserId).Update("balance", gorm.Expr("balance + ?", currentWithdraw.Price))
 }
 
 func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, error) {
@@ -78,4 +79,13 @@ func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, e
 		return withdraws, err
 	}
 	return withdraws, nil
+}
+
+func (r *WithdrawPostgres) GetPositionPrice(amount int) (float64, error) {
+	var price float64
+	err := r.db.Model(&model.Price{}).Where("position = ?", amount).Find(&price).Error
+	if err != nil {
+		return price, err
+	}
+	return price, nil
 }
