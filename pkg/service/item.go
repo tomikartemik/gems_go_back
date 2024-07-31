@@ -19,11 +19,11 @@ func (s *ItemService) CreateItem(item model.Item) (model.ItemWithID, error) {
 	} else if item.Rarity < 20 {
 		item.Color = "#6cbf01"
 	} else if item.Rarity < 40 {
-		item.Color = "#7d42c9"
+		item.Color = "#00989E"
 	} else if item.Rarity < 50 {
 		item.Color = "#db2f4c"
 	} else {
-		item.Color = "#3b4364"
+		item.Color = "#ffffff"
 	}
 	return s.repo.CreateItem(item)
 }
