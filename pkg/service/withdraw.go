@@ -34,26 +34,44 @@ func (s *WithdrawService) TelegramBot() {
 }
 
 func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
+	// Начало транзакции
+	tx := s.repo.BeginTransaction()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Получение цены позиции
 	price, err := s.repo.GetPositionPrice(currentWithdraw.Amount)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 	currentWithdraw.Price = price
-	createdWithdraw, err := s.repo.CreateWithdraw(currentWithdraw)
+
+	// Создание вывода средств с использованием транзакции
+	createdWithdraw, err := s.repo.CreateWithdraw(tx, currentWithdraw)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 	if createdWithdraw.Username == "денег не хватает, броук" {
+		tx.Rollback()
 		return errors.New("денег не хватает, броук")
 	}
 
-	callbackData := fmt.Sprintf("perform_task_%d", createdWithdraw.ID)
+	// Коммит транзакции
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
 
+	// Формирование сообщения для Telegram
+	callbackData := fmt.Sprintf("perform_task_%d", createdWithdraw.ID)
 	button := tgbotapi.NewInlineKeyboardButtonData("Выполнить", callbackData)
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(button),
 	)
-
 	text := fmt.Sprintf(
 		"📋 Новый заказ №%d\n\n"+
 			"👤 Пользователь:\n"+
@@ -64,10 +82,12 @@ func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 		createdWithdraw.ID,
 		createdWithdraw.UserId,
 		createdWithdraw.Username,
-		createdWithdraw.Amount)
+		createdWithdraw.Amount,
+	)
 	msg := tgbotapi.NewMessageToChannel(channelID, text)
 	msg.ReplyMarkup = keyboard
 
+	// Отправка сообщения в Telegram
 	_, err = bot.Send(msg)
 	return err
 }

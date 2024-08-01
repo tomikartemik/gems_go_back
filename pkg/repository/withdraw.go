@@ -15,35 +15,28 @@ func NewWithdrawPostgres(db *gorm.DB) *WithdrawPostgres {
 	return &WithdrawPostgres{db: db}
 }
 
-func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdraw, error) {
+func (r *WithdrawPostgres) BeginTransaction() *gorm.DB {
+	return r.db.Begin()
+}
+
+func (r *WithdrawPostgres) CreateWithdraw(tx *gorm.DB, withdraw model.Withdraw) (model.Withdraw, error) {
 	var user model.User
 	var newWithdraw model.Withdraw
-
-	// Начало транзакции
-	tx := r.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
 
 	// Получение пользователя с блокировкой записи
 	err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Model(&model.User{}).Where("id = ?", withdraw.UserId).First(&user).Error
 	if err != nil {
-		tx.Rollback()
 		return newWithdraw, err
 	}
 
 	// Проверка баланса
 	if user.Balance < withdraw.Price || user.Balance <= 0 {
-		tx.Rollback()
-		return model.Withdraw{Username: "Недостаточно средств"}, nil
+		return model.Withdraw{Username: "денег не хватает, броук"}, nil
 	}
 
 	// Обновление баланса
 	err = tx.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", withdraw.Price)).Error
 	if err != nil {
-		tx.Rollback()
 		return newWithdraw, err
 	}
 
@@ -60,12 +53,6 @@ func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdr
 	}
 	err = tx.Model(&model.Withdraw{}).Create(&newWithdraw).Error
 	if err != nil {
-		tx.Rollback()
-		return newWithdraw, err
-	}
-
-	// Коммит транзакции
-	if err := tx.Commit().Error; err != nil {
 		return newWithdraw, err
 	}
 

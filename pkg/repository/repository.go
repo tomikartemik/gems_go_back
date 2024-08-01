@@ -77,7 +77,8 @@ type Replenishment interface {
 }
 
 type Withdraw interface {
-	CreateWithdraw(withdraw model.Withdraw) (model.Withdraw, error)
+	CreateWithdraw(tx *gorm.DB, withdraw model.Withdraw) (model.Withdraw, error)
+	BeginTransaction() *gorm.DB
 	CompleteWithdraw(withdrawId int) error
 	GetWithdraw(withdrawId int) (model.Withdraw, error)
 	GetUsersWithdraws(userId string) ([]model.Withdraw, error)
