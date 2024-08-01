@@ -166,7 +166,7 @@ func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Rotate = 0.0
 	responseCrash.Status = "Pending"
 	u = rand.Float64()
-	winMultiplier = math.Pow(1-u, -1/3.5)
+	winMultiplier = math.Pow(1-u, -1/2.5)
 	lastGame, err := s.repo.GetLastCrashRecord()
 	if err != nil {
 		log.Fatal(err)
