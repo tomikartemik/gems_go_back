@@ -3,6 +3,7 @@ package repository
 import (
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type RoulettePostgres struct {
@@ -44,21 +45,47 @@ func (r *RoulettePostgres) GetLastRouletteRecord() (model.RouletteRecord, error)
 
 func (r *RoulettePostgres) NewBetRoulette(newBet model.BetRoulette) string {
 	var user model.User
-	err := r.db.Model(&model.User{}).Where("id = ?", newBet.UserID).First(&user).Error
+
+	// Начало транзакции
+	tx := r.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Получение пользователя с блокировкой записи
+	err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Model(&model.User{}).Where("id = ?", newBet.UserID).First(&user).Error
 	if err != nil {
+		tx.Rollback()
 		return "User not found!"
 	}
-	if user.Balance < newBet.Amount {
+
+	// Проверка баланса
+	if user.Balance < newBet.Amount || newBet.Amount == 0 {
+		tx.Rollback()
 		return "Not enough money!"
 	}
-	err = r.db.Model(&model.User{}).Where("id = ?", user.Id).Update("balance", (user.Balance - newBet.Amount)).Error
+
+	// Обновление баланса
+	err = tx.Model(&model.User{}).Where("id = ?", user.Id).Update("balance", gorm.Expr("balance - ?", newBet.Amount)).Error
 	if err != nil {
-		return "Хуйня какая-то"
+		tx.Rollback()
+		return "Error updating balance"
 	}
-	err = r.db.Model(&model.BetRoulette{}).Create(&newBet).Error
+
+	// Создание записи о ставке
+	err = tx.Model(&model.BetRoulette{}).Create(&newBet).Error
 	if err != nil {
-		return "Хуйня какая-то"
+		tx.Rollback()
+		return "Error creating bet"
 	}
+
+	// Коммит транзакции
+	if err := tx.Commit().Error; err != nil {
+		return "Transaction commit error"
+	}
+
 	return "OK"
 }
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -17,29 +18,57 @@ func NewWithdrawPostgres(db *gorm.DB) *WithdrawPostgres {
 func (r *WithdrawPostgres) CreateWithdraw(withdraw model.Withdraw) (model.Withdraw, error) {
 	var user model.User
 	var newWithdraw model.Withdraw
-	err := r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).First(&user).Error
+
+	// Начало транзакции
+	tx := r.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Получение пользователя с блокировкой записи
+	err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Model(&model.User{}).Where("id = ?", withdraw.UserId).First(&user).Error
 	if err != nil {
+		tx.Rollback()
 		return newWithdraw, err
 	}
-	if user.Balance < newWithdraw.Price || user.Balance <= 0 {
-		return model.Withdraw{Username: "денег не хватает, броук"}, err
+
+	// Проверка баланса
+	if user.Balance < withdraw.Price || user.Balance <= 0 {
+		tx.Rollback()
+		return model.Withdraw{Username: "Недостаточно средств"}, nil
 	}
-	err = r.db.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", withdraw.Price)).Error
+
+	// Обновление баланса
+	err = tx.Model(&model.User{}).Where("id = ?", withdraw.UserId).Update("balance", gorm.Expr("balance - ?", withdraw.Price)).Error
 	if err != nil {
+		tx.Rollback()
 		return newWithdraw, err
 	}
-	newWithdraw.UserId = withdraw.UserId
-	newWithdraw.Username = user.Username
-	newWithdraw.AccountEmail = withdraw.AccountEmail
-	newWithdraw.Code = withdraw.Code
-	newWithdraw.Amount = withdraw.Amount
-	newWithdraw.Price = withdraw.Price
-	newWithdraw.Status = "processing"
-	newWithdraw.CreatedAt = time.Now()
-	err = r.db.Model(&model.Withdraw{}).Create(&newWithdraw).Error
+
+	// Создание записи о выводе средств
+	newWithdraw = model.Withdraw{
+		UserId:       withdraw.UserId,
+		Username:     user.Username,
+		AccountEmail: withdraw.AccountEmail,
+		Code:         withdraw.Code,
+		Amount:       withdraw.Amount,
+		Price:        withdraw.Price,
+		Status:       "processing",
+		CreatedAt:    time.Now(),
+	}
+	err = tx.Model(&model.Withdraw{}).Create(&newWithdraw).Error
 	if err != nil {
+		tx.Rollback()
 		return newWithdraw, err
 	}
+
+	// Коммит транзакции
+	if err := tx.Commit().Error; err != nil {
+		return newWithdraw, err
+	}
+
 	return newWithdraw, nil
 }
 

@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"sort"
 )
 
@@ -106,15 +106,22 @@ func (r *CasePostgres) DeleteCase(id int) error {
 func (r *CasePostgres) CheckThePossibilityOfPurchasing(userId string, caseId int) bool {
 	var user model.User
 	var caseInfo model.Case
+
+	// Получение информации о пользователе
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
 		return false
 	}
+
+	// Получение информации о кейсе
 	if err := r.db.Model(&model.Case{}).Where("id = ?", caseId).First(&caseInfo).Error; err != nil {
 		return false
 	}
+
+	// Проверка достаточности баланса
 	if float64(caseInfo.Price) <= user.Balance && user.Balance > 0 {
 		return true
 	}
+
 	return false
 }
 
@@ -132,48 +139,68 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 	var purchasedCase model.Case
 	var newItem, bestItem model.Item
 	var user model.User
+
+	// Начало транзакции
+	tx := r.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Добавление предмета в инвентарь пользователя
 	userItem.ItemID = itemId
 	userItem.UserID = userId
-	result := r.db.Create(&userItem)
-	if result.Error != nil {
-		fmt.Println(result.Error)
-		return 0, result.Error
-	}
-
-	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
-		fmt.Println(err)
+	if err := tx.Create(&userItem).Error; err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 
-	if err := r.db.Model(&model.Case{}).Where("id = ?", caseId).First(&purchasedCase).Error; err != nil {
-		fmt.Println(err)
+	// Получение информации о пользователе с блокировкой записи
+	if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 
+	// Получение информации о кейсе
+	if err := tx.Model(&model.Case{}).Where("id = ?", caseId).First(&purchasedCase).Error; err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	// Проверка и обновление лучшего предмета пользователя
 	if user.BestItemId != 0 {
-		if err := r.db.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
-			fmt.Println(err)
+		if err := tx.Model(&model.Item{}).Where("id = ?", itemId).First(&newItem).Error; err != nil {
+			tx.Rollback()
 			return 0, err
 		}
-		if err := r.db.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
-			fmt.Println(err)
+		if err := tx.Model(&model.Item{}).Where("id = ?", user.BestItemId).First(&bestItem).Error; err != nil {
+			tx.Rollback()
 			return 0, err
 		}
 		if newItem.Price > bestItem.Price {
-			if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
-				fmt.Println(err)
+			if err := tx.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", newItem.ID).Error; err != nil {
+				tx.Rollback()
 				return 0, err
 			}
 		}
 	} else {
-		if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
-			fmt.Println(err)
+		if err := tx.Model(&model.User{}).Where("id = ?", userId).Update("best_item_id", itemId).Error; err != nil {
+			tx.Rollback()
 			return 0, err
 		}
 	}
-	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", purchasedCase.Price)).Error; err != nil {
-		fmt.Println(err)
+
+	// Обновление баланса пользователя
+	if err := tx.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance - ?", purchasedCase.Price)).Error; err != nil {
+		tx.Rollback()
 		return 0, err
 	}
+
+	// Коммит транзакции
+	if err := tx.Commit().Error; err != nil {
+		return 0, err
+	}
+
 	return userItem.ID, nil
 }
