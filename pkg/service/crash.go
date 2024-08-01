@@ -70,8 +70,6 @@ var delta = 0.0
 var deltaCrash = 0.0
 var lastCrashGameID int
 
-var stepen = math.Pow(2.0, 52.0)
-
 var acceptingBetsCrash = true
 var acceptingCashoutsCrash = false
 
@@ -167,10 +165,8 @@ func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Length = 0.0
 	responseCrash.Rotate = 0.0
 	responseCrash.Status = "Pending"
-	//u = rand.Float64() * (stepen)
-	//winMultiplier = math.Round((100*stepen-u)/(stepen-u)) / 100.0
 	u = rand.Float64()
-	winMultiplier = math.Pow(1-u, -1/1.5)
+	winMultiplier = math.Pow(1-u, -1/3.5)
 	lastGame, err := s.repo.GetLastCrashRecord()
 	if err != nil {
 		log.Fatal(err)
