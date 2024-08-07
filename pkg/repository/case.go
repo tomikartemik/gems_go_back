@@ -151,6 +151,7 @@ func (r *CasePostgres) AddItemToInventoryAndChangeBalance(userId string, itemId 
 	// Добавление предмета в инвентарь пользователя
 	userItem.ItemID = itemId
 	userItem.UserID = userId
+	userItem.Sold = false
 	if err := tx.Create(&userItem).Error; err != nil {
 		tx.Rollback()
 		return 0, err

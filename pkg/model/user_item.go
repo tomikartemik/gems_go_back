@@ -5,4 +5,5 @@ type UserItem struct {
 	UserID string `json:"user_id"`
 	ItemID int    `json:"item_id"`
 	Item   Item   `json:"item" gorm:"foreignKey:ItemID"`
+	Sold   bool   `json:"sold"`
 }

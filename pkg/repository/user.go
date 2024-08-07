@@ -112,6 +112,8 @@ func (r *UserPostgres) GetUserInventory(userId string) ([]model.ItemOfInventory,
 			item.PhotoLink,
 			item.Color,
 			userItems[i].ID,
+			userItems[i].Sold,
+			item.CanBeWithdrawn,
 		})
 	}
 
@@ -125,13 +127,16 @@ func (r *UserPostgres) SellItem(userId string, user_item_id int) error {
 	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Find(&user_item).Error; err != nil {
 		return err
 	}
+	if user_item.Sold == true {
+		return errors.New("Уже продано!")
+	}
 	if err := r.db.Model(&model.Item{}).Where("id = ?", user_item.ItemID).Find(&item).Error; err != nil {
 		return err
 	}
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).Update("balance", gorm.Expr("balance + ?", item.Price)).Error; err != nil {
 		return err
 	}
-	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Delete(user_item).Error; err != nil {
+	if err := r.db.Model(&model.UserItem{}).Where("id = ?", user_item_id).Update("sold", true).Error; err != nil {
 		return err
 	}
 	return nil
