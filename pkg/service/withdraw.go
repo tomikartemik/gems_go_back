@@ -43,12 +43,12 @@ func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 	}()
 
 	// Получение цены позиции
-	price, err := s.repo.GetPositionPrice(currentWithdraw.ItemId)
+	price, err := s.repo.GetPositionPrice(currentWithdraw.Amount)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	currentWithdraw.Price = float64(price)
+	currentWithdraw.Price = price
 
 	// Создание вывода средств с использованием транзакции
 	createdWithdraw, err := s.repo.CreateWithdraw(tx, currentWithdraw)
@@ -82,7 +82,7 @@ func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 		createdWithdraw.ID,
 		createdWithdraw.UserId,
 		createdWithdraw.Username,
-		createdWithdraw.ItemId,
+		createdWithdraw.Amount,
 	)
 	msg := tgbotapi.NewMessageToChannel(channelID, text)
 	msg.ReplyMarkup = keyboard
@@ -169,7 +169,7 @@ func (s *WithdrawService) HandlePerformTask(callback *tgbotapi.CallbackQuery, or
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.ItemId)
+		currentWithdraw.Amount)
 	privateMsg := tgbotapi.NewMessage(int64(user.ID), taskDetailsToUser)
 	privateMsg.ReplyMarkup = finishKeyboard
 	_, err = bot.Send(privateMsg)
@@ -198,7 +198,7 @@ func (s *WithdrawService) HandleFinishTask(callback *tgbotapi.CallbackQuery, cur
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.ItemId)
+		currentWithdraw.Amount)
 
 	editMsg := tgbotapi.NewEditMessageText(
 		callback.Message.Chat.ID,
@@ -234,7 +234,7 @@ func (s *WithdrawService) HandleCancelTask(callback *tgbotapi.CallbackQuery, cur
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.ItemId)
+		currentWithdraw.Amount)
 
 	editMsg := tgbotapi.NewEditMessageText(
 		callback.Message.Chat.ID,
