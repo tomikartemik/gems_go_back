@@ -48,8 +48,9 @@ func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderI
 	return url, nil
 }
 
-func (s *ReplenishmentService) NewReplenishment(userId string, amount float64) (string, error) {
-	replenishmentID, email, err := s.repo.NewReplenishment(userId, amount)
+func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, promo string) (string, error) {
+	amountWithReward := amount * s.repo.GetReward(promo, userId)
+	replenishmentID, email, err := s.repo.NewReplenishment(userId, amountWithReward)
 	if err != nil {
 		return "", err
 	}

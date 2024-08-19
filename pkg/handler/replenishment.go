@@ -2,21 +2,24 @@ package handler
 
 import (
 	"fmt"
-	"gems_go_back/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
+type ReplInput struct {
+	Amount float64 `json:"amount"`
+	Promo  string  `json:"promo"`
+}
+
 func (h *Handler) NewReplenishment(c *gin.Context) {
-	var input model.Replenishment
+	var input ReplInput
 	userID := c.GetString("user_id")
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	amount := input.Amount
-	location, err := h.services.Replenishment.NewReplenishment(userID, amount)
+	location, err := h.services.Replenishment.NewReplenishment(userID, input.Amount, input.Promo)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

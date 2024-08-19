@@ -50,3 +50,19 @@ func (r *ReplenishmentPostgres) AcceptReplenishment(replenishmentID int) error {
 	}
 	return nil
 }
+
+func (r *ReplenishmentPostgres) GetReward(promo, userID string) float64 {
+	reward := 1.0
+	promoInfo := &model.Promo{}
+	if err := r.db.Model(&model.Promo{}).Where("promo = ?", promo).First(&promoInfo).Error; err != nil {
+		return reward
+	}
+	if err := r.db.Model(&model.PromoUsage{}).Where("promo_id = ?", promoInfo.ID).Where("user_id = ?", userID).Error; err == gorm.ErrRecordNotFound {
+		r.db.Model(&model.PromoUsage{}).Create(&model.PromoUsage{
+			PromoID: promoInfo.ID,
+			UserID:  userID,
+		})
+		return promoInfo.Reward
+	}
+	return reward
+}
