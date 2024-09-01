@@ -43,7 +43,6 @@ type ResponseCrash struct {
 	Multiplier      float64 `json:"multiplier"`
 	TimeBeforeStart float64 `json:"time_before_start"`
 	Length          float64 `json:"length"`
-	Rotate          float64 `json:"rotate"`
 }
 
 type InfoAboutCrashBet struct {
@@ -61,12 +60,11 @@ type BetsAtLastCrashGame struct {
 
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
-var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0, 0.0}
+var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
 var u = 0.0
-var delta = 0.0
 var deltaCrash = 0.0
 var lastCrashGameID int
 
@@ -163,7 +161,6 @@ func (s *CrashService) StartPreparingCrash() {
 	clientsMutexCrash.Unlock()
 	acceptingBetsCrash = true
 	responseCrash.Length = 0.0
-	responseCrash.Rotate = 0.0
 	responseCrash.Status = "Pending"
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.5)
@@ -207,11 +204,8 @@ func (s *CrashService) GameCrash() {
 		time.Sleep(10 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
 		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
-		if responseCrash.Length < 100.0 {
+		if responseCrash.Length <= 100.0 {
 			responseCrash.Length += 0.4
-		} else if responseCrash.Rotate < 19.5 {
-			responseCrash.Length += 0.0026
-			responseCrash.Rotate += 0.0065
 		}
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
@@ -231,14 +225,7 @@ func (s *CrashService) GameCrash() {
 func (s *CrashService) EndCrash() {
 	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
-	delta = responseCrash.Rotate / 300.0
-	deltaCrash = 0
-	if responseCrash.Length > 100 {
-		deltaCrash = (responseCrash.Length - 100) / 300
-	}
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
-		responseCrash.Rotate -= delta
-		responseCrash.Length -= deltaCrash
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
