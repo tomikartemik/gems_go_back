@@ -46,7 +46,7 @@ func (r *WithdrawPostgres) CreateWithdraw(tx *gorm.DB, withdraw model.Withdraw) 
 		Username:     user.Username,
 		AccountEmail: withdraw.AccountEmail,
 		Code:         withdraw.Code,
-		Amount:       withdraw.Amount,
+		Position:     withdraw.Position,
 		Price:        withdraw.Price,
 		Status:       "processing",
 		CreatedAt:    time.Now(),
@@ -97,9 +97,9 @@ func (r *WithdrawPostgres) GetUsersWithdraws(userId string) ([]model.Withdraw, e
 	return withdraws, nil
 }
 
-func (r *WithdrawPostgres) GetPositionPrice(amount int) (float64, error) {
+func (r *WithdrawPostgres) GetPositionPrice(position string) (float64, error) {
 	var postition model.Price
-	err := r.db.Model(&model.Price{}).Where("position = ?", amount).Find(&postition).Error
+	err := r.db.Model(&model.Price{}).Where("position = ?", position).Find(&postition).Error
 	if err != nil {
 		return 0, err
 	}

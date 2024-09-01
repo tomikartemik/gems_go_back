@@ -43,7 +43,7 @@ func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 	}()
 
 	// Получение цены позиции
-	price, err := s.repo.GetPositionPrice(currentWithdraw.Amount)
+	price, err := s.repo.GetPositionPrice(currentWithdraw.Position)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -78,11 +78,11 @@ func (s *WithdrawService) CreateWithdraw(currentWithdraw model.Withdraw) error {
 			"├ ID: %s\n"+
 			"└ Username: %s\n\n"+
 			"🛒 Заказ:\n"+
-			"└ Гемы: %d\n",
+			"└ Товар: %s\n",
 		createdWithdraw.ID,
 		createdWithdraw.UserId,
 		createdWithdraw.Username,
-		createdWithdraw.Amount,
+		createdWithdraw.Position,
 	)
 	msg := tgbotapi.NewMessageToChannel(channelID, text)
 	msg.ReplyMarkup = keyboard
@@ -163,13 +163,13 @@ func (s *WithdrawService) HandlePerformTask(callback *tgbotapi.CallbackQuery, or
 			"├ Email: %s\n"+
 			"└ Code: %d\n\n"+
 			"📋 Заказ:\n"+
-			"└ Гемы: %d\n",
+			"└ Товар: %s\n",
 		currentWithdraw.ID,
 		currentWithdraw.UserId,
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.Amount)
+		currentWithdraw.Position)
 	privateMsg := tgbotapi.NewMessage(int64(user.ID), taskDetailsToUser)
 	privateMsg.ReplyMarkup = finishKeyboard
 	_, err = bot.Send(privateMsg)
@@ -191,14 +191,14 @@ func (s *WithdrawService) HandleFinishTask(callback *tgbotapi.CallbackQuery, cur
 			"├ Email: %s\n"+
 			"└ Code: %d\n\n"+
 			"📋 Заказ:\n"+
-			"└ Гемы: %d\n\n"+
+			"└ Товар: %s\n\n"+
 			"Выполнен ✅✅✅",
 		currentWithdraw.ID,
 		currentWithdraw.UserId,
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.Amount)
+		currentWithdraw.Position)
 
 	editMsg := tgbotapi.NewEditMessageText(
 		callback.Message.Chat.ID,
@@ -227,14 +227,14 @@ func (s *WithdrawService) HandleCancelTask(callback *tgbotapi.CallbackQuery, cur
 			"├ Email: %s\n"+
 			"└ Code: %d\n\n"+
 			"📋 Заказ:\n"+
-			"└ Гемы: %d\n\n"+
+			"└ Товар: %s\n\n"+
 			"Отменен ❌❌❌",
 		currentWithdraw.ID,
 		currentWithdraw.UserId,
 		currentWithdraw.Username,
 		currentWithdraw.AccountEmail,
 		currentWithdraw.Code,
-		currentWithdraw.Amount)
+		currentWithdraw.Position)
 
 	editMsg := tgbotapi.NewEditMessageText(
 		callback.Message.Chat.ID,
