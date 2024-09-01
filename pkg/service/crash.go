@@ -228,7 +228,7 @@ func (s *CrashService) GameCrash() {
 func (s *CrashService) EndCrash() {
 	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
-	wayTo150 := (150 - responseCrash.Length) / 300
+	wayTo150 := (200 - responseCrash.Length) / 300
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
 		responseCrash.Length += wayTo150
