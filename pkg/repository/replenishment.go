@@ -51,18 +51,36 @@ func (r *ReplenishmentPostgres) AcceptReplenishment(replenishmentID int) error {
 	return nil
 }
 
-func (r *ReplenishmentPostgres) GetReward(promo, userID string) float64 {
-	reward := 1.0
+func (r *ReplenishmentPostgres) GetReward(promo, userID string) (float64, error) {
+	defaultReward := 1.0
 	promoInfo := &model.Promo{}
-	if err := r.db.Model(&model.Promo{}).Where("promo = ?", promo).First(&promoInfo).Error; err != nil {
-		return reward
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return defaultReward, tx.Error
 	}
-	if err := r.db.Model(&model.PromoUsage{}).Where("promo_id = ?", promoInfo.ID).Where("user_id = ?", userID).Error; err == gorm.ErrRecordNotFound {
-		r.db.Model(&model.PromoUsage{}).Create(&model.PromoUsage{
-			PromoID: promoInfo.ID,
-			UserID:  userID,
-		})
-		return promoInfo.Reward
+	if err := tx.Model(&model.Promo{}).Where("promo = ?", promo).First(&promoInfo).Error; err != nil {
+		tx.Rollback()
+		return defaultReward, err
 	}
-	return reward
+
+	usage := &model.PromoUsage{}
+	if err := tx.Model(&model.PromoUsage{}).Where("promo_id = ?", promoInfo.ID).Where("user_id = ?", userID).First(&usage).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			newUsage := &model.PromoUsage{
+				PromoID: promoInfo.ID,
+				UserID:  userID,
+			}
+			if err := tx.Create(newUsage).Error; err != nil {
+				tx.Rollback()
+				return defaultReward, err
+			}
+			tx.Commit()
+			return promoInfo.Reward, nil
+		}
+		tx.Rollback()
+		return defaultReward, err
+	}
+
+	tx.Commit()
+	return defaultReward, nil
 }

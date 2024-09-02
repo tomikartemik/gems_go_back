@@ -74,7 +74,7 @@ type Roulette interface {
 type Replenishment interface {
 	NewReplenishment(userID string, amount float64) (string, string, error)
 	AcceptReplenishment(replenishmentID int) error
-	GetReward(promo, userID string) float64
+	GetReward(promo, userID string) (float64, error)
 }
 
 type Withdraw interface {
