@@ -76,6 +76,7 @@ func (s *AuthService) GetUserById(id string) (schema.UserWithItems, error) {
 
 	return userWithInventory, nil
 }
+
 func (s *AuthService) UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error) {
 	return s.repo.UpdateUser(id, user)
 }

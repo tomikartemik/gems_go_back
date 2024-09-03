@@ -175,9 +175,7 @@ func (s *CrashService) StartPreparingCrash() {
 }
 
 func (s *CrashService) PreparingCrash() {
-	//for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
-	for time_before_start := 300.0; time_before_start >= 0; time_before_start-- {
-
+	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
 		responseCrash.TimeBeforeStart = time_before_start / 100.0
