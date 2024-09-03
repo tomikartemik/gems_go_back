@@ -70,6 +70,7 @@ func (r *UserPostgres) GetUserById(id string) (schema.ShowUser, error) {
 	userResponse.BestItem = bestItem
 	return userResponse, nil
 }
+
 func (r *UserPostgres) UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error) {
 	if err := r.db.Model(&model.User{}).Where("id = ?", id).Updates(&user).Error; err != nil {
 		return schema.ShowUser{}, err

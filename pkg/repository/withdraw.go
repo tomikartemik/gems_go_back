@@ -108,7 +108,7 @@ func (r *WithdrawPostgres) GetPositionPrice(position string) (float64, error) {
 
 func (r *WithdrawPostgres) GetPositionPrices() []model.Price {
 	var positions []model.Price
-	if err := r.db.Model(&model.Price{}).Find(&positions).Error; err != nil {
+	if err := r.db.Model(&model.Price{}).Order("id").Find(&positions).Error; err != nil {
 		return []model.Price{}
 	}
 	return positions
