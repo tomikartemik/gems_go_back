@@ -56,8 +56,10 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 		rewardInfo, err := s.repo.GetReward(promo, userId)
 		if err != nil {
 			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
+			fmt.Println(replenishmentID, email, err)
 		} else {
 			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
+			fmt.Println(replenishmentID, email, err)
 		}
 	}
 	var merchantID = os.Getenv("MERCHANT_ID")
