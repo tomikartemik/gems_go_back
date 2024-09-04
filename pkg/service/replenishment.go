@@ -1,6 +1,7 @@
 package service
 
 import (
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -27,29 +28,23 @@ func NewReplenishmentService(repo repository.Replenishment) *ReplenishmentServic
 	return &ReplenishmentService{repo: repo}
 }
 
-func EncryptToSHA256(input string) string {
-	hash := sha256.New()
-
-	hash.Write([]byte(input))
-
-	hashBytes := hash.Sum(nil)
-
-	hashString := hex.EncodeToString(hashBytes)
-
-	return hashString
+func hashData(data string, apiKey string) string {
+	hash := hmac.New(sha256.New, []byte(apiKey))
+	hash.Write([]byte(data))
+	return hex.EncodeToString(hash.Sum(nil))
 }
 
 // Функция для создания подписи
-func createSignature(amount, currency, email, i, ip, nonce, shopId string) string {
+func createSignature(secret1, amount, currency, email, i, ip, nonce, shopId string) string {
 	data := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", amount, currency, email, i, ip, nonce, shopId)
 	fmt.Println(data)
-	return EncryptToSHA256(data)
+	return hashData(data, secret1)
 }
 
 // Функция для отправки запроса на пополнение
 func createPaymentRequest(shopID, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
 
-	signature := createSignature(amount, currency, email, paymentMethod, "20.21.27.109", orderID, shopID)
+	signature := createSignature(secret1, amount, currency, email, paymentMethod, "20.21.27.109", orderID, shopID)
 	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&shopId=%s&nonce=%s&amount=%s&signature=%s&ip=20.21.27.109", currency, email, paymentMethod, shopID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
