@@ -40,10 +40,10 @@ func createSignature(merchantID, secret1, amount, currency, orderID string) stri
 }
 
 // Функция для отправки запроса на пополнение
-func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderID, description, email string) (string, error) {
+func createPaymentRequest(shopID, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
 
-	signature := createSignature(merchantID, secret1, amount, currency, orderID)
-	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&m=%s&o=%s&oa=%s&s=%s", currency, email, description, merchantID, orderID, amount, signature)
+	signature := createSignature(shopID, secret1, amount, currency, orderID)
+	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&shopId=%s&nonce=%s&amount=%s&signature=%s&ip=20.21.27.109", currency, email, paymentMethod, shopID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
 }
