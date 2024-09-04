@@ -102,7 +102,7 @@ type CreateOrderResponse struct {
 }
 
 func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, APIKey string) string {
-	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%s", amount, currency, email, i, ip, nonce, shopID)
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d", amount, currency, email, i, ip, nonce, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
@@ -171,7 +171,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "124.138.144.202", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "138.116.3.217", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
