@@ -132,7 +132,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 	}
 	fmt.Println(string(requestBody))
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("POST", "https://api.freekassa.ru/v1/orders", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", "https://api.freekassa.ru/v1/orders/create", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
