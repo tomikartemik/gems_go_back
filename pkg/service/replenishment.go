@@ -1,8 +1,7 @@
 package service
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
+	"crypto/md5"
 	"encoding/hex"
 	"fmt"
 	"gems_go_back/pkg/repository"
@@ -28,24 +27,23 @@ func NewReplenishmentService(repo repository.Replenishment) *ReplenishmentServic
 	return &ReplenishmentService{repo: repo}
 }
 
-func hashData(data string, apiKey string) string {
-	hash := hmac.New(sha256.New, []byte(apiKey))
-	hash.Write([]byte(data))
-	return hex.EncodeToString(hash.Sum(nil))
+// Функция для генерации MD5 хеша
+func generateMD5Hash(data string) string {
+	hash := md5.Sum([]byte(data))
+	return hex.EncodeToString(hash[:])
 }
 
 // Функция для создания подписи
-func createSignature(apiKey, amount, currency, email, i, ip, nonce, shopId string) string {
-	data := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", amount, currency, email, i, ip, nonce, shopId)
-	fmt.Println(data)
-	return hashData(data, apiKey)
+func createSignature(merchantID, secret1, amount, currency, orderID string) string {
+	data := fmt.Sprintf("%s:%s:%s:%s:%s", merchantID, amount, secret1, currency, orderID)
+	return generateMD5Hash(data)
 }
 
 // Функция для отправки запроса на пополнение
-func createPaymentRequest(shopID, apiKey, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
+func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderID, description, email string) (string, error) {
 
-	signature := createSignature(apiKey, amount, currency, email, paymentMethod, "20.21.27.109", orderID, shopID)
-	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&shopId=%s&nonce=%s&amount=%s&signature=%s&ip=20.21.27.109", currency, email, paymentMethod, shopID, orderID, amount, signature)
+	signature := createSignature(merchantID, secret1, amount, currency, orderID)
+	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&m=%s&o=%s&oa=%s&s=%s", currency, email, "4", merchantID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
 }
@@ -54,20 +52,20 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	var replenishmentID string
 	var email string
 	var err error
-	rewardInfo, err := s.repo.GetReward(promo, userId)
-	if err != nil {
-		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
-	} else {
-		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
+	if len(promo) > 0 {
+		rewardInfo, err := s.repo.GetReward(promo, userId)
+		if err != nil {
+			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
+		} else {
+			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
+		}
 	}
-
-	var apiKey = os.Getenv("API_KEY")
 	var merchantID = os.Getenv("MERCHANT_ID")
 	var secret1 = os.Getenv("SECRET_1")
 	var secret2 = os.Getenv("SECRET_2")
 	var currency = os.Getenv("CURRENCY")
 
-	location, err := createPaymentRequest(merchantID, apiKey, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "36", email)
+	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "44", email)
 	if err != nil {
 		return "", err
 	}
