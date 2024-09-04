@@ -36,6 +36,7 @@ func generateMD5Hash(data string) string {
 // Функция для создания подписи
 func createSignature(amount, currency, email, i, ip, nonce, shopId string) string {
 	data := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s", amount, currency, email, i, ip, nonce, shopId)
+	fmt.Println(data)
 	return generateMD5Hash(data)
 }
 
