@@ -161,21 +161,21 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 }
 
 func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, promo string) (string, error) {
-	var replenishmentID string
+	var orderID string
 	var email string
 	var err error
 	rewardInfo, err := s.repo.GetReward(promo, userId)
 	if err != nil {
-		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
-		fmt.Println(err)
+		orderID, email, err = s.repo.NewReplenishment(userId, amount)
 	} else {
-		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
-		fmt.Println(err)
+		orderID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
 	}
+
 	var merchantID = os.Getenv("MERCHANT_ID")
-	merchantIDToInt, _ := strconv.Atoi(merchantID)
-	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
+
+	merchantIDToInt, _ := strconv.Atoi(merchantID)
+	replenishmentIDInt, _ := strconv.Atoi(orderID)
 
 	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "201.109.241.36", replenishmentIDInt, APIKey)
 	if err != nil {

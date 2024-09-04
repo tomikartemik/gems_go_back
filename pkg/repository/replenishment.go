@@ -5,6 +5,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
 	"strconv"
+	"time"
 )
 
 type ReplenishmentPostgres struct {
@@ -16,7 +17,9 @@ func NewReplenishmentPostgres(db *gorm.DB) *ReplenishmentPostgres {
 }
 
 func (r *ReplenishmentPostgres) NewReplenishment(userID string, amount float64) (string, string, error) {
+	orderID := int(time.Now().UnixNano())
 	newReplenishment := model.Replenishment{
+		ID:      orderID,
 		UserID:  userID,
 		Amount:  amount,
 		Success: false,
@@ -31,7 +34,7 @@ func (r *ReplenishmentPostgres) NewReplenishment(userID string, amount float64) 
 		return "", "", err
 	}
 	fmt.Println("repo: ", strconv.Itoa(newReplenishment.ID), user.Email)
-	return strconv.Itoa(newReplenishment.ID), user.Email, nil
+	return strconv.Itoa(orderID), user.Email, nil
 }
 
 func (r *ReplenishmentPostgres) AcceptReplenishment(replenishmentID int) error {
