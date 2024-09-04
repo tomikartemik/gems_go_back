@@ -131,6 +131,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("POST", "https://api.freekassa.com/v1/orders/create", bytes.NewBuffer(requestBody))
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -138,17 +139,20 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
 	var createOrderResp CreateOrderResponse
 	if err := json.Unmarshal(body, &createOrderResp); err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -163,15 +167,17 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	rewardInfo, err := s.repo.GetReward(promo, userId)
 	if err != nil {
 		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
+		fmt.Println(err)
 	} else {
 		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
+		fmt.Println(err)
 	}
 	var merchantID = os.Getenv("MERCHANT_ID")
 	merchantIDToInt, _ := strconv.Atoi(merchantID)
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "187.225.240.160", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "201.109.241.36", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
