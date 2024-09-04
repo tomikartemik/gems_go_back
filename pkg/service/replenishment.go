@@ -177,7 +177,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	merchantIDToInt, _ := strconv.Atoi(merchantID)
 	replenishmentIDInt, _ := strconv.Atoi(orderID)
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "201.109.241.36", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 36, "201.109.241.36", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
