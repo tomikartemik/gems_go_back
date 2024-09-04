@@ -43,7 +43,7 @@ func createSignature(merchantID, secret1, amount, currency, orderID string) stri
 func createPaymentRequest(merchantID, secret1, secret2, amount, currency, orderID, description, email string) (string, error) {
 
 	signature := createSignature(merchantID, secret1, amount, currency, orderID)
-	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&m=%s&o=%s&oa=%s&s=%s", currency, email, "4", merchantID, orderID, amount, signature)
+	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&m=%s&o=%s&oa=%s&s=%s", currency, email, description, merchantID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
 }
@@ -52,20 +52,18 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	var replenishmentID string
 	var email string
 	var err error
-	if len(promo) > 0 {
-		rewardInfo, err := s.repo.GetReward(promo, userId)
-		if err != nil {
-			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
-		} else {
-			replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
-		}
+	rewardInfo, err := s.repo.GetReward(promo, userId)
+	if err != nil {
+		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount)
+	} else {
+		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
 	}
 	var merchantID = os.Getenv("MERCHANT_ID")
 	var secret1 = os.Getenv("SECRET_1")
 	var secret2 = os.Getenv("SECRET_2")
 	var currency = os.Getenv("CURRENCY")
 
-	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "44", email)
+	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "12", email)
 	if err != nil {
 		return "", err
 	}
