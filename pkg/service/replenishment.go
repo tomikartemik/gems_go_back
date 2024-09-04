@@ -125,30 +125,25 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 		Signature:  signature,
 	}
 
-	// Преобразование данных в JSON
 	requestBody, err := json.Marshal(orderRequest)
 	if err != nil {
 		return nil, err
 	}
-
-	// Создание HTTP-клиента и выполнение запроса
+	fmt.Println(string(requestBody))
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("POST", "https://api.freekassa.ru/v1/orders", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
 
-	// Добавление заголовков
 	req.Header.Set("Content-Type", "application/json")
 
-	// Выполнение запроса
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// Чтение и обработка ответа
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -178,6 +173,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 
 	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "192.168.0.1", replenishmentID, APIKey)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 	fmt.Println(location.Data.PaymentURL)
