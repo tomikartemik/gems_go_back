@@ -84,14 +84,14 @@ func (s *ReplenishmentService) AcceptReplenishment(replenishmentID int) {
 }
 
 type CreateOrderRequest struct {
-	Amount     float64 `json:"amount"`   // Сумма платежа
-	CurrencyID string  `json:"currency"` // Идентификатор валюты
-	Email      string  `json:"email"`    // Email покупателя
-	ShopID     int     `json:"shopId"`
-	I          int     `json:"i"`
-	IP         string  `json:"ip"`        // IP адрес покупателя (опционально)
-	Nonce      int     `json:"nonce"`     // Уникальное значение для предотвращения повторных запросов
-	Signature  string  `json:"signature"` // Подпись для проверки целостности данных
+	ShopID     int    `json:"shopId"`
+	Nonce      int    `json:"nonce"`
+	Signature  string `json:"signature"`
+	I          int    `json:"i"`
+	Email      string `json:"email"`
+	IP         string `json:"ip"`
+	Amount     string `json:"amount"`
+	CurrencyID string `json:"currency"`
 }
 
 type CreateOrderResponse struct {
@@ -101,21 +101,19 @@ type CreateOrderResponse struct {
 	Location  string `json:"location"`
 }
 
-func createSignature(shopID int, amount int, currency string, email string, i int, ip string, nonce int, tel string, secretKey string) string {
-	message := fmt.Sprintf("%d|%s|%s|%d|%s|%d|%d|%s", amount, currency, email, i, ip, nonce, shopID, tel)
+func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, APIKey string) string {
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%s", amount, currency, email, i, ip, nonce, shopID)
 	fmt.Println(message)
-	h := hmac.New(sha256.New, []byte(secretKey))
+	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, tel string, secretKey string) (*CreateOrderResponse, error) {
-	// Создание подписи
-	signature := createSignature(shopID, int(amount), currency, email, i, ip, nonce, tel, secretKey)
+func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, APIKey string) (*CreateOrderResponse, error) {
+	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, APIKey)
 
-	// Подготовка данных запроса
 	orderRequest := CreateOrderRequest{
-		Amount:     amount,
+		Amount:     fmt.Sprintf("%.2f", amount),
 		CurrencyID: currency,
 		Email:      email,
 		ShopID:     shopID,
@@ -173,7 +171,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "43.181.104.25", replenishmentIDInt, "+79172650003", APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "124.138.144.202", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
