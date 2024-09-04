@@ -34,8 +34,8 @@ func generateMD5Hash(data string) string {
 }
 
 // Функция для создания подписи
-func createSignature(merchantID, secret1, amount, currency, orderID, ip string) string {
-	data := fmt.Sprintf("%s:%s:%s:%s:%s:%s", merchantID, amount, secret1, currency, orderID, ip)
+func createSignature(merchantID, secret1, amount, currency, ip, orderID string) string {
+	data := fmt.Sprintf("%s:%s:%s:%s:%s:%s", merchantID, amount, secret1, currency, ip, orderID)
 	return generateMD5Hash(data)
 }
 
