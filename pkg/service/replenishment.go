@@ -129,7 +129,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 	}
 	fmt.Println(string(requestBody))
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("POST", "https://api.freekassa.ru/v1/orders/create", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", "https://api.freekassa.com/v1/orders/create", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "138.116.3.217", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "187.225.240.160", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
