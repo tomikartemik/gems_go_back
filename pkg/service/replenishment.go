@@ -35,16 +35,16 @@ func hashData(data string, apiKey string) string {
 }
 
 // Функция для создания подписи
-func createSignature(secret1, amount, currency, email, i, ip, nonce, shopId string) string {
+func createSignature(apiKey, amount, currency, email, i, ip, nonce, shopId string) string {
 	data := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", amount, currency, email, i, ip, nonce, shopId)
 	fmt.Println(data)
-	return hashData(data, secret1)
+	return hashData(data, apiKey)
 }
 
 // Функция для отправки запроса на пополнение
-func createPaymentRequest(shopID, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
+func createPaymentRequest(shopID, apiKey, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
 
-	signature := createSignature(secret1, amount, currency, email, paymentMethod, "20.21.27.109", orderID, shopID)
+	signature := createSignature(apiKey, amount, currency, email, paymentMethod, "20.21.27.109", orderID, shopID)
 	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&shopId=%s&nonce=%s&amount=%s&signature=%s&ip=20.21.27.109", currency, email, paymentMethod, shopID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
@@ -61,12 +61,13 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
 	}
 
+	var apiKey = os.Getenv("API_KEY")
 	var merchantID = os.Getenv("MERCHANT_ID")
 	var secret1 = os.Getenv("SECRET_1")
 	var secret2 = os.Getenv("SECRET_2")
 	var currency = os.Getenv("CURRENCY")
 
-	location, err := createPaymentRequest(merchantID, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "36", email)
+	location, err := createPaymentRequest(merchantID, apiKey, secret1, secret2, strconv.FormatFloat(amount, 'f', -1, 64), currency, replenishmentID, "36", email)
 	if err != nil {
 		return "", err
 	}
