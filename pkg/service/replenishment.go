@@ -111,7 +111,7 @@ func createSignature(shopID int, amount int, currency string, email string, i in
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, tel string, secretKey string) (*CreateOrderResponse, error) {
 	// Создание подписи
-	signature := createSignature(shopID, int(amount), currency, email, i, ip, nonce, secretKey, tel)
+	signature := createSignature(shopID, int(amount), currency, email, i, ip, nonce, tel, secretKey)
 
 	// Подготовка данных запроса
 	orderRequest := CreateOrderRequest{
@@ -173,7 +173,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "118.101.55.105", replenishmentIDInt, "+79172650003", APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "43.181.104.25", replenishmentIDInt, "+79172650003", APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
