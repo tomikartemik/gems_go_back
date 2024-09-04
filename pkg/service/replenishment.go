@@ -84,10 +84,10 @@ func (s *ReplenishmentService) AcceptReplenishment(replenishmentID int) {
 }
 
 type CreateOrderRequest struct {
-	Amount     float64 `json:"amount"`      // Сумма платежа
-	CurrencyID string  `json:"currency_id"` // Идентификатор валюты
-	Email      string  `json:"email"`       // Email покупателя
-	ShopID     int     `json:"shop_id"`
+	Amount     float64 `json:"amount"`   // Сумма платежа
+	CurrencyID string  `json:"currency"` // Идентификатор валюты
+	Email      string  `json:"email"`    // Email покупателя
+	ShopID     int     `json:"shopId"`
 	I          int     `json:"i"`
 	IP         string  `json:"ip"`        // IP адрес покупателя (опционально)
 	Nonce      int     `json:"nonce"`     // Уникальное значение для предотвращения повторных запросов
