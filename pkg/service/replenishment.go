@@ -90,7 +90,7 @@ type CreateOrderRequest struct {
 	ShopID     int     `json:"shop_id"`
 	I          int     `json:"i"`
 	IP         string  `json:"ip"`        // IP адрес покупателя (опционально)
-	Nonce      string  `json:"nonce"`     // Уникальное значение для предотвращения повторных запросов
+	Nonce      int     `json:"nonce"`     // Уникальное значение для предотвращения повторных запросов
 	Signature  string  `json:"signature"` // Подпись для проверки целостности данных
 }
 
@@ -103,14 +103,14 @@ type CreateOrderResponse struct {
 	} `json:"data"`
 }
 
-func createSignature(shopID int, amount float64, currency string, email string, i int, ip string, nonce string, secretKey string) string {
-	message := fmt.Sprintf("%d|%f|%s|%s|%d|%s|%s", shopID, amount, currency, email, i, ip, nonce)
+func createSignature(shopID int, amount float64, currency string, email string, i int, ip string, nonce int, secretKey string) string {
+	message := fmt.Sprintf("%d|%f|%s|%s|%d|%s|%d", shopID, amount, currency, email, i, ip, nonce)
 	h := hmac.New(sha256.New, []byte(secretKey))
 	h.Write([]byte(message))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce string, secretKey string) (*CreateOrderResponse, error) {
+func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, secretKey string) (*CreateOrderResponse, error) {
 	// Создание подписи
 	signature := createSignature(shopID, amount, currency, email, i, ip, nonce, secretKey)
 
@@ -169,10 +169,11 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 		replenishmentID, email, err = s.repo.NewReplenishment(userId, amount*rewardInfo)
 	}
 	var merchantID = os.Getenv("MERCHANT_ID")
-	merchantIDToInt, err := strconv.Atoi(merchantID)
+	merchantIDToInt, _ := strconv.Atoi(merchantID)
+	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "192.168.0.1", replenishmentID, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "192.168.0.1", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
