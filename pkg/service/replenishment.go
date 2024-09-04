@@ -95,12 +95,10 @@ type CreateOrderRequest struct {
 }
 
 type CreateOrderResponse struct {
-	Status string `json:"status"`
-	Data   struct {
-		OrderID    string `json:"order_id"`
-		InvoiceID  string `json:"invoice_id"`
-		PaymentURL string `json:"payment_url"`
-	} `json:"data"`
+	Type      string `json:"type"`
+	OrderID   int    `json:"orderId"`
+	OrderHash string `json:"orderHash"`
+	Location  string `json:"location"`
 }
 
 func createSignature(shopID int, amount float64, currency string, email string, i int, ip string, nonce int, secretKey string) string {
@@ -174,11 +172,11 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	replenishmentIDInt, _ := strconv.Atoi(replenishmentID)
 	var APIKey = os.Getenv("API_KEY")
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "114.69.180.234", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 44, "110.65.180.234", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println(location.Data.PaymentURL)
-	return location.Data.PaymentURL, nil
+	fmt.Println(location.Location)
+	return location.Location, nil
 }
