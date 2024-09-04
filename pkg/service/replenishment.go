@@ -101,7 +101,7 @@ type CreateOrderResponse struct {
 	Location  string `json:"location"`
 }
 
-func createSignature(shopID int, amount float64, currency string, email string, i int, ip string, nonce int, secretKey string) string {
+func createSignature(shopID int, amount int, currency string, email string, i int, ip string, nonce int, secretKey string) string {
 	message := fmt.Sprintf("%f|%s|%s|%d|%s|%d|%d", amount, currency, email, i, ip, nonce, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(secretKey))
@@ -111,7 +111,7 @@ func createSignature(shopID int, amount float64, currency string, email string, 
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, secretKey string) (*CreateOrderResponse, error) {
 	// Создание подписи
-	signature := createSignature(shopID, amount, currency, email, i, ip, nonce, secretKey)
+	signature := createSignature(shopID, int(amount), currency, email, i, ip, nonce, secretKey)
 
 	// Подготовка данных запроса
 	orderRequest := CreateOrderRequest{
