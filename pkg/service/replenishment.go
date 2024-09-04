@@ -155,6 +155,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 		return nil, err
 	}
 
+	fmt.Println(createOrderResp)
 	return &createOrderResp, nil
 }
 
