@@ -34,15 +34,15 @@ func generateMD5Hash(data string) string {
 }
 
 // Функция для создания подписи
-func createSignature(merchantID, secret1, amount, currency, ip, orderID string) string {
-	data := fmt.Sprintf("%s:%s:%s:%s:%s:%s", merchantID, amount, secret1, currency, ip, orderID)
+func createSignature(amount, currency, email, i, ip, nonce, secret1, shopId string) string {
+	data := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s", amount, currency, email, i, ip, nonce, secret1, shopId)
 	return generateMD5Hash(data)
 }
 
 // Функция для отправки запроса на пополнение
 func createPaymentRequest(shopID, secret1, secret2, amount, currency, orderID, paymentMethod, email string) (string, error) {
 
-	signature := createSignature(shopID, secret1, amount, currency, orderID, "20.21.27.109")
+	signature := createSignature(amount, currency, email, paymentMethod, "20.21.27.109", orderID, secret1, shopID)
 	url := fmt.Sprintf("https://pay.freekassa.com?currency=%s&email=%s&i=%s&shopId=%s&nonce=%s&amount=%s&signature=%s&ip=20.21.27.109", currency, email, paymentMethod, shopID, orderID, amount, signature)
 	fmt.Println(url)
 	return url, nil
