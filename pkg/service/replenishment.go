@@ -1,7 +1,7 @@
 package service
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"gems_go_back/pkg/repository"
@@ -27,17 +27,23 @@ func NewReplenishmentService(repo repository.Replenishment) *ReplenishmentServic
 	return &ReplenishmentService{repo: repo}
 }
 
-// Функция для генерации MD5 хеша
-func generateMD5Hash(data string) string {
-	hash := md5.Sum([]byte(data))
-	return hex.EncodeToString(hash[:])
+func EncryptToSHA256(input string) string {
+	hash := sha256.New()
+
+	hash.Write([]byte(input))
+
+	hashBytes := hash.Sum(nil)
+
+	hashString := hex.EncodeToString(hashBytes)
+
+	return hashString
 }
 
 // Функция для создания подписи
 func createSignature(amount, currency, email, i, ip, nonce, shopId string) string {
 	data := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", amount, currency, email, i, ip, nonce, shopId)
 	fmt.Println(data)
-	return generateMD5Hash(data)
+	return EncryptToSHA256(data)
 }
 
 // Функция для отправки запроса на пополнение
