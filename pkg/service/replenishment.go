@@ -203,7 +203,7 @@ func (s *ReplenishmentService) CheckReplenishment(nonce int) {
 	var APIKey = os.Getenv("API_KEY")
 
 	shopID, _ := strconv.Atoi(shopIDStr)
-	message := fmt.Sprintf("%d|%s", nonce, shopID)
+	message := fmt.Sprintf("%d|%d", nonce, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
