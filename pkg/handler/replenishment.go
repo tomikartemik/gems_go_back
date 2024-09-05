@@ -56,6 +56,9 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 func (h *Handler) MSGFromFreekassa(c *gin.Context) {
 	var jsonData map[string]interface{}
 
+	queryParams := c.Request.URL.Query()
+	fmt.Printf("queryParams: %+v\n", queryParams)
+
 	if err := c.BindJSON(&jsonData); err != nil {
 		c.JSON(400, gin.H{"error": "Ошибка парсинга JSON"})
 		return
