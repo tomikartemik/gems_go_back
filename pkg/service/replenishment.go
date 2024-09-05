@@ -92,6 +92,7 @@ type CreateOrderRequest struct {
 	IP         string `json:"ip"`
 	Amount     string `json:"amount"`
 	CurrencyID string `json:"currency"`
+	PaymentID  int    `json:"paymentId"`
 }
 
 type CreateOrderResponse struct {
@@ -101,8 +102,8 @@ type CreateOrderResponse struct {
 	Location  string `json:"location"`
 }
 
-func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, APIKey string) string {
-	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d", amount, currency, email, i, ip, nonce, shopID)
+func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string) string {
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d", amount, currency, email, i, ip, nonce, paymentId, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
@@ -110,7 +111,7 @@ func createSignature(shopID int, amount string, currency string, email string, i
 }
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, APIKey string) (*CreateOrderResponse, error) {
-	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, APIKey)
+	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey)
 
 	orderRequest := CreateOrderRequest{
 		Amount:     fmt.Sprintf("%.2f", amount),
@@ -120,6 +121,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 		IP:         ip,
 		I:          i,
 		Nonce:      nonce,
+		PaymentID:  nonce,
 		Signature:  signature,
 	}
 
