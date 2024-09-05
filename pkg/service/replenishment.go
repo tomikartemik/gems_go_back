@@ -249,6 +249,7 @@ func (s *ReplenishmentService) CheckReplenishment(orderID int) {
 		fmt.Println(err)
 		//return nil, err
 	}
-
-	fmt.Println(checkOrder)
+	if checkOrder["type"] == "success" {
+		s.AcceptReplenishment(orderID)
+	}
 }
