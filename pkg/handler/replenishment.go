@@ -54,11 +54,14 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 }
 
 func (h *Handler) MSGFromFrekassa(c *gin.Context) {
-	var data map[string]interface{}
-	if err := c.BindJSON(&data); err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	var jsonData map[string]interface{}
+
+	if err := c.BindJSON(&jsonData); err != nil {
+		c.JSON(400, gin.H{"error": "Ошибка парсинга JSON"})
 		return
 	}
-	fmt.Printf("data: %+v\n", data)
+
+	fmt.Println("Полученный JSON:", jsonData)
+
 	c.Redirect(http.StatusFound, "https://dododrop.ru")
 }

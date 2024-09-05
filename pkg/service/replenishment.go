@@ -93,7 +93,6 @@ type CreateOrderRequest struct {
 	Amount     string `json:"amount"`
 	CurrencyID string `json:"currency"`
 	PaymentID  int    `json:"paymentId"`
-	SuccessUrl string `json:"success_url"`
 }
 
 type CreateOrderResponse struct {
@@ -103,8 +102,8 @@ type CreateOrderResponse struct {
 	Location  string `json:"location"`
 }
 
-func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string, successUrl string) string {
-	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d|%s", amount, currency, email, i, ip, nonce, paymentId, shopID, successUrl)
+func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string) string {
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d|%s", amount, currency, email, i, ip, nonce, paymentId, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
@@ -112,9 +111,8 @@ func createSignature(shopID int, amount string, currency string, email string, i
 }
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, APIKey string) (*CreateOrderResponse, error) {
-	successUrl := fmt.Sprintf("http://api.dododrop.ru/fk/accepted?ORDER_ID=%d", nonce)
 
-	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey, successUrl)
+	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey)
 
 	orderRequest := CreateOrderRequest{
 		Amount:     fmt.Sprintf("%.2f", amount),
@@ -125,7 +123,6 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 		I:          i,
 		Nonce:      nonce,
 		PaymentID:  nonce,
-		SuccessUrl: successUrl,
 		Signature:  signature,
 	}
 
@@ -133,11 +130,11 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(requestBody))
+	//fmt.Println(string(requestBody))
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest("POST", "https://api.freekassa.com/v1/orders/create", bytes.NewBuffer(requestBody))
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return nil, err
 	}
 
@@ -145,24 +142,24 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return nil, err
 	}
 
 	var createOrderResp CreateOrderResponse
 	if err := json.Unmarshal(body, &createOrderResp); err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return nil, err
 	}
 
-	fmt.Println("resp", createOrderResp)
+	//fmt.Println("resp", createOrderResp)
 	return &createOrderResp, nil
 }
 
@@ -191,6 +188,6 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println(location.Location)
+	//fmt.Println(location.Location)
 	return location.Location, nil
 }
