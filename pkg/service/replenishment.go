@@ -112,7 +112,7 @@ func createSignature(shopID int, amount string, currency string, email string, i
 }
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, APIKey string) (*CreateOrderResponse, error) {
-	successUrl := fmt.Sprintf("http://api.dododrop.ru/fk/accepted?orderId=%d", nonce)
+	successUrl := fmt.Sprintf("http://api.dododrop.ru/fk/accepted?ORDER_ID=%d", nonce)
 
 	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey, successUrl)
 

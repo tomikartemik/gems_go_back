@@ -34,7 +34,7 @@ func (h *Handler) RedirectAccepted(c *gin.Context) {
 	queryParams := c.Request.URL.Query()
 	fmt.Printf("queryParams: %+v\n", queryParams)
 
-	replenishmentIdStr := c.Query("orderId")
+	replenishmentIdStr := c.Query("ORDER_ID")
 	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
 	go h.services.AcceptReplenishment(replenishmentId)
 	fmt.Printf("replenishmentId: %d\n", replenishmentId)
@@ -55,7 +55,7 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 
 func (h *Handler) MSGFromFrekassa(c *gin.Context) {
 	var data map[string]interface{}
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.BindJSON(&data); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
