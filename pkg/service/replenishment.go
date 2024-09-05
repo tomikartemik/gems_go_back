@@ -93,6 +93,7 @@ type CreateOrderRequest struct {
 	Amount     string `json:"amount"`
 	CurrencyID string `json:"currency"`
 	PaymentID  int    `json:"paymentId"`
+	SuccessUrl string `json:"success_url"`
 }
 
 type CreateOrderResponse struct {
@@ -102,8 +103,8 @@ type CreateOrderResponse struct {
 	Location  string `json:"location"`
 }
 
-func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string) string {
-	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d", amount, currency, email, i, ip, nonce, paymentId, shopID)
+func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string, successUrl string) string {
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d|%s", amount, currency, email, i, ip, nonce, paymentId, shopID, successUrl)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
@@ -111,7 +112,9 @@ func createSignature(shopID int, amount string, currency string, email string, i
 }
 
 func createOrder(amount float64, currency string, email string, shopID int, i int, ip string, nonce int, APIKey string) (*CreateOrderResponse, error) {
-	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey)
+	successUrl := fmt.Sprintf("http://api.dododrop.ru/fk/accepted?orderId=%d", nonce)
+
+	signature := createSignature(shopID, fmt.Sprintf("%.2f", amount), currency, email, i, ip, nonce, nonce, APIKey, successUrl)
 
 	orderRequest := CreateOrderRequest{
 		Amount:     fmt.Sprintf("%.2f", amount),
@@ -122,6 +125,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 		I:          i,
 		Nonce:      nonce,
 		PaymentID:  nonce,
+		SuccessUrl: successUrl,
 		Signature:  signature,
 	}
 
