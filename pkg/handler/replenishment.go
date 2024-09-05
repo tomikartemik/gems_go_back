@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 type ReplInput struct {
@@ -49,10 +48,13 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 }
 
 func (h *Handler) MSGFromFreekassa(c *gin.Context) {
-	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
-	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
-	go h.services.AcceptReplenishment(replenishmentId)
-	fmt.Println("MSG", replenishmentIdStr)
+	var jsonData map[string]interface{}
+
+	queryParams := c.Request.URL.Query()
+	fmt.Printf("queryParams: %+v\n", queryParams)
+
+	c.JSON(http.StatusOK, "OK")
+	fmt.Println("Полученный JSON:", jsonData)
 
 	//c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
