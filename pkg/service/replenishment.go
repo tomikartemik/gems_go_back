@@ -160,7 +160,7 @@ func createOrder(amount float64, currency string, email string, shopID int, i in
 	return &createOrderResp, nil
 }
 
-func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, promo string) (string, error) {
+func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, promo string, i int, ip string) (string, error) {
 	var orderID string
 	var email string
 	var err error
@@ -177,7 +177,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	merchantIDToInt, _ := strconv.Atoi(merchantID)
 	replenishmentIDInt, _ := strconv.Atoi(orderID)
 
-	location, err := createOrder(amount, "RUB", email, merchantIDToInt, 36, "201.109.241.36", replenishmentIDInt, APIKey)
+	location, err := createOrder(amount, "RUB", email, merchantIDToInt, i, "201.109.241.36", replenishmentIDInt, APIKey)
 	if err != nil {
 		fmt.Println(err)
 		return "", err

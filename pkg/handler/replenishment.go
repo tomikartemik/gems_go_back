@@ -10,6 +10,8 @@ import (
 type ReplInput struct {
 	Amount float64 `json:"amount"`
 	Promo  string  `json:"promo"`
+	I      int     `json:"i"`
+	Ip     string  `json:"ip"`
 }
 
 func (h *Handler) NewReplenishment(c *gin.Context) {
@@ -19,7 +21,8 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	location, err := h.services.Replenishment.NewReplenishment(userID, input.Amount, input.Promo)
+	fmt.Printf("input: %+v\n", input)
+	location, err := h.services.Replenishment.NewReplenishment(userID, input.Amount, input.Promo, input.I, input.Ip)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -31,6 +34,7 @@ func (h *Handler) RedirectAccepted(c *gin.Context) {
 	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
 	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
 	go h.services.AcceptReplenishment(replenishmentId)
+	fmt.Printf("replenishmentId: %d\n", replenishmentId)
 	c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
 
@@ -42,6 +46,7 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 			c.String(http.StatusOK, "Key: %s, Value: %s\n", key, value)
 		}
 	}
+	fmt.Printf("queryParams: %+v\n", queryParams)
 	c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
 
@@ -51,6 +56,6 @@ func (h *Handler) MSGFromFrekassa(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println(data)
+	fmt.Printf("data: %+v\n", data)
 	c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
