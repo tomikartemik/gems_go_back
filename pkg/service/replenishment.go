@@ -195,15 +195,17 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 type CheckReplenishment struct {
 	ShopID    int    `json:"shopId"`
 	Nonce     int    `json:"nonce"`
+	OrderID   int    `json:"orderId"`
 	Signature string `json:"signature"`
 }
 
-func (s *ReplenishmentService) CheckReplenishment(nonce int) {
+func (s *ReplenishmentService) CheckReplenishment(orderID int) {
 	var shopIDStr = os.Getenv("MERCHANT_ID")
 	var APIKey = os.Getenv("API_KEY")
+	nonce := int(time.Now().UnixNano())
 
 	shopID, _ := strconv.Atoi(shopIDStr)
-	message := fmt.Sprintf("%d|%d", nonce, shopID)
+	message := fmt.Sprintf("%d|%d|%d", nonce, orderID, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
@@ -211,6 +213,7 @@ func (s *ReplenishmentService) CheckReplenishment(nonce int) {
 	checkRepl := CheckReplenishment{
 		ShopID:    shopID,
 		Nonce:     nonce,
+		OrderID:   orderID,
 		Signature: signature,
 	}
 
