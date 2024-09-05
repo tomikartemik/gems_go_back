@@ -34,7 +34,7 @@ func (h *Handler) RedirectAccepted(c *gin.Context) {
 	queryParams := c.Request.URL.Query()
 	fmt.Printf("queryParams: %+v\n", queryParams)
 
-	replenishmentIdStr := c.Query("ORDER_ID")
+	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
 	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
 	go h.services.AcceptReplenishment(replenishmentId)
 	fmt.Printf("replenishmentId: %d\n", replenishmentId)
