@@ -103,7 +103,7 @@ type CreateOrderResponse struct {
 }
 
 func createSignature(shopID int, amount string, currency string, email string, i int, ip string, nonce int, paymentId int, APIKey string) string {
-	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d|%s", amount, currency, email, i, ip, nonce, paymentId, shopID)
+	message := fmt.Sprintf("%s|%s|%s|%d|%s|%d|%d|%d", amount, currency, email, i, ip, nonce, paymentId, shopID)
 	fmt.Println(message)
 	h := hmac.New(sha256.New, []byte(APIKey))
 	h.Write([]byte(message))
