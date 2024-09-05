@@ -191,3 +191,61 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 	//fmt.Println(location.Location)
 	return location.Location, nil
 }
+
+type CheckReplenishment struct {
+	ShopID    int    `json:"shopId"`
+	Nonce     int    `json:"nonce"`
+	Signature string `json:"signature"`
+}
+
+func (s *ReplenishmentService) CheckReplenishment(nonce int) {
+	var shopIDStr = os.Getenv("MERCHANT_ID")
+	var APIKey = os.Getenv("API_KEY")
+
+	shopID, _ := strconv.Atoi(shopIDStr)
+	message := fmt.Sprintf("%d|%s", nonce, shopID)
+	fmt.Println(message)
+	h := hmac.New(sha256.New, []byte(APIKey))
+	h.Write([]byte(message))
+	signature := hex.EncodeToString(h.Sum(nil))
+	checkRepl := CheckReplenishment{
+		ShopID:    shopID,
+		Nonce:     nonce,
+		Signature: signature,
+	}
+
+	requestBody, err := json.Marshal(checkRepl)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	req, err := http.NewRequest("POST", "https://api.freekassa.com/v1/orders", bytes.NewBuffer(requestBody))
+	if err != nil {
+		fmt.Println(err)
+		//return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		//return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		//return nil, err
+	}
+
+	var checkOrder map[string]interface{}
+	if err := json.Unmarshal(body, &checkOrder); err != nil {
+		fmt.Println(err)
+		//return nil, err
+	}
+
+	fmt.Println(checkOrder)
+}
