@@ -64,7 +64,8 @@ func (h *Handler) MSGFromFreekassa(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, "OK")
 	fmt.Println("Полученный JSON:", jsonData)
 
-	c.Redirect(http.StatusFound, "https://dododrop.ru")
+	//c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
