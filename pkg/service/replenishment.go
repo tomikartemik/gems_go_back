@@ -188,7 +188,7 @@ func (s *ReplenishmentService) NewReplenishment(userId string, amount float64, p
 		fmt.Println(err)
 		return "", err
 	}
-	//fmt.Println(location.Location)
+	fmt.Println(location.Location)
 	return location.Location, nil
 }
 

@@ -43,6 +43,9 @@ func (r *ReplenishmentPostgres) AcceptReplenishment(replenishmentID int) error {
 	if err != nil {
 		return err
 	}
+	if replenishment.Success == true {
+		return nil
+	}
 	err = r.db.Model(&model.Replenishment{}).Where("id = ?", replenishmentID).Update("success", true).Error
 	if err != nil {
 		return err
