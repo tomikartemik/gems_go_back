@@ -54,31 +54,13 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 }
 
 func (h *Handler) MSGFromFreekassa(c *gin.Context) {
-	merchantID := c.PostForm("MERCHANT_ID")
-	amount := c.PostForm("AMOUNT")
-	intid := c.PostForm("intid")
-	orderID := c.PostForm("MERCHANT_ORDER_ID")
-	email := c.PostForm("P_EMAIL")
-	phone := c.PostForm("P_PHONE")
-	curID := c.PostForm("CUR_ID")
-	sign := c.PostForm("SIGN")
-	usKey := c.PostForm("us_key")
-	payerAccount := c.PostForm("payer_account")
-	commission := c.PostForm("commission")
+	var jsonData map[string]interface{}
 
-	// Вывод полученных данных на консоль
-	fmt.Printf("MERCHANT_ID: %s\n", merchantID)
-	fmt.Printf("AMOUNT: %s\n", amount)
-	fmt.Printf("intid: %s\n", intid)
-	fmt.Printf("MERCHANT_ORDER_ID: %s\n", orderID)
-	fmt.Printf("P_EMAIL: %s\n", email)
-	fmt.Printf("P_PHONE: %s\n", phone)
-	fmt.Printf("CUR_ID: %s\n", curID)
-	fmt.Printf("SIGN: %s\n", sign)
-	fmt.Printf("us_key: %s\n", usKey)
-	fmt.Printf("payer_account: %s\n", payerAccount)
-	fmt.Printf("commission: %s\n", commission)
+	queryParams := c.Request.URL.Query()
+	fmt.Printf("queryParams: %+v\n", queryParams)
 
 	c.JSON(http.StatusOK, "OK")
+	fmt.Println("Полученный JSON:", jsonData)
+
 	//c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
