@@ -33,11 +33,6 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 func (h *Handler) RedirectAccepted(c *gin.Context) {
 	queryParams := c.Request.URL.Query()
 	fmt.Printf("queryParams: %+v\n", queryParams)
-
-	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
-	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
-	go h.services.AcceptReplenishment(replenishmentId)
-	fmt.Printf("replenishmentId: %d\n", replenishmentId)
 	c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
 
@@ -54,13 +49,10 @@ func (h *Handler) RedirectDenied(c *gin.Context) {
 }
 
 func (h *Handler) MSGFromFreekassa(c *gin.Context) {
-	var jsonData map[string]interface{}
-
-	queryParams := c.Request.URL.Query()
-	fmt.Printf("queryParams: %+v\n", queryParams)
-
-	c.JSON(http.StatusOK, "OK")
-	fmt.Println("Полученный JSON:", jsonData)
+	replenishmentIdStr := c.Query("MERCHANT_ORDER_ID")
+	replenishmentId, _ := strconv.Atoi(replenishmentIdStr)
+	go h.services.AcceptReplenishment(replenishmentId)
+	fmt.Println("MSG", replenishmentIdStr)
 
 	//c.Redirect(http.StatusFound, "https://dododrop.ru")
 }
