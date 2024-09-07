@@ -22,7 +22,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // Укажите домены, которым разрешен доступ
+		AllowOrigins:     []string{"https://dododrop.ru"}, // Укажите домены, которым разрешен доступ
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With", "Content-Type", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
