@@ -22,7 +22,7 @@ func (h *Handler) NewReplenishment(c *gin.Context) {
 		return
 	}
 	fmt.Printf("input: %+v\n", input)
-	location, err := h.services.Replenishment.NewReplenishment(userID, input.Amount, input.Promo, input.I, input.Ip)
+	location, err := h.services.Replenishment.NewReplenishment(userID, input.Amount, input.Promo, 13, input.Ip)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
