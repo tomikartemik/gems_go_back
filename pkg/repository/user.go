@@ -156,7 +156,9 @@ func (r *UserPostgres) SellAllItem(userId string) error {
 		if err != nil {
 			return err
 		}
-		totalPrice += item.Price
+		if userItem.Sold == false {
+			totalPrice += item.Price
+		}
 		item = model.Item{}
 	}
 	err = r.db.Model(&model.UserItem{}).Delete(userItems).Error
