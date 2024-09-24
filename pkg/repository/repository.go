@@ -4,6 +4,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/schema"
 	"gorm.io/gorm"
+	"mime/multipart"
 )
 
 type Repository struct {
@@ -16,6 +17,7 @@ type Repository struct {
 	Withdraw
 	Online
 	Drop
+	Receipt
 }
 
 type User interface {
@@ -99,6 +101,10 @@ type Drop interface {
 	GetItemsIds() ([]int, error)
 }
 
+type Receipt interface {
+	UploadReceipt(file *multipart.FileHeader, filepath string) error
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:          NewUserPostgres(db),
@@ -110,5 +116,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Withdraw:      NewWithdrawPostgres(db),
 		Online:        NewOnlinePostgres(db),
 		Drop:          NewDropPostgres(db),
+		Receipt:       NewReceiptPostgres(db),
 	}
 }

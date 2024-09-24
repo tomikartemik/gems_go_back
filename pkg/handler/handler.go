@@ -51,6 +51,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.GET("/last-drops", h.getLastDrops)
 	router.GET("/drops", h.handleConnectionsDrop)
 
+	router.POST("/receipt", h.UploadReceipt)
+	router.Static("/uploads", "./uploads")
+
 	admin := router.Group("/admin")
 	{
 		admin.POST("/change-status", h.adminChangeStatus)

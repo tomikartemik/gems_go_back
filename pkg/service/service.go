@@ -6,6 +6,7 @@ import (
 	"gems_go_back/pkg/schema"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/gorilla/websocket"
+	"mime/multipart"
 )
 
 type User interface {
@@ -94,6 +95,10 @@ type Drop interface {
 	DropWS()
 }
 
+type Receipt interface {
+	UploadReceipt(file *multipart.FileHeader) (string, error)
+}
+
 type Service struct {
 	User
 	Item
@@ -104,6 +109,7 @@ type Service struct {
 	Withdraw
 	Online
 	Drop
+	Receipt
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -117,5 +123,6 @@ func NewService(repos *repository.Repository) *Service {
 		Withdraw:      NewWithdrawService(repos.Withdraw),
 		Online:        NewOnlineService(repos.Online),
 		Drop:          NewDropService(repos.Drop),
+		Receipt:       NewReceiptService(repos.Receipt),
 	}
 }
