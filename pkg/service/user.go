@@ -1,9 +1,7 @@
 package service
 
 import (
-	"crypto/sha1"
 	"errors"
-	"fmt"
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"gems_go_back/pkg/schema"
@@ -21,11 +19,6 @@ type AuthService struct {
 	repo repository.User
 }
 
-type tokenClaims struct {
-	jwt.StandardClaims
-	UserId string `json:"user_id"`
-}
-
 type SignInResponse struct {
 	Token string               `json:"token"`
 	User  schema.UserWithItems `json:"user"`
@@ -37,7 +30,7 @@ func NewAuthService(repo repository.User) *AuthService {
 
 func (s *AuthService) CreateUser(user model.User) (schema.ShowUser, error) {
 	user.Id = uuid.Must(uuid.NewV4()).String()
-	user.Password = generatePasswordHash(user.Password)
+	user.Password = GeneratePasswordHash(user.Password)
 	user.IsActive = true
 	if user.IsAdmin != true {
 		user.IsAdmin = false
@@ -104,7 +97,7 @@ func (s *AuthService) SignIn(email string, password string) (SignInResponse, err
 	var userWithItems schema.UserWithItems
 	var user schema.ShowUser
 
-	user, err := s.repo.SignIn(email, generatePasswordHash(password))
+	user, err := s.repo.SignIn(email, GeneratePasswordHash(password))
 	if err != nil {
 		return signInResponse, err
 	}
@@ -114,24 +107,11 @@ func (s *AuthService) SignIn(email string, password string) (SignInResponse, err
 		return signInResponse, err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		user.ID,
-	})
+	token := CreateToken(user.ID)
 
-	signInResponse.Token, _ = token.SignedString([]byte(signingKey))
+	signInResponse.Token = token
 	signInResponse.User = userWithItems
 	return signInResponse, nil
-}
-
-func generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
 func (s *AuthService) SellItem(userId string, userItemId int) (schema.UserWithItems, error) {
