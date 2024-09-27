@@ -18,6 +18,7 @@ type Repository struct {
 	Online
 	Drop
 	Receipt
+	Admin
 }
 
 type User interface {
@@ -105,6 +106,11 @@ type Receipt interface {
 	UploadReceipt(file *multipart.FileHeader, filepath string) error
 }
 
+type Admin interface {
+	CreateAdmin(admin model.Admin) error
+	SignInAdmin(mail, password string) (model.Admin, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:          NewUserPostgres(db),
@@ -117,5 +123,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Online:        NewOnlinePostgres(db),
 		Drop:          NewDropPostgres(db),
 		Receipt:       NewReceiptPostgres(db),
+		Admin:         NewAdminPostgres(db),
 	}
 }

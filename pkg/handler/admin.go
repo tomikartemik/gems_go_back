@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gems_go_back/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -21,4 +22,38 @@ func (h *Handler) adminChangeStatus(c *gin.Context) {
 	h.services.ChangeStatusOfStartRoulette(input.Status)
 	h.services.SetOnline()
 	c.JSON(http.StatusOK, "Changed status to "+strconv.FormatBool(input.Status))
+}
+
+func (h *Handler) signUpAdmin(c *gin.Context) {
+	var input model.Admin
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err := h.services.Admin.CreateAdmin(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
+
+func (h *Handler) signInAdmin(c *gin.Context) {
+	var input model.Admin
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token, err := h.services.Admin.SignInAdmin(input.Username, input.Password)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, token)
 }

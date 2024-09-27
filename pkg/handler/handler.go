@@ -57,6 +57,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	admin := router.Group("/admin")
 	{
 		admin.POST("/change-status", h.adminChangeStatus)
+		admin.POST("/sign-in", h.signInAdmin)
+		admin.POST("/sign-up", h.signUpAdmin)
 	}
 
 	fk := router.Group("/fk")

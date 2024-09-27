@@ -99,6 +99,11 @@ type Receipt interface {
 	UploadReceipt(file *multipart.FileHeader) (string, error)
 }
 
+type Admin interface {
+	CreateAdmin(admin model.Admin) error
+	SignInAdmin(email string, password string) (string, error)
+}
+
 type Service struct {
 	User
 	Item
@@ -110,6 +115,7 @@ type Service struct {
 	Online
 	Drop
 	Receipt
+	Admin
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -124,5 +130,6 @@ func NewService(repos *repository.Repository) *Service {
 		Online:        NewOnlineService(repos.Online),
 		Drop:          NewDropService(repos.Drop),
 		Receipt:       NewReceiptService(repos.Receipt),
+		Admin:         NewAdminService(repos.Admin),
 	}
 }
