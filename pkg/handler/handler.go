@@ -97,6 +97,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authenticated.POST("/replenishment", h.NewReplenishment)
 		authenticated.POST("/own-replenishment", h.CreateOwnReplenishment)
 		authenticated.GET("/own-replenishment", h.GetReplenishments)
+		authenticated.POST("/own-replenishment/change-status", h.ChangeStatus)
 
 		withdraw := authenticated.Group("/withdraw")
 		{

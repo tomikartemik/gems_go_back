@@ -56,3 +56,17 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 func (s *OwnReplenishmentService) GetReplenishments() ([]model.OwnReplenishment, error) {
 	return s.repo.GetReplenishments()
 }
+
+func (s *OwnReplenishmentService) ChangeStatus(replenishmentID int, status string) error {
+	replenishment, err := s.repo.ChangeStatus(replenishmentID, status)
+	if err != nil {
+		return err
+	}
+	if status == "Approved" {
+		err = s.repo.ChangeBalance(replenishment.UserId, replenishment.Amount)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
