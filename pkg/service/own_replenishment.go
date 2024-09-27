@@ -52,3 +52,7 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 	fileURL := fmt.Sprintf("/uploads/%s", newFileName)
 	return fileURL, nil
 }
+
+func (s *OwnReplenishmentService) GetReplenishments() ([]model.OwnReplenishment, error) {
+	return s.repo.GetReplenishments()
+}

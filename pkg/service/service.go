@@ -102,6 +102,7 @@ type Admin interface {
 
 type OwnReplenishment interface {
 	CreateReplenishment(amount float64, userID string, file *multipart.FileHeader) error
+	GetReplenishments() ([]model.OwnReplenishment, error)
 }
 
 type Service struct {

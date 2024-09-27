@@ -114,6 +114,7 @@ type Admin interface {
 
 type OwnReplenishment interface {
 	CreateReplenishment(replenishment model.OwnReplenishment) error
+	GetReplenishments() ([]model.OwnReplenishment, error)
 }
 
 func NewRepository(db *gorm.DB) *Repository {

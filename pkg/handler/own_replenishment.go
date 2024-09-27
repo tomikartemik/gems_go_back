@@ -22,3 +22,12 @@ func (h *Handler) CreateOwnReplenishment(c *gin.Context) {
 
 	err = h.services.CreateReplenishment(amount, userId, file)
 }
+
+func (h *Handler) GetReplenishments(c *gin.Context) {
+	replenishments, err := h.services.GetReplenishments()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, replenishments)
+}
