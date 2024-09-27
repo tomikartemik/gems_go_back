@@ -19,6 +19,7 @@ type Repository struct {
 	Drop
 	Receipt
 	Admin
+	OwnReplenishment
 }
 
 type User interface {
@@ -111,18 +112,23 @@ type Admin interface {
 	SignInAdmin(mail, password string) (model.Admin, error)
 }
 
+type OwnReplenishment interface {
+	CreateReplenishment(replenishment model.OwnReplenishment) error
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		User:          NewUserPostgres(db),
-		Item:          NewItemPostgres(db),
-		Case:          NewCasePostgres(db),
-		Crash:         NewCrashPostgres(db),
-		Roulette:      NewRoulettePostgres(db),
-		Replenishment: NewReplenishmentPostgres(db),
-		Withdraw:      NewWithdrawPostgres(db),
-		Online:        NewOnlinePostgres(db),
-		Drop:          NewDropPostgres(db),
-		Receipt:       NewReceiptPostgres(db),
-		Admin:         NewAdminPostgres(db),
+		User:             NewUserPostgres(db),
+		Item:             NewItemPostgres(db),
+		Case:             NewCasePostgres(db),
+		Crash:            NewCrashPostgres(db),
+		Roulette:         NewRoulettePostgres(db),
+		Replenishment:    NewReplenishmentPostgres(db),
+		Withdraw:         NewWithdrawPostgres(db),
+		Online:           NewOnlinePostgres(db),
+		Drop:             NewDropPostgres(db),
+		Receipt:          NewReceiptPostgres(db),
+		Admin:            NewAdminPostgres(db),
+		OwnReplenishment: NewOwnReplenishmentPostgres(db),
 	}
 }

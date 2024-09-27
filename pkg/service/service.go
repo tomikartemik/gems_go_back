@@ -95,13 +95,13 @@ type Drop interface {
 	DropWS()
 }
 
-type Receipt interface {
-	UploadReceipt(file *multipart.FileHeader) (string, error)
-}
-
 type Admin interface {
 	CreateAdmin(admin model.Admin) error
 	SignInAdmin(email string, password string) (string, error)
+}
+
+type OwnReplenishment interface {
+	CreateReplenishment(amount float64, userID string, file *multipart.FileHeader) error
 }
 
 type Service struct {
@@ -114,22 +114,22 @@ type Service struct {
 	Withdraw
 	Online
 	Drop
-	Receipt
 	Admin
+	OwnReplenishment
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		User:          NewAuthService(repos.User),
-		Item:          NewItemService(repos.Item),
-		Case:          NewCaseService(repos.Case),
-		Crash:         NewCrashService(repos.Crash),
-		Roulette:      NewRouletteService(repos.Roulette),
-		Replenishment: NewReplenishmentService(repos.Replenishment),
-		Withdraw:      NewWithdrawService(repos.Withdraw),
-		Online:        NewOnlineService(repos.Online),
-		Drop:          NewDropService(repos.Drop),
-		Receipt:       NewReceiptService(repos.Receipt),
-		Admin:         NewAdminService(repos.Admin),
+		User:             NewAuthService(repos.User),
+		Item:             NewItemService(repos.Item),
+		Case:             NewCaseService(repos.Case),
+		Crash:            NewCrashService(repos.Crash),
+		Roulette:         NewRouletteService(repos.Roulette),
+		Replenishment:    NewReplenishmentService(repos.Replenishment),
+		Withdraw:         NewWithdrawService(repos.Withdraw),
+		Online:           NewOnlineService(repos.Online),
+		Drop:             NewDropService(repos.Drop),
+		Admin:            NewAdminService(repos.Admin),
+		OwnReplenishment: NewOwnReplenishmentService(repos.OwnReplenishment, repos.Receipt),
 	}
 }
