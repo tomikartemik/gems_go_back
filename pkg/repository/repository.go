@@ -20,6 +20,7 @@ type Repository struct {
 	Receipt
 	Admin
 	OwnReplenishment
+	Card
 }
 
 type User interface {
@@ -119,6 +120,11 @@ type OwnReplenishment interface {
 	ChangeBalance(userID string, amount float64) error
 }
 
+type Card interface {
+	UpdateCard(card model.Card) error
+	GetCard() (model.Card, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:             NewUserPostgres(db),
@@ -133,5 +139,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Receipt:          NewReceiptPostgres(db),
 		Admin:            NewAdminPostgres(db),
 		OwnReplenishment: NewOwnReplenishmentPostgres(db),
+		Card:             NewCardPostgres(db),
 	}
 }

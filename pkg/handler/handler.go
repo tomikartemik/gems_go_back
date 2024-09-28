@@ -53,6 +53,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.Static("/uploads", "./uploads")
 
+	router.GET("/card", h.GetCard)
+
 	admin := router.Group("/admin")
 	{
 		admin.POST("/change-status", h.adminChangeStatus)
@@ -98,6 +100,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		authenticated.POST("/own-replenishment", h.CreateOwnReplenishment)
 		authenticated.GET("/own-replenishment", h.GetReplenishments)
 		authenticated.POST("/own-replenishment/change-status", h.ChangeStatus)
+		authenticated.POST("/update-card", h.UpdateCard)
 
 		withdraw := authenticated.Group("/withdraw")
 		{

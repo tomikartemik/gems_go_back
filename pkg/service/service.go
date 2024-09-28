@@ -106,6 +106,11 @@ type OwnReplenishment interface {
 	ChangeStatus(replenishmentID int, status string) error
 }
 
+type Card interface {
+	UpdateCard(card model.Card) error
+	GetCard() (model.Card, error)
+}
+
 type Service struct {
 	User
 	Item
@@ -118,6 +123,7 @@ type Service struct {
 	Drop
 	Admin
 	OwnReplenishment
+	Card
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -133,5 +139,6 @@ func NewService(repos *repository.Repository) *Service {
 		Drop:             NewDropService(repos.Drop),
 		Admin:            NewAdminService(repos.Admin),
 		OwnReplenishment: NewOwnReplenishmentService(repos.OwnReplenishment, repos.Receipt),
+		Card:             NewCardService(repos.Card),
 	}
 }
