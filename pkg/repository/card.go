@@ -14,7 +14,7 @@ func NewCardPostgres(db *gorm.DB) *CardPostgres {
 }
 
 func (r *CardPostgres) UpdateCard(card model.Card) error {
-	return r.db.Save(&card).Error
+	return r.db.Save(&card).Where("type = main").Error
 }
 
 func (r *CardPostgres) GetCard() (model.Card, error) {
