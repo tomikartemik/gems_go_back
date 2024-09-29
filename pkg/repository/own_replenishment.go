@@ -46,7 +46,7 @@ func (r *OwnReplenishmentPostgres) ChangeStatus(replenishmentID int, status stri
 
 func (r *OwnReplenishmentPostgres) ChangeBalance(userID string, amount float64) error {
 	user := model.User{}
-	err := r.db.First(&user, userID).Error
+	err := r.db.Model(&model.User{}).Where("id = ?", userID).First(&user).Error
 	if err != nil {
 		return err
 	}
