@@ -14,7 +14,7 @@ func NewCardPostgres(db *gorm.DB) *CardPostgres {
 }
 
 func (r *CardPostgres) UpdateCard(card model.Card) error {
-	err := r.db.Model(&model.Card{}).Where("type = main").Update("name", card.Name).Update("number", card.Number).Update("bank", card.Bank).Error
+	err := r.db.Model(&model.Card{}).Where("type = ?", "main").Update("name", card.Name).Update("number", card.Number).Update("bank", card.Bank).Error
 	return err
 }
 
