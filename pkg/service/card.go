@@ -14,6 +14,7 @@ func NewCardService(repo repository.Card) *CardService {
 }
 
 func (s *CardService) UpdateCard(card model.Card) error {
+	card.Type = "main"
 	return s.repo.UpdateCard(card)
 }
 

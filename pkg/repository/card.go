@@ -14,15 +14,7 @@ func NewCardPostgres(db *gorm.DB) *CardPostgres {
 }
 
 func (r *CardPostgres) UpdateCard(card model.Card) error {
-	err := r.db.Unscoped().Delete(&model.Card{}).Error
-	if err != nil {
-		return err
-	}
-	err = r.db.Create(&card).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return r.db.Save(&card).Error
 }
 
 func (r *CardPostgres) GetCard() (model.Card, error) {
