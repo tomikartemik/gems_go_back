@@ -66,6 +66,7 @@ func (s *CaseService) GetCase(id int) (schema.ShowCase, error) {
 	caseOutput.Name = caseInfo.Name
 	caseOutput.Price = caseInfo.Price
 	caseOutput.PhotoLink = caseInfo.PhotoLink
+	caseOutput.Collection = caseInfo.Collection
 	caseOutput.Items = caseItems
 	return caseOutput, nil
 }
