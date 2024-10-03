@@ -325,7 +325,7 @@ func getRandomElements(arr []model.FakeBets) []model.FakeBets {
 	return result
 }
 
-func fakeAmount(min, max int) float64 {
+func randomInt(min, max int) float64 {
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
 
@@ -342,30 +342,34 @@ func (s *CrashService) GenerateFakeBets() {
 		return
 	}
 	fakeBets := getRandomElements(users)
+	maxDelay := 10000 / len(fakeBets)
+	var delay int
 	var infoAboutFakeCrashBet InfoAboutCrashBet
 	for _, fakeBet := range fakeBets {
 		infoAboutFakeCrashBet = InfoAboutCrashBet{
 			PlayerID:       "fake",
 			PlayerNickname: fakeBet.Name,
-			Amount:         fakeAmount(10, 500),
+			Amount:         randomInt(10, 500),
 			UserMultiplier: 0,
 			Winning:        0,
 		}
-	}
-	betsAtLastCrashGame.Bets = append(
-		betsAtLastCrashGame.Bets,
-		infoAboutFakeCrashBet,
-	)
-	clientsMutexCrash.Lock()
-	for client := range clientsCrash {
-		err := client.conn.WriteJSON(betsAtLastCrashGame)
-		if err != nil {
-			log.Println("Write error:", err)
-			client.conn.Close()
-			delete(clientsCrash, client)
+		betsAtLastCrashGame.Bets = append(
+			betsAtLastCrashGame.Bets,
+			infoAboutFakeCrashBet,
+		)
+		clientsMutexCrash.Lock()
+		for client := range clientsCrash {
+			err := client.conn.WriteJSON(betsAtLastCrashGame)
+			if err != nil {
+				log.Println("Write error:", err)
+				client.conn.Close()
+				delete(clientsCrash, client)
+			}
 		}
+		clientsMutexCrash.Unlock()
+		delay = int(randomInt(0, maxDelay))
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
-	clientsMutexCrash.Unlock()
 }
 
 //
