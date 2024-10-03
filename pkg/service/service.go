@@ -52,6 +52,7 @@ type Crash interface {
 	UpdateSavedBetCrash(userId string, multiplier float64)
 	AddBetCrashToResponse(userId string, amount float64)
 	InitCrashBetsForNewClient() BetsAtLastCrashGame
+	GenerateFakeBets()
 }
 
 type Roulette interface {
