@@ -325,12 +325,15 @@ func getRandomElements(arr []model.FakeBets) []model.FakeBets {
 	return result
 }
 
-func fakeAmount(min, max float64) float64 {
+func fakeAmount(min, max int) float64 {
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
 
-	// Генерируем случайное float число в диапазоне [min, max]
-	return min + rand.Float64()*(max-min)
+	// Генерируем случайное целое число в диапазоне [min, max]
+	randomInt := rand.Intn(max-min+1) + min
+
+	// Преобразуем его в формат float64 с двумя нулями
+	return float64(randomInt)
 }
 
 func (s *CrashService) GenerateFakeBets() {
