@@ -176,7 +176,7 @@ func (s *CrashService) StartPreparingCrash() {
 }
 
 func (s *CrashService) PreparingCrash() {
-	s.GenerateFakeBets()
+	go s.GenerateFakeBets()
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
