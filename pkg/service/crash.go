@@ -304,13 +304,13 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 
 func getRandomElements(arr []model.FakeBets) []model.FakeBets {
 	// Получаем длину массива
-	length := len(arr)
+	length := len(arr) / 2
 
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
 
 	// Выбираем случайное число от 0 до длины массива
-	randomCount := rand.Intn(length + 1)
+	randomCount := rand.Intn(length)
 
 	// Создаем слайс для результата
 	var result []model.FakeBets
