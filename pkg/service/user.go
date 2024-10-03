@@ -74,7 +74,7 @@ func (s *AuthService) UpdateUser(id string, user schema.InputUser) (schema.ShowU
 	return s.repo.UpdateUser(id, user)
 }
 
-func (s *AuthService) ParseToken(accesToken string) (string, error) {
+func (s *AuthService) ParseToken(accesToken string) (string, string, error) {
 	token, err := jwt.ParseWithClaims(accesToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -82,14 +82,14 @@ func (s *AuthService) ParseToken(accesToken string) (string, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return "", errors.New("invalid token claims")
+		return "", "", errors.New("invalid token claims")
 	}
-	return claims.UserId, nil
+	return claims.UserId, claims.Role, nil
 }
 
 func (s *AuthService) SignIn(email string, password string) (SignInResponse, error) {
@@ -107,7 +107,7 @@ func (s *AuthService) SignIn(email string, password string) (SignInResponse, err
 		return signInResponse, err
 	}
 
-	token := CreateToken(user.ID)
+	token := CreateToken(user.ID, "user")
 
 	signInResponse.Token = token
 	signInResponse.User = userWithItems

@@ -27,6 +27,11 @@ func (h *Handler) adminChangeStatus(c *gin.Context) {
 func (h *Handler) signUpAdmin(c *gin.Context) {
 	var input model.Admin
 
+	if role := c.GetString("role"); role != "admin" {
+		newErrorResponse(c, http.StatusForbidden, "You are not authorized to access this resource") // 403 Forbidden
+		return
+	}
+
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

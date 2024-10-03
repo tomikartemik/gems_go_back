@@ -24,9 +24,10 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.User.ParseToken(headerParts[1])
+	userId, role, err := h.services.User.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 	}
 	c.Set("user_id", userId)
+	c.Set("role", role)
 }

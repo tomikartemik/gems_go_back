@@ -14,11 +14,12 @@ import (
 )
 
 type CrashService struct {
-	repo repository.Crash
+	repo         repository.Crash
+	fakeBetsRepo repository.FakeBets
 }
 
-func NewCrashService(repo repository.Crash) *CrashService {
-	return &CrashService{repo: repo}
+func NewCrashService(repo repository.Crash, fakeBetsRepo repository.FakeBets) *CrashService {
+	return &CrashService{repo: repo, fakeBetsRepo: fakeBetsRepo}
 }
 
 type ClientCrash struct {
@@ -298,6 +299,69 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 			break
 		}
 	}
+}
+
+func getRandomElements(arr []model.FakeBets) []model.FakeBets {
+	// Получаем длину массива
+	length := len(arr)
+
+	// Инициализируем генератор случайных чисел
+	rand.Seed(time.Now().UnixNano())
+
+	// Выбираем случайное число от 0 до длины массива
+	randomCount := rand.Intn(length + 1)
+
+	// Создаем слайс для результата
+	var result []model.FakeBets
+
+	// Добавляем случайные элементы в результат
+	for i := 0; i < randomCount; i++ {
+		// Выбираем случайный индекс и добавляем элемент в результат
+		randomIndex := rand.Intn(length)
+		result = append(result, arr[randomIndex])
+	}
+
+	return result
+}
+
+func fakeAmount(min, max float64) float64 {
+	// Инициализируем генератор случайных чисел
+	rand.Seed(time.Now().UnixNano())
+
+	// Генерируем случайное float число в диапазоне [min, max]
+	return min + rand.Float64()*(max-min)
+}
+
+func (s *CrashService) GenerateFakeBets() {
+	users, err := s.fakeBetsRepo.GetFakeUsers()
+	if err != nil {
+		return
+	}
+	fakeBets := getRandomElements(users)
+	var infoAboutFakeCrashBet InfoAboutCrashBet
+	for _, fakeBet := range fakeBets {
+		infoAboutFakeCrashBet = InfoAboutCrashBet{
+			PlayerID:       "fake",
+			PlayerNickname: fakeBet.Name,
+			Amount:         fakeAmount(10, 500),
+			UserMultiplier: 0,
+			Winning:        0,
+		}
+	}
+	betsAtLastCrashGame.Bets = append(
+		betsAtLastCrashGame.Bets,
+		infoAboutFakeCrashBet,
+	)
+	clientsMutexCrash.Lock()
+	for client := range clientsCrash {
+		err := client.conn.WriteJSON(betsAtLastCrashGame)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsCrash, client)
+		}
+	}
+	clientsMutexCrash.Unlock()
 }
 
 //

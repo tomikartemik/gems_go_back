@@ -44,6 +44,11 @@ func (h *Handler) GetReplenishments(c *gin.Context) {
 func (h *Handler) ChangeStatus(c *gin.Context) {
 	var input ChangeStatusRequest
 
+	if role := c.GetString("role"); role != "admin" {
+		newErrorResponse(c, http.StatusForbidden, "You are not authorized to access this resource") // 403 Forbidden
+		return
+	}
+
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

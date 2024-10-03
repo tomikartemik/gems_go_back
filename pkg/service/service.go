@@ -11,7 +11,7 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (schema.ShowUser, error)
-	ParseToken(token string) (string, error)
+	ParseToken(token string) (string, string, error)
 	UpdateUser(id string, user schema.InputUser) (schema.ShowUser, error)
 	GetUserById(id string) (schema.UserWithItems, error)
 	SignIn(email string, password string) (SignInResponse, error)
@@ -131,7 +131,7 @@ func NewService(repos *repository.Repository) *Service {
 		User:             NewAuthService(repos.User),
 		Item:             NewItemService(repos.Item),
 		Case:             NewCaseService(repos.Case),
-		Crash:            NewCrashService(repos.Crash),
+		Crash:            NewCrashService(repos.Crash, repos.FakeBets),
 		Roulette:         NewRouletteService(repos.Roulette),
 		Replenishment:    NewReplenishmentService(repos.Replenishment),
 		Withdraw:         NewWithdrawService(repos.Withdraw),

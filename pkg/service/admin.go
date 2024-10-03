@@ -28,7 +28,7 @@ func (s *AdminService) SignInAdmin(email string, password string) (string, error
 		return "", err
 	}
 
-	token := CreateToken(admin.Id)
+	token := CreateToken(admin.Id, "admin")
 
 	return token, nil
 }

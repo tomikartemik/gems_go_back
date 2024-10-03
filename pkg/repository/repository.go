@@ -21,6 +21,7 @@ type Repository struct {
 	Admin
 	OwnReplenishment
 	Card
+	FakeBets
 }
 
 type User interface {
@@ -125,6 +126,10 @@ type Card interface {
 	GetCard() (model.Card, error)
 }
 
+type FakeBets interface {
+	GetFakeUsers() ([]model.FakeBets, error)
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		User:             NewUserPostgres(db),
@@ -140,5 +145,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Admin:            NewAdminPostgres(db),
 		OwnReplenishment: NewOwnReplenishmentPostgres(db),
 		Card:             NewCardPostgres(db),
+		FakeBets:         NewFakeBetsPostgres(db),
 	}
 }
