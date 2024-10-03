@@ -110,8 +110,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 			}
 			if cashout.PlayerID == "fake" {
 				go s.CashOutFakeBets(cashout.PlayerNickname, cashout.Multiplier)
-			}
-			if cashout.GameId == lastCrashGameID {
+			} else if cashout.GameId == lastCrashGameID {
 				errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
 				go s.UpdateSavedBetCrash(cashout.PlayerID, cashout.Multiplier)
 				fmt.Println(errorStr)
