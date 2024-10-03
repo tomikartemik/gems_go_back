@@ -307,22 +307,32 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 
 func getRandomElementsForCrash(arr []model.FakeBets) []model.FakeBets {
 	// Получаем длину массива
-	length := len(arr) / 2
+	length := len(arr)
 
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
 
-	// Выбираем случайное число от 0 до длины массива
-	randomCount := rand.Intn(length) + 1
-
 	// Создаем слайс для результата
 	var result []model.FakeBets
 
+	// Проверяем, что массив не пустой
+	if length == 0 {
+		return result
+	}
+
+	// Перемешиваем исходный массив
+	shuffled := make([]model.FakeBets, length)
+	copy(shuffled, arr)
+	rand.Shuffle(length, func(i, j int) {
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	})
+
+	// Определяем количество случайных элементов (до половины длины массива)
+	randomCount := rand.Intn(length/2) + 1
+
 	// Добавляем случайные элементы в результат
 	for i := 0; i < randomCount; i++ {
-		// Выбираем случайный индекс и добавляем элемент в результат
-		randomIndex := rand.Intn(length)
-		result = append(result, arr[randomIndex])
+		result = append(result, shuffled[i])
 	}
 
 	return result
