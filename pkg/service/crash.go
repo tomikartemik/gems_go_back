@@ -33,10 +33,10 @@ type BetMessageCrash struct {
 }
 
 type CashoutMessageCrash struct {
-	GameId     int     `json:"game_id"`
-	PlayerID   string  `json:"player_id"`
-	PlayerName string  `json:"player_name"`
-	Multiplier float64 `json:"multiplier"`
+	GameId         int     `json:"game_id"`
+	PlayerID       string  `json:"player_id"`
+	PlayerNickname string  `json:"player_nickname"`
+	Multiplier     float64 `json:"multiplier"`
 }
 
 type ResponseCrash struct {
@@ -109,7 +109,7 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 				continue
 			}
 			if cashout.PlayerID == "fake" {
-				go s.UpdateSavedBetCrash(cashout.PlayerName, cashout.Multiplier)
+				go s.UpdateSavedBetCrash(cashout.PlayerNickname, cashout.Multiplier)
 			}
 			if cashout.GameId == lastCrashGameID {
 				errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
