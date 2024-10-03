@@ -113,11 +113,11 @@ func (r *RoulettePostgres) CreditingWinningsRoulette(gameID int) string {
 	return "OK"
 }
 
-func (r *RoulettePostgres) GetUsersPhotoAndNickForRoulette(userId string) (string, error) {
+func (r *RoulettePostgres) GetUsersPhotoAndNickForRoulette(userId string) (string, int, error) {
 	var user model.User
 	err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
-	return user.Username, err
+	return user.Username, 0, err
 }

@@ -122,10 +122,10 @@ func (r *CrashPostgres) CreditingWinningsCrash(gameID int) string {
 	return "OK"
 }
 
-func (r *CrashPostgres) GetUsersPhotoAndNickForCrash(userId string) (string, error) {
+func (r *CrashPostgres) GetUsersPhotoAndNickForCrash(userId string) (string, int, error) {
 	var user model.User
 	if err := r.db.Model(&model.User{}).Where("id = ?", userId).First(&user).Error; err != nil {
-		return "", err
+		return "", 0, err
 	}
-	return user.Username, nil
+	return user.Username, user.Photo, nil
 }

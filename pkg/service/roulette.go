@@ -33,9 +33,9 @@ type BetMessageRoulette struct {
 }
 
 type BetMessageRouletteResponse struct {
-	PlayerNickname string `json:"player_nickname"`
-	//Image    string `json:"image"`
-	Amount float64 `json:"amount"`
+	PlayerNickname string  `json:"player_nickname"`
+	Image          int     `json:"image"`
+	Amount         float64 `json:"amount"`
 }
 
 type BetsAtLastRouletteGame struct {
@@ -250,12 +250,13 @@ func (s *RouletteService) EndRoulette() {
 func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64, cell int) {
 	var betMessageRouletteResponse BetMessageRouletteResponse
 	betsAtLastRouletteGame.MainAmount += amount
-	playerNickname, err := s.repo.GetUsersPhotoAndNickForRoulette(userID)
+	playerNickname, photo, err := s.repo.GetUsersPhotoAndNickForRoulette(userID)
 	if err != nil {
 		log.Println(err)
 	}
 	betMessageRouletteResponse.PlayerNickname = playerNickname
 	betMessageRouletteResponse.Amount = amount
+	betMessageRouletteResponse.Image = photo
 	if cell == 2 {
 		betsAtLastRouletteGame.Bet2 = append(betsAtLastRouletteGame.Bet2, betMessageRouletteResponse)
 	} else if cell == 3 {
@@ -335,6 +336,7 @@ func (s *RouletteService) GenerateFakeBetsRoulette() {
 		infoAboutFakeRouletteBet = BetMessageRouletteResponse{
 			PlayerNickname: fakeBet.Name,
 			Amount:         randomIntRoulette(10, 500),
+			Image:          fakeBet.Photo,
 		}
 
 		cell = getRandomCell()

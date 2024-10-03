@@ -64,7 +64,7 @@ type Crash interface {
 	NewCashoutCrash(gameID int, userID string, userMultiplier float64) string
 	UpdateWinMultipliers(gameID int, winMultiplier float64) string
 	CreditingWinningsCrash(gameID int) string
-	GetUsersPhotoAndNickForCrash(userId string) (string, error)
+	GetUsersPhotoAndNickForCrash(userId string) (string, int, error)
 }
 
 type Roulette interface {
@@ -74,7 +74,7 @@ type Roulette interface {
 	NewBetRoulette(newBet model.BetRoulette) string
 	UpdateWinCells(gameID int, winCell int) string
 	CreditingWinningsRoulette(gameID int) string
-	GetUsersPhotoAndNickForRoulette(userId string) (string, error)
+	GetUsersPhotoAndNickForRoulette(userId string) (string, int, error)
 }
 
 type Replenishment interface {

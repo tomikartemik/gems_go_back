@@ -48,9 +48,9 @@ type ResponseCrash struct {
 }
 
 type InfoAboutCrashBet struct {
-	PlayerID       string `json:"player_id"`
-	PlayerNickname string `json:"player_nickname"`
-	//PlayerPhoto string `json:"player_photo"`
+	PlayerID       string  `json:"player_id"`
+	PlayerNickname string  `json:"player_nickname"`
+	PlayerPhoto    int     `json:"player_photo"`
 	Amount         float64 `json:"amount"`
 	UserMultiplier float64 `json:"user_multiplier"`
 	Winning        float64 `json:"winning"`
@@ -256,7 +256,7 @@ func (s *CrashService) EndCrash() {
 }
 
 func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
-	nickname, err := s.repo.GetUsersPhotoAndNickForCrash(userId)
+	nickname, photo, err := s.repo.GetUsersPhotoAndNickForCrash(userId)
 	if err != nil {
 		return
 	}
@@ -266,6 +266,7 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		Amount:         amount,
 		UserMultiplier: 0,
 		Winning:        0,
+		PlayerPhoto:    photo,
 	}
 	betsAtLastCrashGame.Bets = append(
 		betsAtLastCrashGame.Bets,
@@ -365,6 +366,7 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 			Amount:         randomIntCrash(10, 500),
 			UserMultiplier: 0,
 			Winning:        0,
+			PlayerPhoto:    fakeBet.Photo,
 		}
 		betsAtLastCrashGame.Bets = append(
 			betsAtLastCrashGame.Bets,
