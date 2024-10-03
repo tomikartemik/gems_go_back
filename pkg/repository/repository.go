@@ -128,6 +128,7 @@ type Card interface {
 
 type FakeBets interface {
 	GetFakeUsers() ([]model.FakeBets, error)
+	CreateFakeBet(user model.FakeBets)
 }
 
 func NewRepository(db *gorm.DB) *Repository {

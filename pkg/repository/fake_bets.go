@@ -18,3 +18,7 @@ func (r *FakeBetsPostgres) GetFakeUsers() ([]model.FakeBets, error) {
 	r.db.Model(&model.FakeBets{}).Find(&users)
 	return users, nil
 }
+
+func (r *FakeBetsPostgres) CreateFakeBet(user model.FakeBets) {
+	r.db.Model(&model.FakeBets{}).Create(&user)
+}

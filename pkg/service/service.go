@@ -112,6 +112,10 @@ type Card interface {
 	GetCard() (model.Card, error)
 }
 
+type FakeBet interface {
+	CreateFakeBetter(user model.FakeBets)
+}
+
 type Service struct {
 	User
 	Item
@@ -125,6 +129,7 @@ type Service struct {
 	Admin
 	OwnReplenishment
 	Card
+	FakeBet
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -141,5 +146,6 @@ func NewService(repos *repository.Repository) *Service {
 		Admin:            NewAdminService(repos.Admin),
 		OwnReplenishment: NewOwnReplenishmentService(repos.OwnReplenishment, repos.Receipt),
 		Card:             NewCardService(repos.Card),
+		FakeBet:          NewFakeBetService(repos.FakeBets),
 	}
 }

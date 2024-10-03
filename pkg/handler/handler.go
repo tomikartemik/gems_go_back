@@ -55,6 +55,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.GET("/card", h.GetCard)
 
+	router.POST("/create-fake-better", h.CreateFakeBetter)
+
 	admin := router.Group("/admin")
 	{
 		admin.POST("/change-status", h.adminChangeStatus)
