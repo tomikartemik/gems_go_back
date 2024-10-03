@@ -328,14 +328,17 @@ func (s *RouletteService) GenerateFakeBetsRoulette() {
 	maxDelay := 10000 / len(fakeBets)
 	var delay int
 	var cell int
+	var amount float64
 	var infoAboutFakeRouletteBet BetMessageRouletteResponse
 	for _, fakeBet := range fakeBets {
+		amount = randomIntRoulette(10, 500)
 		infoAboutFakeRouletteBet = BetMessageRouletteResponse{
 			PlayerNickname: fakeBet.Name,
 			Amount:         randomIntRoulette(10, 500),
 		}
 
 		cell = getRandomCell()
+		betsAtLastRouletteGame.MainAmount += amount
 
 		if cell == 2 {
 			betsAtLastRouletteGame.Bet2 = append(betsAtLastRouletteGame.Bet2, infoAboutFakeRouletteBet)
