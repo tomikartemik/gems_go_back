@@ -52,7 +52,7 @@ type Crash interface {
 	UpdateSavedBetCrash(userId string, multiplier float64)
 	AddBetCrashToResponse(userId string, amount float64)
 	InitCrashBetsForNewClient() BetsAtLastCrashGame
-	GenerateFakeBets()
+	GenerateFakeBetsCrash()
 }
 
 type Roulette interface {
@@ -67,6 +67,7 @@ type Roulette interface {
 	EndRoulette()
 	GetAllRouletteRecords() ([]model.RouletteRecord, error)
 	InitRouletteBetsForNewClient() BetsAtLastRouletteGame
+	GenerateFakeBetsRoulette()
 }
 
 type Replenishment interface {
@@ -138,7 +139,7 @@ func NewService(repos *repository.Repository) *Service {
 		Item:             NewItemService(repos.Item),
 		Case:             NewCaseService(repos.Case),
 		Crash:            NewCrashService(repos.Crash, repos.FakeBets),
-		Roulette:         NewRouletteService(repos.Roulette),
+		Roulette:         NewRouletteService(repos.Roulette, repos.FakeBets),
 		Replenishment:    NewReplenishmentService(repos.Replenishment),
 		Withdraw:         NewWithdrawService(repos.Withdraw),
 		Online:           NewOnlineService(repos.Online),

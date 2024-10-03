@@ -176,7 +176,7 @@ func (s *CrashService) StartPreparingCrash() {
 }
 
 func (s *CrashService) PreparingCrash() {
-	go s.GenerateFakeBets()
+	go s.GenerateFakeBetsCrash()
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
@@ -302,7 +302,7 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 	}
 }
 
-func getRandomElements(arr []model.FakeBets) []model.FakeBets {
+func getRandomElementsForCrash(arr []model.FakeBets) []model.FakeBets {
 	// Получаем длину массива
 	length := len(arr) / 2
 
@@ -325,7 +325,7 @@ func getRandomElements(arr []model.FakeBets) []model.FakeBets {
 	return result
 }
 
-func randomInt(min, max int) float64 {
+func randomIntCrash(min, max int) float64 {
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
 
@@ -336,12 +336,12 @@ func randomInt(min, max int) float64 {
 	return float64(randomInt)
 }
 
-func (s *CrashService) GenerateFakeBets() {
+func (s *CrashService) GenerateFakeBetsCrash() {
 	users, err := s.fakeBetsRepo.GetFakeUsers()
 	if err != nil {
 		return
 	}
-	fakeBets := getRandomElements(users)
+	fakeBets := getRandomElementsForCrash(users)
 	maxDelay := 10000 / len(fakeBets)
 	var delay int
 	var infoAboutFakeCrashBet InfoAboutCrashBet
@@ -349,7 +349,7 @@ func (s *CrashService) GenerateFakeBets() {
 		infoAboutFakeCrashBet = InfoAboutCrashBet{
 			PlayerID:       "fake",
 			PlayerNickname: fakeBet.Name,
-			Amount:         randomInt(10, 500),
+			Amount:         randomIntCrash(10, 500),
 			UserMultiplier: 0,
 			Winning:        0,
 		}
@@ -367,7 +367,7 @@ func (s *CrashService) GenerateFakeBets() {
 			}
 		}
 		clientsMutexCrash.Unlock()
-		delay = int(randomInt(0, maxDelay))
+		delay = int(randomIntCrash(0, maxDelay))
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }

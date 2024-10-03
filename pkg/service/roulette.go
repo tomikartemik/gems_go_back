@@ -13,11 +13,12 @@ import (
 )
 
 type RouletteService struct {
-	repo repository.Roulette
+	repo         repository.Roulette
+	fakeBetsRepo repository.FakeBets
 }
 
-func NewRouletteService(repo repository.Roulette) *RouletteService {
-	return &RouletteService{repo: repo}
+func NewRouletteService(repo repository.Roulette, fakeBetsRepo repository.FakeBets) *RouletteService {
+	return &RouletteService{repo: repo, fakeBetsRepo: fakeBetsRepo}
 }
 
 type ClientRoulette struct {
@@ -170,6 +171,7 @@ func (s *RouletteService) StartPreparingRoulette() {
 }
 
 func (s *RouletteService) PreparingRoulette() {
+	go s.GenerateFakeBetsRoulette()
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexRoulette.Lock()
@@ -275,6 +277,91 @@ func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64
 		}
 	}
 	clientsMutexRoulette.Unlock()
+}
+
+func getRandomElementsForRoulette(arr []model.FakeBets) []model.FakeBets {
+	// Получаем длину массива
+	length := len(arr) / 2
+
+	// Инициализируем генератор случайных чисел
+	rand.Seed(time.Now().UnixNano())
+
+	// Выбираем случайное число от 0 до длины массива
+	randomCount := rand.Intn(length)
+
+	// Создаем слайс для результата
+	var result []model.FakeBets
+
+	// Добавляем случайные элементы в результат
+	for i := 0; i < randomCount; i++ {
+		// Выбираем случайный индекс и добавляем элемент в результат
+		randomIndex := rand.Intn(length)
+		result = append(result, arr[randomIndex])
+	}
+
+	return result
+}
+
+func randomIntRoulette(min, max int) float64 {
+	// Инициализируем генератор случайных чисел
+	rand.Seed(time.Now().UnixNano())
+
+	// Генерируем случайное целое число в диапазоне [min, max]
+	randomInt := rand.Intn(max-min+1) + min
+
+	// Преобразуем его в формат float64 с двумя нулями
+	return float64(randomInt)
+}
+
+func getRandomCell() int {
+	options := []int{2, 3, 5, 10, 100}
+	rand.Seed(time.Now().UnixNano())        // Инициализация генератора случайных чисел
+	return options[rand.Intn(len(options))] // Выбор случайного числа из options
+}
+
+func (s *RouletteService) GenerateFakeBetsRoulette() {
+	users, err := s.fakeBetsRepo.GetFakeUsers()
+	if err != nil {
+		return
+	}
+	fakeBets := getRandomElementsForRoulette(users)
+	maxDelay := 10000 / len(fakeBets)
+	var delay int
+	var cell int
+	var infoAboutFakeRouletteBet BetMessageRouletteResponse
+	for _, fakeBet := range fakeBets {
+		infoAboutFakeRouletteBet = BetMessageRouletteResponse{
+			PlayerNickname: fakeBet.Name,
+			Amount:         randomIntRoulette(10, 500),
+		}
+
+		cell = getRandomCell()
+
+		if cell == 2 {
+			betsAtLastRouletteGame.Bet2 = append(betsAtLastRouletteGame.Bet2, infoAboutFakeRouletteBet)
+		} else if cell == 3 {
+			betsAtLastRouletteGame.Bet3 = append(betsAtLastRouletteGame.Bet3, infoAboutFakeRouletteBet)
+		} else if cell == 5 {
+			betsAtLastRouletteGame.Bet5 = append(betsAtLastRouletteGame.Bet5, infoAboutFakeRouletteBet)
+		} else if cell == 10 {
+			betsAtLastRouletteGame.Bet10 = append(betsAtLastRouletteGame.Bet10, infoAboutFakeRouletteBet)
+		} else if cell == 100 {
+			betsAtLastRouletteGame.Bet100 = append(betsAtLastRouletteGame.Bet100, infoAboutFakeRouletteBet)
+		}
+		clientsMutexRoulette.Lock()
+		for client := range clientsRoulette {
+			err = client.conn.WriteJSON(betsAtLastRouletteGame)
+			if err != nil {
+				log.Println("Write error:", err)
+				client.conn.Close()
+				delete(clientsRoulette, client)
+			}
+		}
+		clientsMutexRoulette.Unlock()
+
+		delay = int(randomIntCrash(0, maxDelay))
+		time.Sleep(time.Duration(delay) * time.Millisecond)
+	}
 }
 
 func (s *RouletteService) GetAllRouletteRecords() ([]model.RouletteRecord, error) {
