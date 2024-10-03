@@ -287,7 +287,7 @@ func getRandomElementsForRoulette(arr []model.FakeBets) []model.FakeBets {
 	rand.Seed(time.Now().UnixNano())
 
 	// Выбираем случайное число от 0 до длины массива
-	randomCount := rand.Intn(length)
+	randomCount := rand.Intn(length) + 1
 
 	// Создаем слайс для результата
 	var result []model.FakeBets
