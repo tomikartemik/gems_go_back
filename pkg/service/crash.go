@@ -35,6 +35,7 @@ type BetMessageCrash struct {
 type CashoutMessageCrash struct {
 	GameId     int     `json:"game_id"`
 	PlayerID   string  `json:"player_id"`
+	PlayerName string  `json:"player_name"`
 	Multiplier float64 `json:"multiplier"`
 }
 
@@ -106,6 +107,9 @@ func (s *CrashService) EditConnsCrash(conn *websocket.Conn) {
 			if err = json.Unmarshal(message, &cashout); err != nil {
 				fmt.Println("Invalid bet format:", err)
 				continue
+			}
+			if cashout.PlayerID == "fake" {
+				go s.UpdateSavedBetCrash(cashout.PlayerName, cashout.Multiplier)
 			}
 			if cashout.GameId == lastCrashGameID {
 				errorStr := s.repo.NewCashoutCrash(cashout.GameId, cashout.PlayerID, cashout.Multiplier)
@@ -369,6 +373,28 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 		clientsMutexCrash.Unlock()
 		delay = int(randomIntCrash(0, maxDelay))
 		time.Sleep(time.Duration(delay) * time.Millisecond)
+	}
+}
+
+func (s *CrashService) CashOutFakeBets(name string, multiplier float64) {
+	for betsInCurrentGame := range betsAtLastCrashGame.Bets {
+		if betsAtLastCrashGame.Bets[betsInCurrentGame].PlayerNickname == name {
+			currentWinning := math.Round(betsAtLastCrashGame.Bets[betsInCurrentGame].Amount*multiplier*100.0) / 100.0
+			currentMultiplier := math.Round(multiplier*100.0) / 100.0
+			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
+			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
+			clientsMutexCrash.Lock()
+			for client := range clientsCrash {
+				err := client.conn.WriteJSON(betsAtLastCrashGame)
+				if err != nil {
+					log.Println("Write error:", err)
+					client.conn.Close()
+					delete(clientsCrash, client)
+				}
+			}
+			clientsMutexCrash.Unlock()
+			break
+		}
 	}
 }
 
