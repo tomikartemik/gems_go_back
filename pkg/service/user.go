@@ -35,6 +35,7 @@ func (s *AuthService) CreateUser(user model.User) (schema.ShowUser, error) {
 	if user.IsAdmin != true {
 		user.IsAdmin = false
 	}
+	user.Balance = 2000
 	user.BestItemId = 0
 	rand.Seed(time.Now().UnixNano())
 	photoInt := rand.Intn(82) + 1
