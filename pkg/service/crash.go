@@ -282,7 +282,7 @@ func (s *CrashService) EndCrash() {
 	//}
 	for time_before_pending := 60; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(50 * time.Millisecond)
-		responseCrash.Length -= 1.2
+		responseCrash.Length += 1.2
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
