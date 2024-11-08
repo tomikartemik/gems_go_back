@@ -180,24 +180,10 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	//for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
-	//	time.Sleep(10 * time.Millisecond)
-	//	clientsMutexCrash.Lock()
-	//	responseCrash.TimeBeforeStart = time_before_start / 100.0
-	//	for client := range clientsCrash {
-	//		err := client.conn.WriteJSON(responseCrash)
-	//		if err != nil {
-	//			log.Println("Write error:", err)
-	//			client.conn.Close()
-	//			delete(clientsCrash, client)
-	//		}
-	//	}
-	//	clientsMutexCrash.Unlock()
-	//}
-	for time_before_start := 100.0; time_before_start >= 0; time_before_start-- {
-		time.Sleep(100 * time.Millisecond)
+	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
+		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
-		responseCrash.TimeBeforeStart = time_before_start / 10.0
+		responseCrash.TimeBeforeStart = time_before_start / 100.0
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
 			if err != nil {
@@ -208,6 +194,20 @@ func (s *CrashService) PreparingCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
+	//for time_before_start := 100.0; time_before_start >= 0; time_before_start-- {
+	//	time.Sleep(100 * time.Millisecond)
+	//	clientsMutexCrash.Lock()
+	//	responseCrash.TimeBeforeStart = time_before_start / 10.0
+	//	for client := range clientsCrash {
+	//		err := client.conn.WriteJSON(responseCrash)
+	//		if err != nil {
+	//			log.Println("Write error:", err)
+	//			client.conn.Close()
+	//			delete(clientsCrash, client)
+	//		}
+	//	}
+	//	clientsMutexCrash.Unlock()
+	//}
 
 	s.StartGameCrash()
 }
@@ -221,30 +221,12 @@ func (s *CrashService) StartGameCrash() {
 }
 
 func (s *CrashService) GameCrash() {
-	//for responseCrash.Multiplier < winMultiplier {
-	//	time.Sleep(20 * time.Millisecond)
-	//	//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
-	//	responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
-	//	if responseCrash.Length <= 100.0 {
-	//		responseCrash.Length += 0.4
-	//	}
-	//	clientsMutexCrash.Lock()
-	//	for client := range clientsCrash {
-	//		err := client.conn.WriteJSON(responseCrash)
-	//		if err != nil {
-	//			log.Println("Write error:", err)
-	//			client.conn.Close()
-	//			delete(clientsCrash, client)
-	//		}
-	//	}
-	//	clientsMutexCrash.Unlock()
-	//}
 	for responseCrash.Multiplier < winMultiplier {
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
 		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
 		if responseCrash.Length <= 100.0 {
-			responseCrash.Length += 1
+			responseCrash.Length += 0.4
 		}
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
@@ -257,6 +239,24 @@ func (s *CrashService) GameCrash() {
 		}
 		clientsMutexCrash.Unlock()
 	}
+	//for responseCrash.Multiplier < winMultiplier {
+	//	time.Sleep(50 * time.Millisecond)
+	//	//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
+	//	responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
+	//	if responseCrash.Length <= 100.0 {
+	//		responseCrash.Length += 1
+	//	}
+	//	clientsMutexCrash.Lock()
+	//	for client := range clientsCrash {
+	//		err := client.conn.WriteJSON(responseCrash)
+	//		if err != nil {
+	//			log.Println("Write error:", err)
+	//			client.conn.Close()
+	//			delete(clientsCrash, client)
+	//		}
+	//	}
+	//	clientsMutexCrash.Unlock()
+	//}
 
 	go s.repo.NewCrashRecord(winMultiplier)
 	s.EndCrash()
@@ -280,8 +280,8 @@ func (s *CrashService) EndCrash() {
 	//	}
 	//	clientsMutexCrash.Unlock()
 	//}
-	for time_before_pending := 60; time_before_pending >= 0; time_before_pending-- {
-		time.Sleep(50 * time.Millisecond)
+	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
+		time.Sleep(10 * time.Millisecond)
 		responseCrash.Length += 1.2
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
