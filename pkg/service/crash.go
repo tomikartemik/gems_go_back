@@ -222,7 +222,7 @@ func (s *CrashService) StartGameCrash() {
 
 func (s *CrashService) GameCrash() {
 	for responseCrash.Multiplier < winMultiplier {
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
 		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
 		if responseCrash.Length <= 100.0 {
