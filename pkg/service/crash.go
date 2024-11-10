@@ -180,11 +180,11 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
+	for time_before_start := 100.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(100 * time.Millisecond)
 		//time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
-		responseCrash.TimeBeforeStart = time_before_start / 1000.0
+		responseCrash.TimeBeforeStart = time_before_start / 10.0
 		//responseCrash.TimeBeforeStart = time_before_start / 100.0
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
