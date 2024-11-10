@@ -181,9 +181,11 @@ func (s *CrashService) StartPreparingCrash() {
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
 	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
+		//time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
-		responseCrash.TimeBeforeStart = time_before_start / 100.0
+		responseCrash.TimeBeforeStart = time_before_start / 1000.0
+		//responseCrash.TimeBeforeStart = time_before_start / 100.0
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
 			if err != nil {
@@ -222,9 +224,10 @@ func (s *CrashService) StartGameCrash() {
 
 func (s *CrashService) GameCrash() {
 	for responseCrash.Multiplier < winMultiplier {
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
-		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
+		//responseCrash.Multiplier = math.Round(responseCrash.Multiplier*10003) / 10000
+		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*1003) / 1000
 		if responseCrash.Length <= 100.0 {
 			responseCrash.Length += 0.4
 		}
@@ -280,8 +283,8 @@ func (s *CrashService) EndCrash() {
 	//	}
 	//	clientsMutexCrash.Unlock()
 	//}
-	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
-		time.Sleep(10 * time.Millisecond)
+	for time_before_pending := 30; time_before_pending >= 0; time_before_pending-- {
+		time.Sleep(100 * time.Millisecond)
 		responseCrash.Length += 1.2
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
