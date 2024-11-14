@@ -448,7 +448,7 @@ func (s *CrashService) CashOutFakeBets(name string, multiplier float64) {
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
 			clientsMutexCrash.Lock()
 			for client := range clientsCrash {
-				err := client.conn.WriteJSON(betsAtLastCrashGame)
+				err := client.conn.WriteJSON("")
 				if err != nil {
 					log.Println("Write error:", err)
 					client.conn.Close()
