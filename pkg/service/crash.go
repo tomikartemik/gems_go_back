@@ -326,7 +326,7 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 	)
 	clientsMutexCrash.Lock()
 	for client := range clientsCrash {
-		err := client.conn.WriteJSON(betsAtLastCrashGame)
+		err := client.conn.WriteJSON(infoAboutCrashBet)
 		if err != nil {
 			log.Println("Write error:", err)
 			client.conn.Close()
