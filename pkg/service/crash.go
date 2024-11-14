@@ -424,16 +424,16 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 			betsAtLastCrashGame.Bets,
 			infoAboutFakeCrashBet,
 		)
-		clientsMutexCrash.Lock()
-		for client := range clientsCrash {
-			err := client.conn.WriteJSON(betsAtLastCrashGame)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsCrash, client)
-			}
-		}
-		clientsMutexCrash.Unlock()
+		//clientsMutexCrash.Lock()
+		//for client := range clientsCrash {
+		//	err := client.conn.WriteJSON(betsAtLastCrashGame)
+		//	if err != nil {
+		//		log.Println("Write error:", err)
+		//		client.conn.Close()
+		//		delete(clientsCrash, client)
+		//	}
+		//}
+		//clientsMutexCrash.Unlock()
 		delay = int(randomIntCrash(0, maxDelay))
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
