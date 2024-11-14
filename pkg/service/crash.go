@@ -286,16 +286,16 @@ func (s *CrashService) EndCrash() {
 	for time_before_pending := 30; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(100 * time.Millisecond)
 		responseCrash.Length += 1.2
-		clientsMutexCrash.Lock()
-		for client := range clientsCrash {
-			err := client.conn.WriteJSON(responseCrash)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsCrash, client)
-			}
-		}
-		clientsMutexCrash.Unlock()
+		//clientsMutexCrash.Lock()
+		//for client := range clientsCrash {
+		//	err := client.conn.WriteJSON(responseCrash)
+		//	if err != nil {
+		//		log.Println("Write error:", err)
+		//		client.conn.Close()
+		//		delete(clientsCrash, client)
+		//	}
+		//}
+		//clientsMutexCrash.Unlock()
 	}
 
 	s.repo.UpdateWinMultipliers(lastCrashGameID, winMultiplier)
@@ -324,16 +324,16 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		betsAtLastCrashGame.Bets,
 		infoAboutCrashBet,
 	)
-	clientsMutexCrash.Lock()
-	for client := range clientsCrash {
-		err := client.conn.WriteJSON(infoAboutCrashBet)
-		if err != nil {
-			log.Println("Write error:", err)
-			client.conn.Close()
-			delete(clientsCrash, client)
-		}
-	}
-	clientsMutexCrash.Unlock()
+	//clientsMutexCrash.Lock()
+	//for client := range clientsCrash {
+	//	err := client.conn.WriteJSON(infoAboutCrashBet)
+	//	if err != nil {
+	//		log.Println("Write error:", err)
+	//		client.conn.Close()
+	//		delete(clientsCrash, client)
+	//	}
+	//}
+	//clientsMutexCrash.Unlock()
 }
 
 func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
@@ -446,16 +446,16 @@ func (s *CrashService) CashOutFakeBets(name string, multiplier float64) {
 			currentMultiplier := math.Round(multiplier*100.0) / 100.0
 			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
-			clientsMutexCrash.Lock()
-			for client := range clientsCrash {
-				err := client.conn.WriteJSON("")
-				if err != nil {
-					log.Println("Write error:", err)
-					client.conn.Close()
-					delete(clientsCrash, client)
-				}
-			}
-			clientsMutexCrash.Unlock()
+			//clientsMutexCrash.Lock()
+			//for client := range clientsCrash {
+			//	err := client.conn.WriteJSON("")
+			//	if err != nil {
+			//		log.Println("Write error:", err)
+			//		client.conn.Close()
+			//		delete(clientsCrash, client)
+			//	}
+			//}
+			//clientsMutexCrash.Unlock()
 			break
 		}
 	}
