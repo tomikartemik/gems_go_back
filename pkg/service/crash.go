@@ -274,7 +274,7 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 	)
 	clientsMutexCrash.Lock()
 	for client := range clientsCrash {
-		err := client.conn.WriteJSON(betsAtLastCrashGame)
+		err := client.conn.WriteJSON(infoAboutCrashBet)
 		if err != nil {
 			log.Println("Write error:", err)
 			client.conn.Close()
@@ -293,7 +293,7 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
 			clientsMutexCrash.Lock()
 			for client := range clientsCrash {
-				err := client.conn.WriteJSON(betsAtLastCrashGame)
+				err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
 				if err != nil {
 					log.Println("Write error:", err)
 					client.conn.Close()
@@ -374,7 +374,7 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 		)
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
-			err := client.conn.WriteJSON(betsAtLastCrashGame)
+			err := client.conn.WriteJSON(infoAboutFakeCrashBet)
 			if err != nil {
 				log.Println("Write error:", err)
 				client.conn.Close()
@@ -396,7 +396,7 @@ func (s *CrashService) CashOutFakeBets(name string, multiplier float64) {
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
 			clientsMutexCrash.Lock()
 			for client := range clientsCrash {
-				err := client.conn.WriteJSON(betsAtLastCrashGame)
+				err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
 				if err != nil {
 					log.Println("Write error:", err)
 					client.conn.Close()
