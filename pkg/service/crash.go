@@ -60,6 +60,12 @@ type BetsAtLastCrashGame struct {
 	Bets []InfoAboutCrashBet `json:"bets"`
 }
 
+type InitResponse struct {
+	Status           string              `json:"status"`
+	NewGameStartTime time.Time           `json:"new_game_start_time"`
+	Bets             BetsAtLastCrashGame `json:"bets"`
+}
+
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
 var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0}
@@ -69,6 +75,7 @@ var winMultiplier = 0.0
 var u = 0.0
 var deltaCrash = 0.0
 var lastCrashGameID int
+var newGameStartTime time.Time
 
 var acceptingBetsCrash = true
 var acceptingCashoutsCrash = false
@@ -180,20 +187,18 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
-		time.Sleep(10 * time.Millisecond)
-		clientsMutexCrash.Lock()
-		responseCrash.TimeBeforeStart = time_before_start / 100.0
-		for client := range clientsCrash {
-			err := client.conn.WriteJSON(responseCrash)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsCrash, client)
-			}
+	newGameStartTime = time.Now().Add(10 * time.Second)
+	clientsMutexCrash.Lock()
+	for client := range clientsCrash {
+		err := client.conn.WriteJSON(newGameStartTime)
+		if err != nil {
+			log.Println("Write error:", err)
+			client.conn.Close()
+			delete(clientsCrash, client)
 		}
 		clientsMutexCrash.Unlock()
 	}
+	time.Sleep(10 * time.Second)
 	s.StartGameCrash()
 }
 
@@ -422,6 +427,10 @@ func (s *CrashService) GetAllRecords() ([]model.CrashRecord, error) {
 	return allRecords, nil
 }
 
-func (s *CrashService) InitCrashBetsForNewClient() BetsAtLastCrashGame {
-	return betsAtLastCrashGame
+func (s *CrashService) InitCrashForNewClient() InitResponse {
+	return InitResponse{
+		Status:           responseCrash.Status,
+		NewGameStartTime: newGameStartTime,
+		Bets:             betsAtLastCrashGame,
+	}
 }
