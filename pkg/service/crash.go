@@ -192,6 +192,7 @@ func (s *CrashService) PreparingCrash() {
 		}
 	}
 	clientsMutexCrash.Unlock()
+	time.Sleep(10 * time.Second)
 	s.StartGameCrash()
 }
 
