@@ -60,6 +60,11 @@ type BetsAtLastCrashGame struct {
 	Bets []InfoAboutCrashBet `json:"bets"`
 }
 
+type PreparingCrashData struct {
+	Status           string    `json:"status"`
+	NewGameStartTime time.Time `json:"new_game_start_time"`
+}
+
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
 var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0}
@@ -184,7 +189,10 @@ func (s *CrashService) PreparingCrash() {
 	newGameStartTime = time.Now().Add(10 * time.Second)
 	clientsMutexCrash.Lock()
 	for client := range clientsCrash {
-		err := client.conn.WriteJSON(newGameStartTime)
+		err := client.conn.WriteJSON(PreparingCrashData{
+			Status:           "Penging",
+			NewGameStartTime: newGameStartTime,
+		})
 		if err != nil {
 			log.Println("Write error:", err)
 			client.conn.Close()
