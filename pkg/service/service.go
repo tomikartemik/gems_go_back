@@ -51,7 +51,8 @@ type Crash interface {
 	GetAllRecords() ([]model.CrashRecord, error)
 	UpdateSavedBetCrash(userId string, multiplier float64)
 	AddBetCrashToResponse(userId string, amount float64)
-	InitCrashForNewClient() InitResponse
+	InitCrashBetsForNewClient() BetsAtLastCrashGame
+	//InitCrashForNewClient() InitResponse
 	GenerateFakeBetsCrash()
 }
 

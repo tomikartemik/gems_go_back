@@ -61,6 +61,7 @@ type BetsAtLastCrashGame struct {
 }
 
 type InitResponse struct {
+	GameId           int                 `json:"game_id"`
 	Status           string              `json:"status"`
 	NewGameStartTime time.Time           `json:"new_game_start_time"`
 	Bets             BetsAtLastCrashGame `json:"bets"`
@@ -427,10 +428,11 @@ func (s *CrashService) GetAllRecords() ([]model.CrashRecord, error) {
 	return allRecords, nil
 }
 
-func (s *CrashService) InitCrashForNewClient() InitResponse {
-	return InitResponse{
-		Status:           responseCrash.Status,
-		NewGameStartTime: newGameStartTime,
-		Bets:             betsAtLastCrashGame,
-	}
+func (s *CrashService) InitCrashBetsForNewClient() BetsAtLastCrashGame {
+	//return InitResponse{
+	//	Status:           responseCrash.Status,
+	//	NewGameStartTime: newGameStartTime,
+	//	Bets:             betsAtLastCrashGame,
+	//}
+	return betsAtLastCrashGame
 }

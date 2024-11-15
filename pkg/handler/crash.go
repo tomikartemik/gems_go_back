@@ -37,6 +37,7 @@ func (h *Handler) getAllCrashRecords(c *gin.Context) {
 }
 
 func (h *Handler) initCrashBetsForNewClient(c *gin.Context) {
-	betsAtCurrentGame := h.services.InitCrashForNewClient()
+	//betsAtCurrentGame := h.services.InitCrashForNewClient()
+	betsAtCurrentGame := h.services.InitCrashBetsForNewClient()
 	c.JSON(http.StatusOK, betsAtCurrentGame)
 }
