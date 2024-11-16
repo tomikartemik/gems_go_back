@@ -190,7 +190,7 @@ func (s *CrashService) PreparingCrash() {
 	clientsMutexCrash.Lock()
 	for client := range clientsCrash {
 		err := client.conn.WriteJSON(PreparingCrashData{
-			Status:           "Penging",
+			Status:           "Pending",
 			NewGameStartTime: newGameStartTime,
 		})
 		if err != nil {
