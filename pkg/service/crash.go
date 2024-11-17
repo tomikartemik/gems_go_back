@@ -190,7 +190,7 @@ func (s *CrashService) PreparingCrash() {
 	preparingCrashData := PreparingCrashData{
 		Status:           "Pending",
 		NewGameStartTime: time.Now().Add(10 * time.Second),
-		GameID:           lastCrashGameID + 1,
+		GameID:           lastCrashGameID,
 	}
 	for i := 0; i < 10; i++ {
 		clientsMutexCrash.Lock()
