@@ -187,20 +187,22 @@ func (s *CrashService) StartPreparingCrash() {
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
 	newGameStartTime = time.Now().Add(10 * time.Second)
-	clientsMutexCrash.Lock()
-	for client := range clientsCrash {
-		err := client.conn.WriteJSON(PreparingCrashData{
-			Status:           "Pending",
-			NewGameStartTime: newGameStartTime,
-		})
-		if err != nil {
-			log.Println("Write error:", err)
-			client.conn.Close()
-			delete(clientsCrash, client)
+	for i := 0; i < 10; i++ {
+		clientsMutexCrash.Lock()
+		for client := range clientsCrash {
+			err := client.conn.WriteJSON(PreparingCrashData{
+				Status:           "Pending",
+				NewGameStartTime: newGameStartTime,
+			})
+			if err != nil {
+				log.Println("Write error:", err)
+				client.conn.Close()
+				delete(clientsCrash, client)
+			}
 		}
+		clientsMutexCrash.Unlock()
+		time.Sleep(1 * time.Second)
 	}
-	clientsMutexCrash.Unlock()
-	time.Sleep(10 * time.Second)
 	s.StartGameCrash()
 }
 
