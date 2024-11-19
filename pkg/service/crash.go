@@ -48,6 +48,7 @@ type ResponseCrash struct {
 }
 
 type InfoAboutCrashBet struct {
+	Index          int     `json:"index"`
 	PlayerID       string  `json:"player_id"`
 	PlayerNickname string  `json:"player_nickname"`
 	PlayerPhoto    int     `json:"player_photo"`
@@ -272,6 +273,7 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		return
 	}
 	infoAboutCrashBet := InfoAboutCrashBet{
+		Index:          len(betsAtLastCrashGame.Bets),
 		PlayerID:       userId,
 		PlayerNickname: nickname,
 		Amount:         amount,
