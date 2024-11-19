@@ -374,6 +374,7 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 	var infoAboutFakeCrashBet InfoAboutCrashBet
 	for _, fakeBet := range fakeBets {
 		infoAboutFakeCrashBet = InfoAboutCrashBet{
+			Index:          len(betsAtLastCrashGame.Bets),
 			PlayerID:       "fake",
 			PlayerNickname: fakeBet.Name,
 			Amount:         randomIntCrash(10, 500),
