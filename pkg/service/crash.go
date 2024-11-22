@@ -40,11 +40,11 @@ type CashoutMessageCrash struct {
 }
 
 type ResponseCrash struct {
-	GameID          int     `json:"game_id"`
-	Status          string  `json:"status"`
-	Multiplier      float64 `json:"multiplier"`
-	TimeBeforeStart float64 `json:"time_before_start"`
-	Length          float64 `json:"length"`
+	GameID          int                 `json:"game_id"`
+	Status          string              `json:"status"`
+	Multiplier      float64             `json:"multiplier"`
+	TimeBeforeStart float64             `json:"timer"`
+	UsersBets       []InfoAboutCrashBet `json:"users_bets"`
 }
 
 type InfoAboutCrashBet struct {
@@ -69,14 +69,13 @@ type PreparingCrashData struct {
 
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
-var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, 0.0}
+var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, []InfoAboutCrashBet{}}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
 var u = 0.0
-var deltaCrash = 0.0
 var lastCrashGameID int
-var newGameStartTime time.Time
+var betsBuffer []InfoAboutCrashBet
 
 var acceptingBetsCrash = true
 var acceptingCashoutsCrash = false
@@ -172,7 +171,6 @@ func (s *CrashService) StartPreparingCrash() {
 	}
 	clientsMutexCrash.Unlock()
 	acceptingBetsCrash = true
-	responseCrash.Length = 0.0
 	responseCrash.Status = "Pending"
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
@@ -204,12 +202,14 @@ func (s *CrashService) PreparingCrash() {
 			}
 		}
 		clientsMutexCrash.Unlock()
+		betsBuffer = betsBuffer[:0]
 		time.Sleep(1 * time.Second)
 	}
 	s.StartGameCrash()
 }
 
 func (s *CrashService) StartGameCrash() {
+	betsBuffer = betsBuffer[:0]
 	acceptingBetsCrash = false
 	acceptingCashoutsCrash = true
 	responseCrash.Status = "Running"
@@ -222,9 +222,6 @@ func (s *CrashService) GameCrash() {
 		time.Sleep(100 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
 		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*1003) / 1000
-		if responseCrash.Length <= 100.0 {
-			responseCrash.Length += 0.4
-		}
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
@@ -235,6 +232,7 @@ func (s *CrashService) GameCrash() {
 			}
 		}
 		clientsMutexCrash.Unlock()
+		betsBuffer = betsBuffer[:0]
 	}
 	go s.repo.NewCrashRecord(winMultiplier)
 	s.EndCrash()
@@ -243,10 +241,9 @@ func (s *CrashService) GameCrash() {
 func (s *CrashService) EndCrash() {
 	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
-	wayTo150 := (200 - responseCrash.Length) / 300
+	betsBuffer = betsBuffer[:0]
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
-		responseCrash.Length += wayTo150
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
@@ -285,16 +282,17 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		betsAtLastCrashGame.Bets,
 		infoAboutCrashBet,
 	)
-	clientsMutexCrash.Lock()
-	for client := range clientsCrash {
-		err := client.conn.WriteJSON(infoAboutCrashBet)
-		if err != nil {
-			log.Println("Write error:", err)
-			client.conn.Close()
-			delete(clientsCrash, client)
-		}
-	}
-	clientsMutexCrash.Unlock()
+	betsBuffer = append(betsBuffer, infoAboutCrashBet)
+	//clientsMutexCrash.Lock()
+	//for client := range clientsCrash {
+	//	err := client.conn.WriteJSON(infoAboutCrashBet)
+	//	if err != nil {
+	//		log.Println("Write error:", err)
+	//		client.conn.Close()
+	//		delete(clientsCrash, client)
+	//	}
+	//}
+	//clientsMutexCrash.Unlock()
 }
 
 func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
@@ -304,16 +302,17 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 			currentMultiplier := math.Round(multiplier*100.0) / 100.0
 			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
-			clientsMutexCrash.Lock()
-			for client := range clientsCrash {
-				err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
-				if err != nil {
-					log.Println("Write error:", err)
-					client.conn.Close()
-					delete(clientsCrash, client)
-				}
-			}
-			clientsMutexCrash.Unlock()
+			betsBuffer = append(betsBuffer, betsAtLastCrashGame.Bets[betsInCurrentGame])
+			//clientsMutexCrash.Lock()
+			//for client := range clientsCrash {
+			//	err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
+			//	if err != nil {
+			//		log.Println("Write error:", err)
+			//		client.conn.Close()
+			//		delete(clientsCrash, client)
+			//	}
+			//}
+			//clientsMutexCrash.Unlock()
 			break
 		}
 	}
@@ -387,16 +386,17 @@ func (s *CrashService) GenerateFakeBetsCrash() {
 			betsAtLastCrashGame.Bets,
 			infoAboutFakeCrashBet,
 		)
-		clientsMutexCrash.Lock()
-		for client := range clientsCrash {
-			err := client.conn.WriteJSON(infoAboutFakeCrashBet)
-			if err != nil {
-				log.Println("Write error:", err)
-				client.conn.Close()
-				delete(clientsCrash, client)
-			}
-		}
-		clientsMutexCrash.Unlock()
+		betsBuffer = append(betsBuffer, infoAboutFakeCrashBet)
+		//clientsMutexCrash.Lock()
+		//for client := range clientsCrash {
+		//	err := client.conn.WriteJSON(infoAboutFakeCrashBet)
+		//	if err != nil {
+		//		log.Println("Write error:", err)
+		//		client.conn.Close()
+		//		delete(clientsCrash, client)
+		//	}
+		//}
+		//clientsMutexCrash.Unlock()
 		delay = int(randomIntCrash(0, maxDelay))
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
@@ -409,16 +409,17 @@ func (s *CrashService) CashOutFakeBets(name string, multiplier float64) {
 			currentMultiplier := math.Round(multiplier*100.0) / 100.0
 			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
-			clientsMutexCrash.Lock()
-			for client := range clientsCrash {
-				err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
-				if err != nil {
-					log.Println("Write error:", err)
-					client.conn.Close()
-					delete(clientsCrash, client)
-				}
-			}
-			clientsMutexCrash.Unlock()
+			betsBuffer = append(betsBuffer, betsAtLastCrashGame.Bets[betsInCurrentGame])
+			//clientsMutexCrash.Lock()
+			//for client := range clientsCrash {
+			//	err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
+			//	if err != nil {
+			//		log.Println("Write error:", err)
+			//		client.conn.Close()
+			//		delete(clientsCrash, client)
+			//	}
+			//}
+			//clientsMutexCrash.Unlock()
 			break
 		}
 	}
