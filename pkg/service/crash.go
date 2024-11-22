@@ -178,6 +178,7 @@ func (s *CrashService) StartPreparingCrash() {
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
 	for i := 0; i < 10; i++ {
+		responseCrash.UsersBets = betsBuffer
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
@@ -205,6 +206,7 @@ func (s *CrashService) StartGameCrash() {
 
 func (s *CrashService) GameCrash() {
 	for responseCrash.Multiplier < winMultiplier {
+		responseCrash.UsersBets = betsBuffer
 		time.Sleep(100 * time.Millisecond)
 		//responseCrash.Multiplier = responseCrash.Multiplier * 1.0004
 		responseCrash.Multiplier = math.Round(responseCrash.Multiplier*1003) / 1000
