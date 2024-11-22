@@ -43,7 +43,7 @@ type ResponseCrash struct {
 	GameID          int                 `json:"game_id"`
 	Status          string              `json:"status"`
 	Multiplier      float64             `json:"multiplier"`
-	TimeBeforeStart float64             `json:"timer"`
+	TimeBeforeStart time.Time           `json:"timer"`
 	UsersBets       []InfoAboutCrashBet `json:"users_bets"`
 }
 
@@ -69,7 +69,7 @@ type PreparingCrashData struct {
 
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
-var responseCrash = ResponseCrash{0, "Crashed", 1.0, 10.0, []InfoAboutCrashBet{}}
+var responseCrash = ResponseCrash{0, "Crashed", 1.0, time.Now(), []InfoAboutCrashBet{}}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
@@ -160,18 +160,9 @@ func (s *CrashService) CrashGame() {
 
 func (s *CrashService) StartPreparingCrash() {
 	betsAtLastCrashGame = BetsAtLastCrashGame{}
-	clientsMutexCrash.Lock()
-	for client := range clientsCrash {
-		err := client.conn.WriteJSON(betsAtLastCrashGame)
-		if err != nil {
-			log.Println("Write error:", err)
-			client.conn.Close()
-			delete(clientsCrash, client)
-		}
-	}
-	clientsMutexCrash.Unlock()
 	acceptingBetsCrash = true
 	responseCrash.Status = "Pending"
+	responseCrash.TimeBeforeStart = time.Now().Add(10 * time.Second)
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
 	//winMultiplier = 1.3
@@ -186,15 +177,10 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	preparingCrashData := PreparingCrashData{
-		Status:           "Pending",
-		NewGameStartTime: time.Now().Add(10 * time.Second),
-		GameID:           lastCrashGameID,
-	}
 	for i := 0; i < 10; i++ {
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
-			err := client.conn.WriteJSON(preparingCrashData)
+			err := client.conn.WriteJSON(responseCrash)
 			if err != nil {
 				log.Println("Write error:", err)
 				client.conn.Close()
