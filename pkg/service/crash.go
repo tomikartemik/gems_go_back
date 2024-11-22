@@ -69,7 +69,7 @@ type PreparingCrashData struct {
 
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
-var responseCrash = ResponseCrash{0, "Crashed", 1.0, time.Now(), []InfoAboutCrashBet{}}
+var responseCrash = ResponseCrash{0, "Crashed", 0.0, time.Now(), []InfoAboutCrashBet{}}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
@@ -162,6 +162,7 @@ func (s *CrashService) StartPreparingCrash() {
 	betsAtLastCrashGame = BetsAtLastCrashGame{}
 	acceptingBetsCrash = true
 	responseCrash.Status = "Pending"
+	responseCrash.Multiplier = 0.0
 	responseCrash.TimeBeforeStart = time.Now().Add(10 * time.Second)
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
