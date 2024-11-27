@@ -190,14 +190,14 @@ func (s *CrashService) PreparingCrash() {
 			}
 		}
 		clientsMutexCrash.Unlock()
-		betsBuffer = betsBuffer[:0]
+		//betsBuffer = betsBuffer[:0]
 		time.Sleep(1 * time.Second)
 	}
 	s.StartGameCrash()
 }
 
 func (s *CrashService) StartGameCrash() {
-	betsBuffer = betsBuffer[:0]
+	//betsBuffer = betsBuffer[:0]
 	acceptingBetsCrash = false
 	acceptingCashoutsCrash = true
 	responseCrash.Status = "Running"
@@ -221,7 +221,7 @@ func (s *CrashService) GameCrash() {
 			}
 		}
 		clientsMutexCrash.Unlock()
-		betsBuffer = betsBuffer[:0]
+		//betsBuffer = betsBuffer[:0]
 	}
 	go s.repo.NewCrashRecord(winMultiplier)
 	s.EndCrash()
@@ -230,7 +230,7 @@ func (s *CrashService) GameCrash() {
 func (s *CrashService) EndCrash() {
 	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
-	betsBuffer = betsBuffer[:0]
+	//betsBuffer = betsBuffer[:0]
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
