@@ -230,7 +230,7 @@ func (s *CrashService) GameCrash() {
 func (s *CrashService) EndCrash() {
 	acceptingCashoutsCrash = false
 	responseCrash.Status = "Crashed"
-	//betsBuffer = betsBuffer[:0]
+	betsBuffer = betsBuffer[:0]
 	for time_before_pending := 300; time_before_pending >= 0; time_before_pending-- {
 		time.Sleep(10 * time.Millisecond)
 		clientsMutexCrash.Lock()
