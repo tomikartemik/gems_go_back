@@ -180,7 +180,7 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	for i := 100; i > 0; i-- {
+	for i := 1000; i > 0; i-- {
 		responseCrash.UsersBets = betsBuffer
 		responseCrash.TimeBeforeStart = strconv.Itoa(i/10) + "." + strconv.Itoa(i%10)
 		clientsMutexCrash.Lock()
@@ -194,7 +194,7 @@ func (s *CrashService) PreparingCrash() {
 		}
 		clientsMutexCrash.Unlock()
 		//betsBuffer = betsBuffer[:0]
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 	s.StartGameCrash()
 }
@@ -333,9 +333,7 @@ func getRandomElementsForCrash(arr []model.FakeBets) []model.FakeBets {
 	})
 
 	// Определяем количество случайных элементов (до половины длины массива)
-	//randomCount := rand.Intn(length/2) + 1
-	randomCount := 5
-
+	randomCount := rand.Intn(length/2) + 1
 	// Добавляем случайные элементы в результат
 	for i := 0; i < randomCount; i++ {
 		result = append(result, shuffled[i])
