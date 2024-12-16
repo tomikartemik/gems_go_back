@@ -9,7 +9,6 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -44,7 +43,7 @@ type ResponseCrash struct {
 	GameID          int                 `json:"game_id"`
 	Status          string              `json:"status"`
 	Multiplier      float64             `json:"multiplier"`
-	TimeBeforeStart string              `json:"timer"`
+	TimeBeforeStart float64             `json:"timer"`
 	UsersBets       []InfoAboutCrashBet `json:"users_bets"`
 }
 
@@ -70,7 +69,7 @@ type PreparingCrashData struct {
 
 var startCrash = false
 var betsAtLastCrashGame BetsAtLastCrashGame
-var responseCrash = ResponseCrash{0, "Crashed", 0.0, "10.0", []InfoAboutCrashBet{}}
+var responseCrash = ResponseCrash{0, "Crashed", 0.0, 10.0, []InfoAboutCrashBet{}}
 var clientsCrash = make(map[*ClientCrash]bool)
 var clientsMutexCrash = &sync.Mutex{}
 var winMultiplier = 0.0
@@ -164,7 +163,7 @@ func (s *CrashService) StartPreparingCrash() {
 	acceptingBetsCrash = true
 	responseCrash.Status = "Pending"
 	responseCrash.Multiplier = 0.0
-	responseCrash.TimeBeforeStart = "10.0"
+	responseCrash.TimeBeforeStart = 10.0
 	//responseCrash.TimeBeforeStart = time.Now().Add(10 * time.Second)
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
@@ -180,9 +179,10 @@ func (s *CrashService) StartPreparingCrash() {
 
 func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
-	for i := 1000; i > 0; i-- {
-		responseCrash.UsersBets = betsBuffer
-		responseCrash.TimeBeforeStart = strconv.Itoa(i/100) + "." + strconv.Itoa((i%100)/10)
+
+	for time_before_start := 1000.0; time_before_start >= 0; time_before_start-- {
+		time.Sleep(10 * time.Millisecond)
+		responseCrash.TimeBeforeStart = time_before_start / 100.0
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
@@ -193,8 +193,6 @@ func (s *CrashService) PreparingCrash() {
 			}
 		}
 		clientsMutexCrash.Unlock()
-		//betsBuffer = betsBuffer[:0]
-		time.Sleep(10 * time.Millisecond)
 	}
 	s.StartGameCrash()
 }
