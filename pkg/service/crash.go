@@ -182,7 +182,7 @@ func (s *CrashService) PreparingCrash() {
 	go s.GenerateFakeBetsCrash()
 	for i := 1000; i > 0; i-- {
 		responseCrash.UsersBets = betsBuffer
-		responseCrash.TimeBeforeStart = strconv.Itoa(i/10) + "." + strconv.Itoa(i%10)
+		responseCrash.TimeBeforeStart = strconv.Itoa(i/100) + "." + strconv.Itoa((i%100)/10)
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
 			err := client.conn.WriteJSON(responseCrash)
