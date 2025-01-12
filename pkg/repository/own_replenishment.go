@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
 )
@@ -18,11 +19,13 @@ func (r *OwnReplenishmentPostgres) CreateReplenishment(replenishment model.OwnRe
 	return r.db.Create(&replenishment).Error
 }
 
-func (r *OwnReplenishmentPostgres) GetReplenishments() ([]model.OwnReplenishment, error) {
+func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder string, page int) ([]model.OwnReplenishment, error) {
 	replenishments := []model.OwnReplenishment{}
 	err := r.db.
 		Find(&replenishments).
 		Where("status = Processing").
+		Order(fmt.Sprintf("id = %s", sortOrder)).
+		Offset(page * 10).
 		Error
 	if err != nil {
 		return nil, err
@@ -55,4 +58,13 @@ func (r *OwnReplenishmentPostgres) ChangeBalance(userID string, amount float64) 
 	}
 	user.Balance = user.Balance + amount
 	return r.db.Save(&user).Error
+}
+
+func (r *OwnReplenishmentPostgres) GetLastId() (int, error) {
+	var replenishment model.OwnReplenishment
+	err := r.db.Model(&replenishment).Last(&replenishment).Error
+	if err != nil {
+		return 0, err
+	}
+	return replenishment.ID, nil
 }

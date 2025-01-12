@@ -7,3 +7,8 @@ type OwnReplenishment struct {
 	ReceiptURL string  `json:"receipt_url"`
 	Status     string  `json:"status"`
 }
+
+type OwnReplenishmentOutput struct {
+	Replenishments []OwnReplenishment `json:"replenishments"`
+	PagesCount     int                `json:"pages_count"`
+}

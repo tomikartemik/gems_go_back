@@ -5,6 +5,7 @@ import (
 	"gems_go_back/pkg/model"
 	"gems_go_back/pkg/repository"
 	"github.com/google/uuid"
+	"math"
 	"mime/multipart"
 	"path/filepath"
 )
@@ -53,8 +54,20 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 	return fileURL, nil
 }
 
-func (s *OwnReplenishmentService) GetReplenishments() ([]model.OwnReplenishment, error) {
-	return s.repo.GetReplenishments()
+func (s *OwnReplenishmentService) GetReplenishments(sortOrder string, page int) (model.OwnReplenishmentOutput, error) {
+	lastID, err := s.repo.GetLastId()
+	if err != nil {
+		return model.OwnReplenishmentOutput{}, err
+	}
+	pagesCount := int(math.Ceil(float64(lastID) / float64(10)))
+	replenishments, err := s.repo.GetReplenishments(sortOrder, page)
+	if err != nil {
+		return model.OwnReplenishmentOutput{}, err
+	}
+	return model.OwnReplenishmentOutput{
+		replenishments,
+		pagesCount,
+	}, nil
 }
 
 func (s *OwnReplenishmentService) ChangeStatus(replenishmentID int, status string) error {
