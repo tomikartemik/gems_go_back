@@ -22,7 +22,7 @@ func (r *OwnReplenishmentPostgres) CreateReplenishment(replenishment model.OwnRe
 func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder string, page int) ([]model.OwnReplenishment, error) {
 	replenishments := []model.OwnReplenishment{}
 	err := r.db.
-		Where("status = Processing").
+		Where("status = ?", "Processing").
 		Order(fmt.Sprintf("id %s", sortOrder)).
 		Offset(page * 10).
 		Limit(10).
