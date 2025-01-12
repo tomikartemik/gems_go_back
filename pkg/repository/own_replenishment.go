@@ -20,7 +20,10 @@ func (r *OwnReplenishmentPostgres) CreateReplenishment(replenishment model.OwnRe
 
 func (r *OwnReplenishmentPostgres) GetReplenishments() ([]model.OwnReplenishment, error) {
 	replenishments := []model.OwnReplenishment{}
-	err := r.db.Find(&replenishments).Where("status = Processing").Error
+	err := r.db.
+		Find(&replenishments).
+		Where("status = Processing").
+		Error
 	if err != nil {
 		return nil, err
 	}
