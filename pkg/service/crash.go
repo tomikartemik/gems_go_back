@@ -164,6 +164,7 @@ func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Status = "Pending"
 	responseCrash.Multiplier = 0.0
 	responseCrash.TimeBeforeStart = 10.0
+	responseCrash.UsersBets = []InfoAboutCrashBet{}
 	//responseCrash.TimeBeforeStart = time.Now().Add(10 * time.Second)
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
