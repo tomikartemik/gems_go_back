@@ -164,7 +164,7 @@ func (s *CrashService) StartPreparingCrash() {
 	responseCrash.Status = "Pending"
 	responseCrash.Multiplier = 0.0
 	responseCrash.TimeBeforeStart = 10.0
-	responseCrash.UsersBets = []InfoAboutCrashBet{}
+	responseCrash.UsersBets = betsAtLastCrashGame.Bets
 	//responseCrash.TimeBeforeStart = time.Now().Add(10 * time.Second)
 	u = rand.Float64()
 	winMultiplier = math.Pow(1-u, -1/2.25)
@@ -274,6 +274,7 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		infoAboutCrashBet,
 	)
 	betsBuffer = append(betsBuffer, infoAboutCrashBet)
+	responseCrash.UsersBets = betsBuffer
 	//clientsMutexCrash.Lock()
 	//for client := range clientsCrash {
 	//	err := client.conn.WriteJSON(infoAboutCrashBet)
