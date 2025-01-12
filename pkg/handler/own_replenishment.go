@@ -32,8 +32,8 @@ func (h *Handler) CreateOwnReplenishment(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) GetReplenishments(c *gin.Context, id, amount, date) {
-	replenishments, err := h.services.GetReplenishments(id, amount, date)
+func (h *Handler) GetReplenishments(c *gin.Context) {
+	replenishments, err := h.services.GetReplenishments()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
