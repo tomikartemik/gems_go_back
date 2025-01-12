@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"gems_go_back/pkg/model"
 	"gorm.io/gorm"
 )
@@ -22,9 +21,10 @@ func (r *OwnReplenishmentPostgres) CreateReplenishment(replenishment model.OwnRe
 func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder string, page int) ([]model.OwnReplenishment, error) {
 	replenishments := []model.OwnReplenishment{}
 	err := r.db.
-		Where("status = Processing").
-		Order(fmt.Sprintf("id = %s", sortOrder)).
+		Where("status = ?", "Processing").
+		Order(sortOrder).
 		Offset(page * 10).
+		Limit(10).
 		Find(&replenishments).
 		Error
 	if err != nil {
