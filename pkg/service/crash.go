@@ -183,6 +183,7 @@ func (s *CrashService) PreparingCrash() {
 
 	for time_before_start := 100.0; time_before_start >= 0; time_before_start-- {
 		time.Sleep(100 * time.Millisecond)
+		responseCrash.UsersBets = betsAtLastCrashGame.Bets
 		responseCrash.TimeBeforeStart = time_before_start / 10.0
 		clientsMutexCrash.Lock()
 		for client := range clientsCrash {
