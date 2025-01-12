@@ -275,7 +275,6 @@ func (s *CrashService) AddBetCrashToResponse(userId string, amount float64) {
 		infoAboutCrashBet,
 	)
 	betsBuffer = append(betsBuffer, infoAboutCrashBet)
-	responseCrash.UsersBets = betsBuffer
 	//clientsMutexCrash.Lock()
 	//for client := range clientsCrash {
 	//	err := client.conn.WriteJSON(infoAboutCrashBet)
