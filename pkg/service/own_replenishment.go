@@ -13,10 +13,11 @@ import (
 type OwnReplenishmentService struct {
 	repo        repository.OwnReplenishment
 	repoReceipt repository.Receipt
+	repoUser    repository.User
 }
 
-func NewOwnReplenishmentService(repo repository.OwnReplenishment, repoReceipt repository.Receipt) *OwnReplenishmentService {
-	return &OwnReplenishmentService{repo: repo, repoReceipt: repoReceipt}
+func NewOwnReplenishmentService(repo repository.OwnReplenishment, repoReceipt repository.Receipt, repoUser repository.User) *OwnReplenishmentService {
+	return &OwnReplenishmentService{repo: repo, repoReceipt: repoReceipt, repoUser: repoUser}
 }
 
 func (s *OwnReplenishmentService) CreateReplenishment(amount float64, userID string, file *multipart.FileHeader) error {
@@ -55,19 +56,43 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 }
 
 func (s *OwnReplenishmentService) GetReplenishments(sortOrder string, page int) (model.OwnReplenishmentOutput, error) {
+	ownReplOutput := model.OwnReplenishmentOutput{}
 	lastID, err := s.repo.GetLastId()
 	if err != nil {
 		return model.OwnReplenishmentOutput{}, err
 	}
 	pagesCount := int(math.Ceil(float64(lastID) / float64(10)))
-	replenishments, err := s.repo.GetReplenishments(sortOrder, page)
+	repls, err := s.repo.GetReplenishments(sortOrder, page)
 	if err != nil {
-		return model.OwnReplenishmentOutput{}, err
+		return ownReplOutput, err
 	}
-	return model.OwnReplenishmentOutput{
-		replenishments,
-		pagesCount,
-	}, nil
+	var responses []model.OwnReplenishmentsResponse
+
+	for _, repl := range repls {
+		user, err := s.repoUser.GetUserById(repl.UserId)
+		username := user.Username
+		if err != nil {
+			username = ""
+		}
+
+		response := model.OwnReplenishmentsResponse{
+			ID:         repl.ID,
+			UserId:     repl.UserId,
+			Username:   username,
+			Amount:     repl.Amount,
+			ReceiptURL: repl.ReceiptURL,
+			Status:     repl.Status,
+		}
+
+		responses = append(responses, response)
+	}
+
+	ownReplOutput = model.OwnReplenishmentOutput{
+		Replenishments: responses,
+		PagesCount:     pagesCount,
+	}
+
+	return ownReplOutput, nil
 }
 
 func (s *OwnReplenishmentService) ChangeStatus(replenishmentID int, status string) error {

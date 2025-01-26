@@ -146,7 +146,7 @@ func NewService(repos *repository.Repository) *Service {
 		Online:           NewOnlineService(repos.Online),
 		Drop:             NewDropService(repos.Drop),
 		Admin:            NewAdminService(repos.Admin),
-		OwnReplenishment: NewOwnReplenishmentService(repos.OwnReplenishment, repos.Receipt),
+		OwnReplenishment: NewOwnReplenishmentService(repos.OwnReplenishment, repos.Receipt, repos.User),
 		Card:             NewCardService(repos.Card),
 		FakeBet:          NewFakeBetService(repos.FakeBets),
 	}
