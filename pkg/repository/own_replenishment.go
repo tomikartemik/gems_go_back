@@ -19,13 +19,11 @@ func (r *OwnReplenishmentPostgres) CreateReplenishment(replenishment model.OwnRe
 	return r.db.Create(&replenishment).Error
 }
 
-func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder, status string, page int) ([]model.OwnReplenishment, error) {
+func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder, status string) ([]model.OwnReplenishment, error) {
 	replenishments := []model.OwnReplenishment{}
 	if status == "" {
 		err := r.db.
 			Order(fmt.Sprintf("id %s", sortOrder)).
-			Offset((page - 1) * 10).
-			Limit(10).
 			Find(&replenishments).
 			Error
 		if err != nil {
@@ -35,8 +33,6 @@ func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder, status string, p
 		err := r.db.
 			Where("status = ?", status).
 			Order(fmt.Sprintf("id %s", sortOrder)).
-			Offset((page - 1) * 10).
-			Limit(10).
 			Find(&replenishments).
 			Error
 		if err != nil {

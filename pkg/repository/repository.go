@@ -116,7 +116,7 @@ type Admin interface {
 
 type OwnReplenishment interface {
 	CreateReplenishment(replenishment model.OwnReplenishment) error
-	GetReplenishments(sortOrder, status string, page int) ([]model.OwnReplenishment, error)
+	GetReplenishments(sortOrder, status string) ([]model.OwnReplenishment, error)
 	ChangeStatus(replenishmentID int, status string) (model.OwnReplenishment, error)
 	ChangeBalance(userID string, amount float64) error
 	GetLastId() (int, error)

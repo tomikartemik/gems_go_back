@@ -56,14 +56,23 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 }
 
 func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, page int) (model.OwnReplenishmentOutput, error) {
+	var responses []model.OwnReplenishmentsResponse
+	var choosenItems []model.OwnReplenishment
 	ownReplOutput := model.OwnReplenishmentOutput{}
-	repls, err := s.repo.GetReplenishments(sortOrder, status, page)
+	repls, err := s.repo.GetReplenishments(sortOrder, status)
 	if err != nil {
 		return ownReplOutput, err
 	}
-	var responses []model.OwnReplenishmentsResponse
 
-	for _, repl := range repls {
+	page = page - 1
+
+	if page*10 > len(repls) {
+		choosenItems = repls[page*10:]
+	} else {
+		choosenItems = repls[page*10 : page*10+10]
+	}
+
+	for _, repl := range choosenItems {
 		user, err := s.repoUser.GetUserById(repl.UserId)
 		username := user.Username
 		if err != nil {
