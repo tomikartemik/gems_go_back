@@ -34,7 +34,7 @@ func (h *Handler) CreateOwnReplenishment(c *gin.Context) {
 
 func (h *Handler) GetReplenishments(c *gin.Context) {
 	sortOrder := c.DefaultQuery("sort_order", "ASC")
-	page := c.DefaultQuery("page", "0")
+	page := c.DefaultQuery("page", "1")
 	pageInt, pageErr := strconv.Atoi(page)
 	status := c.DefaultQuery("status", "")
 	if pageErr != nil {
