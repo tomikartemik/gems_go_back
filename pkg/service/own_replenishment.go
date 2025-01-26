@@ -55,14 +55,9 @@ func (s *OwnReplenishmentService) uploadReceipt(file *multipart.FileHeader) (str
 	return fileURL, nil
 }
 
-func (s *OwnReplenishmentService) GetReplenishments(sortOrder string, page int) (model.OwnReplenishmentOutput, error) {
+func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, page int) (model.OwnReplenishmentOutput, error) {
 	ownReplOutput := model.OwnReplenishmentOutput{}
-	lastID, err := s.repo.GetLastId()
-	if err != nil {
-		return model.OwnReplenishmentOutput{}, err
-	}
-	pagesCount := int(math.Ceil(float64(lastID) / float64(10)))
-	repls, err := s.repo.GetReplenishments(sortOrder, page)
+	repls, err := s.repo.GetReplenishments(sortOrder, status, page)
 	if err != nil {
 		return ownReplOutput, err
 	}
@@ -89,7 +84,7 @@ func (s *OwnReplenishmentService) GetReplenishments(sortOrder string, page int) 
 
 	ownReplOutput = model.OwnReplenishmentOutput{
 		Replenishments: responses,
-		PagesCount:     pagesCount,
+		PagesCount:     int(math.Ceil(float64(len(responses)) / float64(10))),
 	}
 
 	return ownReplOutput, nil

@@ -105,7 +105,7 @@ type Admin interface {
 
 type OwnReplenishment interface {
 	CreateReplenishment(amount float64, userID string, file *multipart.FileHeader) error
-	GetReplenishments(sortOrder string, page int) (model.OwnReplenishmentOutput, error)
+	GetReplenishments(sortOrder, status string, page int) (model.OwnReplenishmentOutput, error)
 	ChangeStatus(replenishmentID int, status string) error
 }
 

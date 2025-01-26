@@ -33,14 +33,15 @@ func (h *Handler) CreateOwnReplenishment(c *gin.Context) {
 }
 
 func (h *Handler) GetReplenishments(c *gin.Context) {
-	sortOrder := c.Query("sort_order")
+	sortOrder := c.DefaultQuery("sort_order", "ASC")
 	page := c.DefaultQuery("page", "0")
 	pageInt, pageErr := strconv.Atoi(page)
+	status := c.DefaultQuery("status", "")
 	if pageErr != nil {
 		newErrorResponse(c, http.StatusUnprocessableEntity, pageErr.Error())
 		return
 	}
-	replenishments, err := h.services.GetReplenishments(sortOrder, pageInt)
+	replenishments, err := h.services.GetReplenishments(sortOrder, status, pageInt)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
