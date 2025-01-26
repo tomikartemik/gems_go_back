@@ -24,7 +24,7 @@ func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder, status string, p
 	if status == "" {
 		err := r.db.
 			Order(fmt.Sprintf("id %s", sortOrder)).
-			Offset(page - 1*10).
+			Offset((page - 1) * 10).
 			Limit(10).
 			Find(&replenishments).
 			Error
@@ -35,7 +35,7 @@ func (r *OwnReplenishmentPostgres) GetReplenishments(sortOrder, status string, p
 		err := r.db.
 			Where("status = ?", status).
 			Order(fmt.Sprintf("id %s", sortOrder)).
-			Offset(page - 1*10).
+			Offset((page - 1) * 10).
 			Limit(10).
 			Find(&replenishments).
 			Error
