@@ -72,6 +72,12 @@ func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, pa
 		choosenItems = repls[page*10 : page*10+10]
 	}
 
+	if page*10 > len(repls) {
+		choosenItems = repls[page*10-1:]
+	} else {
+		choosenItems = repls[page*10-1 : page*10+10]
+	}
+
 	for _, repl := range choosenItems {
 		user, err := s.repoUser.GetUserById(repl.UserId)
 		username := user.Username
