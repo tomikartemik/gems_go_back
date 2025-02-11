@@ -64,14 +64,6 @@ func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, pa
 		return ownReplOutput, err
 	}
 
-	page = page - 1
-
-	if page*10 > len(repls) {
-		choosenItems = repls[page*10:]
-	} else {
-		choosenItems = repls[page*10 : page*10+10]
-	}
-
 	if page*10 > len(repls) {
 		choosenItems = repls[page*10-1:]
 	} else {
