@@ -64,11 +64,14 @@ func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, pa
 		return ownReplOutput, err
 	}
 
-	if page*10 > len(repls) {
-		choosenItems = repls[page*10-1:]
-	} else {
-		choosenItems = repls[page*10-1 : page*10+10]
+	start := (page - 1) * 10
+	end := start + 10
+
+	if end > len(repls) {
+		end = len(repls)
 	}
+
+	choosenItems = repls[start:end]
 
 	for _, repl := range choosenItems {
 		user, err := s.repoUser.GetUserById(repl.UserId)
