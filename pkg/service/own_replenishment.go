@@ -93,7 +93,7 @@ func (s *OwnReplenishmentService) GetReplenishments(sortOrder, status string, pa
 
 	ownReplOutput = model.OwnReplenishmentOutput{
 		Replenishments: responses,
-		PagesCount:     int(math.Ceil(float64(len(responses)) / float64(10))),
+		PagesCount:     int(math.Ceil(float64(len(repls)) / float64(10))),
 	}
 
 	return ownReplOutput, nil
