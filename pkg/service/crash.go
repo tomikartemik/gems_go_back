@@ -294,7 +294,7 @@ func (s *CrashService) UpdateSavedBetCrash(userId string, multiplier float64) {
 			currentMultiplier := math.Round(multiplier*100.0) / 100.0
 			betsAtLastCrashGame.Bets[betsInCurrentGame].UserMultiplier = currentMultiplier
 			betsAtLastCrashGame.Bets[betsInCurrentGame].Winning = currentWinning
-			betsBuffer = append(betsBuffer, betsAtLastCrashGame.Bets[betsInCurrentGame])
+			betsBuffer[betsAtLastCrashGame.Bets[betsInCurrentGame].Index] = betsAtLastCrashGame.Bets[betsInCurrentGame]
 			//clientsMutexCrash.Lock()
 			//for client := range clientsCrash {
 			//	err := client.conn.WriteJSON(betsAtLastCrashGame.Bets[betsInCurrentGame])
