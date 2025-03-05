@@ -282,7 +282,7 @@ func (s *RouletteService) AddRouletteBetToResponse(userID string, amount float64
 
 func getRandomElementsForRoulette(arr []model.FakeBets) []model.FakeBets {
 	// Получаем длину массива
-	length := len(arr) / 2
+	length := len(arr) / 3
 
 	// Инициализируем генератор случайных чисел
 	rand.Seed(time.Now().UnixNano())
