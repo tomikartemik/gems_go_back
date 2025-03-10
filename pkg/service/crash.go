@@ -333,8 +333,8 @@ func getRandomElementsForCrash(arr []model.FakeBets) []model.FakeBets {
 	})
 
 	// Определяем количество случайных элементов (до половины длины массива)
-	randomCount := 5
-	//randomCount := rand.Intn(length/2) + 1
+	//randomCount := 5
+	randomCount := rand.Intn(length/2) + 1
 	// Добавляем случайные элементы в результат
 	for i := 0; i < randomCount; i++ {
 		result = append(result, shuffled[i])
